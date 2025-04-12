@@ -1,0 +1,134 @@
+.textInputOutline {
+    border: 1px solid black;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.textInputOutline:focus-within {
+    border-color: transparent;
+    outline: none;
+    box-shadow: 0 0 12px var(--mantine-color-mainPurple-6);
+    border-radius: 12px;
+}
+
+/* Combined pseudo-elements and animations */
+.textInputOutline:focus-within::before,
+.textInputOutline:focus-within::after {
+    content: '';
+    position: absolute;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.textInputOutline:focus-within::before {
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+            135deg,
+            var(--mantine-color-mainPurple-8) 0%,
+            var(--mantine-color-mainPurple-6) 25%,
+            var(--mantine-color-mainPurple-4) 50%,
+            var(--mantine-color-mainPurple-6) 75%,
+            var(--mantine-color-mainPurple-8) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite,
+    morphing 10s ease-in-out infinite alternate,
+    glow 4s ease-in-out infinite alternate;
+}
+
+.textInputOutline:focus-within::after {
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 4px;
+    animation: breathe 3s ease-in-out infinite;
+}
+
+/* Combined keyframes */
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes morphing {
+    0%, 100% { border-radius: 8px; }
+    25% { border-radius: 10px 6px 12px 6px; }
+    50% { border-radius: 6px 12px 6px 10px; }
+    75% { border-radius: 12px 6px 10px 6px; }
+}
+
+@keyframes glow {
+    0% { box-shadow: 0 0 8px var(--mantine-color-mainPurple-6); }
+    50% { box-shadow: 0 0 16px var(--mantine-color-mainPurple-6), 0 0 20px var(--mantine-color-mainPurple-4); }
+    100% { box-shadow: 0 0 8px var(--mantine-color-mainPurple-6); }
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.995); }
+}
+
+.textInputLabel {
+    font-weight: 400;
+    padding-bottom: 5px;
+    font-size: 15px;
+}
+
+.textInputAsterisk {
+    font-family: "Noto Sans", sans-serif;
+    color: var(--mantine-color-mainPurple-6);
+}
+
+
+/* chips */
+
+.chipCheckIcon {
+    display: none; /* Hide the default checkmark */
+}
+
+.chipIconWrapper {
+    width: 0; /* Remove space reserved for the icon */
+    margin: 0;
+}
+.chipLabel {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 13px;
+    /* Default state handled by Mantine's outline variant */
+}
+.chipLabel[data-checked] {
+    /* Styles for the selected chip's label */
+    background-color: var(--mantine-color-lightPurple-7);
+    border-color: transparent; /* Remove border when selected */
+    color: var(--mantine-color-black); /* Ensure text is readable */
+}
+
+.chipLabel[data-checked]:hover {
+    /* Hover state for the selected chip's label */
+    background-color: var(--mantine-color-lightPurple-8); /* Slightly darker on hover */
+}
+
+.chipLabel:not([data-checked]):hover {
+    /* Hover state for non-selected chips */
+    background-color: var(--mantine-color-lightPurple-3); /* Light hover effect */
+}
+
+.chipLabel:not([data-checked]) {
+    /* Explicitly set border for non-selected chips to ensure consistency */
+    /* Note: Mantine's outline variant usually handles this, but explicit definition can prevent issues */
+    border: 1px solid black !important; /* Use !important cautiously if needed to override Mantine styles */
+    border-radius: 5px; /* Match the radius defined in the component props */
+    color: var(--mantine-color-black); /* Ensure text color is black */
+}
+
+/* Optional: Style for the root chip element if needed */
+.chipRoot {
+    /* Add styles for the root element if necessary */
+}

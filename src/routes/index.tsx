@@ -1,0 +1,40 @@
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from '../components/ProtectedRoute';
+import LogInPage from '@components/pages/auth/LogInPage/LogInPage';
+import LandingPage from "@components/pages/LandingPage/LandingPage.tsx";
+import DashboardPage from "@components/pages/Dashboard/DashboardPage.tsx";
+import ProjectPage from "@components/pages/ProjectPage/ProjectPage.tsx";
+import SuccessPage from "@components/pages/SuccessPage/SuccessPage.tsx";
+import CreateProjectPage from "@components/pages/CreateProjectPage/CreateProjectPage.tsx";
+import ProfilePage from "@components/pages/ProfilePage/ProfilePage.tsx";
+import AboutUsPage from "@components/static/AboutUs/AboutUs.tsx";
+import PrivacyAndTermsPage from "@components/static/PrivacyAndTerms/PrivacyAndTerms.tsx";
+
+export const AppRouter: React.FC = () => {
+    return (
+        <Routes>
+            {/* Public routes */}
+            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/login" element={<LogInPage />} />
+            <Route path="/AboutUs" element={<AboutUsPage />} />
+            <Route path="/Privacy" element={<PrivacyAndTermsPage />} />
+
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/project" element={<ProjectPage />} />
+                <Route path="/submitted" element={<SuccessPage />} />
+                <Route path="/create-project" element={<CreateProjectPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+
+            </Route>
+
+            {/* Redirect root to dashboard if authenticated, otherwise to login */}
+            <Route path="/" element={<Navigate to="/landing" replace />} />
+
+            {/* 404 route */}
+            {/*<Route path="*" element={<NotFound />} />*/}
+        </Routes>
+    );
+};

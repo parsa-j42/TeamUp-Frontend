@@ -1,0 +1,32 @@
+/* Base styles for the inner label */
+.innerLabel {
+    transition: color 0.2s ease;
+}
+
+/* Style for active inner labels */
+.label[data-active="true"] {
+    color: white !important;
+}
+
+/* In case you need additional label styling */
+.label {
+    color: #ff8383;
+    font-weight: 500;
+}
+
+/* Additional styling for control elements if needed */
+.control {
+    border: 2px solid #ff8383;
+    border-right: 0;
+}
+
+.control:last-of-type {
+    border-right: 2px solid #ff8383;
+}
+
+/* For the active indicator */
+.indicator {
+    background-color: #553fc4;
+    border-radius:0;
+    border: none;
+}
