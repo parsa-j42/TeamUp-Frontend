@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Text, Button } from '@mantine/core';
 import classes from './CapConPage.module.css';
-import { IconBrandLinkedinFilled } from '@tabler/icons-react';
+import { IconBrandLinkedinFilled, IconBrandFigma, IconWorld } from '@tabler/icons-react';
 
 // Wave decoration for header
 const HeaderWave = () => (
@@ -64,6 +64,34 @@ const CapConPage: React.FC = () => {
                         Team Up
                     </Text>
 
+                    {/* Website and Figma links */}
+                    <Box className={classes.headerButtonsContainer}>
+                        <Button
+                            component="a"
+                            href="https://www.figma.com/proto/BNzSnL2hmirBBRYGv35Tsp/Capstone-Wireframe?node-id=0-1&t=v2j67LxFVFVBDRNc-1"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            py="1px"
+                            className={classes.headerButton}
+                            leftSection={<IconBrandFigma size={18} />}
+                        >
+                            Figma Prototype - Mobile
+                        </Button>
+
+
+                        <Button
+                            component="a"
+                            href="https://TeamUpSAIT.tech/landing"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            py="1px"
+                            className={classes.headerButton}
+                            leftSection={<IconWorld size={18} />}
+                        >
+                            Our Website - Desktop
+                        </Button>
+                    </Box>
+
                     <HeaderWave />
                 </Box>
 
@@ -89,7 +117,9 @@ const CapConPage: React.FC = () => {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={classes.linkedinBtn}
-                                    leftSection={<IconBrandLinkedinFilled color="#0077b5" />}
+                                    leftSection={<IconBrandLinkedinFilled size={18} />}
+                                    w="80%"
+                                    mx="auto"
                                 >
                                     Connect
                                 </Button>
