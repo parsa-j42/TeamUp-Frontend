@@ -133,6 +133,4 @@ dist
 
 .vite_cache/
 
-.yarn/releases/
-
 .idea/
