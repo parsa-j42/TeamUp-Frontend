@@ -1,0 +1,254 @@
+/* Base container */
+.pageWrapper {
+    min-height: 100vh;
+    background-color: #f7f7f7;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 40px 20px;
+}
+
+/* Main content container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* Header section */
+.header {
+    padding: 60px 40px;
+    background: linear-gradient(120deg, #6c63ff 0%, #5046e4 100%);
+    text-align: center;
+    position: relative;
+}
+
+.headerWave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    fill: white;
+}
+
+.title {
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.projectBadge {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 50px;
+    margin-top: 20px;
+    display: inline-block;
+    backdrop-filter: blur(4px);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Team section */
+.teamSection {
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.teamHeading {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 50px;
+    position: relative;
+    display: inline-block;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.teamHeading::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background-color: #6c63ff;
+    border-radius: 3px;
+}
+
+/* Team grid and cards */
+.teamGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.memberCard {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    border: 1px solid #eee;
+}
+
+.memberCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: #6c63ff;
+}
+
+/* Profile image/initial */
+.profileCircle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 30px auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #6c63ff 0%, #5046e4 100%);
+    color: white;
+    font-size: 50px;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.profileCircle::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5046e4 0%, #6c63ff 100%);
+    z-index: -1;
+}
+
+/* Member info */
+.memberName {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 5px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.memberTitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* LinkedIn button */
+.linkedinBtn {
+    margin-top: auto;
+    margin-bottom: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: transparent;
+    color: #0077b5;
+    border: 2px solid #0077b5;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.linkedinBtn:hover {
+    background-color: #0077b5;
+    color: white;
+}
+
+.linkedinIcon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Footer */
+.footer {
+    padding: 30px 40px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.footerHighlight {
+    color: #6c63ff;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header {
+        padding: 40px 20px;
+    }
+
+    .title {
+        font-size: 36px;
+    }
+
+    .teamSection {
+        padding: 40px 20px;
+    }
+
+    .profileCircle {
+        width: 100px;
+        height: 100px;
+        font-size: 40px;
+    }
+}
+
+/* Decorative elements */
+.dots {
+    position: absolute;
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.dotsTop {
+    top: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    background-image: radial-gradient(circle, white 1px, transparent 2px);
+    background-size: 20px 20px;
+}
+
+.dotsBottom {
+    bottom: 20px;
+    left: 20px;
+    width: 100px;
+    height: 100px;
+    background-image: radial-gradient(circle, white 1px, transparent 2px);
+    background-size: 16px 16px;
+}

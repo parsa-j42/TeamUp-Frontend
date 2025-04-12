@@ -18,6 +18,17 @@ const AppContent = () => {
     const routesWithoutFooter = ['/login',];
     const shouldShowFooter = !routesWithoutFooter.includes(location.pathname);
 
+    // Temporary for CapCon
+    const standaloneRoutes = ['/CapCon'];
+    const isStandalone = standaloneRoutes.some(route =>
+        location.pathname === route || location.pathname.startsWith(`${route}/`)
+    );
+
+    if (isStandalone) {
+        return <AppRouter />;
+    }
+    // End of temporary for CapCon
+
     return (
         <AppShell
             header={{
