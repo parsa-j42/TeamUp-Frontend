@@ -12,11 +12,11 @@ import {
     Paper,
     ThemeIcon,
     Divider,
-    Button, // Added Button
-    Select, // Added Select
-    SegmentedControl, // Added SegmentedControl for filters
+    Button,
+    Select,
+    SegmentedControl,
 } from '@mantine/core';
-// Removed RoundedButton as it's not used in this section
+
 import WavyBackground from '@components/shared/WavyBackground/WavyBackground.tsx';
 import MyProjectList from "@components/shared/MyProjectsList.tsx";
 import {
@@ -27,7 +27,7 @@ import {
     IconPhoto,
     IconPointFilled,
     IconCircleDashed,
-    IconChevronDown, // Added for Select dropdown
+    IconChevronDown, 
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import {useNavigate} from "react-router-dom";

@@ -1,6 +1,6 @@
 import {Button, Group} from "@mantine/core";
 import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
-import {useAuth} from "../../../contexts/AuthContext.tsx";
+import {useAuth} from "@contexts/AuthContext.tsx";
 
 export function LoggedOut() {
     const { login } = useAuth();

@@ -1,7 +1,7 @@
 import { Box, Chip, Group, Title } from '@mantine/core';
 import { LabelWithAsterisk } from './LabelWithAsterisk';
-import styles from '../CreateProjectPage.module.css'; // Adjust path relative to this file
-import type { FormOption } from '../formConstants.ts'; // Import the type
+import styles from '../CreateProjectPage.module.css';
+import type { FormOption } from '../formConstants.ts';
 
 interface ChipGroupFieldProps {
     label?: string; // Optional standard label text

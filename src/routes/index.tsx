@@ -1,6 +1,7 @@
 import React from 'react';
 import {Routes, Route, Navigate, useLocation} from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
+
 import LogInPage from '@components/pages/auth/LogInPage/LogInPage';
 import LandingPage from "@components/pages/LandingPage/LandingPage.tsx";
 import DashboardPage from "@components/pages/Dashboard/DashboardPage.tsx";

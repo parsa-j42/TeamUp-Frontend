@@ -1,6 +1,6 @@
 import {Avatar, Box, Button, Group, Menu, Title} from "@mantine/core";
 import { useNavigate } from 'react-router-dom';
-import {useAuth} from "../../../contexts/AuthContext.tsx";
+import {useAuth} from "@contexts/AuthContext.tsx";
 import {
     IconLayoutDashboardFilled,
     IconLogout,

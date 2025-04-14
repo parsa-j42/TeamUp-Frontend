@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Container, Title, Text, Paper } from '@mantine/core';
-import { useAuth } from '../../../../contexts/AuthContext';
+import { useAuth } from '@contexts/AuthContext.tsx';
 
 interface LocationState {
     from?: {

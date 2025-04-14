@@ -5,7 +5,7 @@ import { useHeadroom } from "@mantine/hooks";
 import { NavBar } from "@components/layout/NavBar/NavBar.tsx";
 import { AppRouter } from "./routes";
 import { BrowserRouter, useLocation } from "react-router-dom";
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from '@contexts/AuthContext';
 import {ShellFooter} from "@components/layout/ShellFooter/ShellFooter.tsx";
 import './global.css';
 

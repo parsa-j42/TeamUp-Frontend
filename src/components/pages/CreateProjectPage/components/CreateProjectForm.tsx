@@ -10,13 +10,13 @@ import {
     Text,
 } from '@mantine/core';
 import { ChipGroupField } from './ChipGroupField';
-import styles from '../CreateProjectPage.module.css'; // Adjust path relative to this file
+import styles from '../CreateProjectPage.module.css';
 import {
     numOfMembersFormOptions,
     projectTypeFormOptions,
     mentorRequestFormOptions,
     preferredMentorFormOptions
-} from '../formConstants.ts'; // Import options
+} from '../formConstants.ts';
 
 /**
  * Renders the main form for creating a new project.
