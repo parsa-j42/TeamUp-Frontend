@@ -1,13 +1,13 @@
 import { Avatar, Box, Menu, Title } from "@mantine/core";
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from "../../../contexts/AuthContext";
+import { useAuth } from "@contexts/AuthContext";
 import {
     IconLayoutDashboardFilled,
     IconLogout,
     IconSettings,
     IconUser
 } from "@tabler/icons-react";
-import styles from './NavBar.module.css';
+import styles from '../NavBar.module.css';
 
 interface ProfileMenuProps {
     userName?: string;
