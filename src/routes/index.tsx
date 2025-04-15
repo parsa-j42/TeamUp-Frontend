@@ -31,10 +31,10 @@ export const AppRouter: React.FC = () => {
         <Routes>
             {/* Public routes */}
             <Route path="/landing" element={<LandingPage />} />
-            <Route path="/login" element={<LogInPage />} />
             <Route path="/AboutUs" element={<AboutUsPage />} />
             <Route path="/Privacy" element={<PrivacyAndTermsPage />} />
             <Route path="/SignUp" element={<SignUpPage />} />
+            <Route path="/LogIn" element={<LogInPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
