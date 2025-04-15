@@ -34,11 +34,14 @@ export function RoundedButton({
     const formattedTextColor = textColor && textColor.includes('.')
         ? `var(--mantine-color-${textColor.replace('.', '-')})`
         : textColor;
+    const formattedColor = color && color.includes('.')
+        ? `var(--mantine-color-${color.replace('.', '-')})`
+        : textColor;
 
     const styles = {
         root: {
             ...(borderWidth !== undefined && variant === 'outline' && {
-                border: `${borderWidth}px solid`,
+                border: `${borderWidth}px solid ${formattedColor}`,
             }),
             ...(formattedTextColor && { color: formattedTextColor }),
         },
