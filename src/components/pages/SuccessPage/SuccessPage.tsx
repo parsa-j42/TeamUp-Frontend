@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Text, useMantineTheme } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { DecorativeCircle } from './components/DecorativeCircle'; // Import the decorative circle component
+import { DecorativeCircle } from './components/DecorativeCircle';
 
 /**
  * Displays a success confirmation message to the user after an action

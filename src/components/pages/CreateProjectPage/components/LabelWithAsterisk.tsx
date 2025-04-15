@@ -1,5 +1,5 @@
 import { Group, Text, Title } from '@mantine/core';
-import styles from '../CreateProjectPage.module.css'; // Adjust path relative to this file
+import styles from '../CreateProjectPage.module.css';
 
 interface LabelWithAsteriskProps {
     children: React.ReactNode;

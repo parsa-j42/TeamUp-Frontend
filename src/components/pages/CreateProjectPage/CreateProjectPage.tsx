@@ -4,8 +4,8 @@ import {
     Title,
     useMantineTheme,
 } from '@mantine/core';
-import WavyBackground from '@components/shared/WavyBackground/WavyBackground'; // Assuming this path is correct relative to src/
-import { CreateProjectForm } from './components/CreateProjectForm'; // Import the extracted form component
+import WavyBackground from '@components/shared/WavyBackground/WavyBackground';
+import { CreateProjectForm } from './components/CreateProjectForm';
 
 // Define the SVG path for the wave shape
 // This path creates the top curved edge of the white content area

@@ -12,10 +12,10 @@ import {
     Title,
     useMantineTheme,
 } from '@mantine/core';
-import WavyBackground from '@components/shared/WavyBackground/WavyBackground'; // Adjust path as needed
+import WavyBackground from '@components/shared/WavyBackground/WavyBackground';
 import { useNavigate } from "react-router-dom";
 import { ProjectSectionCard } from './components/ProjectSectionCard';
-import { projectData, WAVE_PATH } from './projectPageConstants'; // Import data and constants
+import { projectData, WAVE_PATH } from './projectPageConstants';
 
 /**
  * Renders the detailed view of a specific project.

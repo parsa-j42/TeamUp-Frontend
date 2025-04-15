@@ -5,7 +5,7 @@ import {
     Text,
     Title,
     useMantineTheme,
-    Anchor, // Import Anchor for the email link
+    Anchor,
 } from '@mantine/core';
 import React from 'react';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Routes, Route, Navigate, useLocation} from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
+
 import LogInPage from '@components/pages/auth/LogInPage/LogInPage';
 import LandingPage from "@components/pages/LandingPage/LandingPage.tsx";
 import DashboardPage from "@components/pages/Dashboard/DashboardPage.tsx";
@@ -11,6 +12,7 @@ import ProfilePage from "@components/pages/ProfilePage/ProfilePage.tsx";
 import AboutUsPage from "@components/static/AboutUs/AboutUs.tsx";
 import PrivacyAndTermsPage from "@components/static/PrivacyAndTerms/PrivacyAndTerms.tsx";
 import CapConPage from "@components/static/CapConPage/CapConPage.tsx";
+import SignUpPage from "@components/pages/auth/SignUpPage/SignUpPage.tsx";
 
 export const AppRouter: React.FC = () => {
     // Temporary for CapCon
@@ -29,9 +31,10 @@ export const AppRouter: React.FC = () => {
         <Routes>
             {/* Public routes */}
             <Route path="/landing" element={<LandingPage />} />
-            <Route path="/login" element={<LogInPage />} />
             <Route path="/AboutUs" element={<AboutUsPage />} />
             <Route path="/Privacy" element={<PrivacyAndTermsPage />} />
+            <Route path="/SignUp" element={<SignUpPage />} />
+            <Route path="/LogIn" element={<LogInPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>

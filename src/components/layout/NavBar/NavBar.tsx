@@ -2,7 +2,7 @@ import {AppShell, Group, Image, TextInput, rem} from "@mantine/core";
 import {LoggedIn} from "@components/layout/NavBar/LoggedIn.tsx";
 import {LoggedOut} from "@components/layout/NavBar/LoggedOut.tsx";
 import {IconSearch} from "@tabler/icons-react";
-import {useAuth} from "../../../contexts/AuthContext.tsx";
+import {useAuth} from "@contexts/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
 
 export function NavBar() {
@@ -20,7 +20,7 @@ export function NavBar() {
                        src="/TeamUpLogo.png" alt="TeamUp Logo"
                        style={{ cursor: 'pointer' }}
                        onClick={handleLogoClick}/>
-                    <Group h="100%" p="0" justify="space-between" gap="xs" wrap="nowrap" pl="60px" flex="1">
+                <Group h="100%" p="0" justify="space-between" gap="xs" wrap="nowrap" pl="60px" flex="1">
                     <TextInput
                         placeholder="Search..."
                         w="35%"
@@ -43,7 +43,7 @@ export function NavBar() {
                         })}
                     />
                     {isAuthenticated ? <LoggedIn /> : <LoggedOut />}
-                    </Group>
+                </Group>
             </Group>
         </AppShell.Header>
     );

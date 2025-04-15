@@ -13,15 +13,15 @@ import {
     useMantineTheme,
     ActionIcon,
     AspectRatio,
-    Modal, // Import Modal
-    ScrollArea, // Import ScrollArea for modal content
-    TextInput, // Example input for edit modals
-    Textarea, // Example input for edit modals
+    Modal,
+    ScrollArea,
+    TextInput,
+    Textarea,
 } from '@mantine/core';
-import { IconPhoto, IconPencil, IconArrowRight, IconClock, IconX, IconPlus } from '@tabler/icons-react'; // Added IconX, IconPlus
+import { IconPhoto, IconPencil, IconArrowRight, IconClock, IconX, IconPlus } from '@tabler/icons-react';
 import WavyBackground from "@components/shared/WavyBackground/WavyBackground.tsx";
-import { useDisclosure } from '@mantine/hooks'; // Import useDisclosure hook
-import React from 'react'; // Import React
+import { useDisclosure } from '@mantine/hooks';
+import React from 'react';
 
 const TOP_WAVE_PATH = "M 0,6 Q 15,8 40,7 C 60,5 80,5 130,7 L 100,0 L 0,0 Z";
 
