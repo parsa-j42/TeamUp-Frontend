@@ -12,6 +12,7 @@ export default defineConfig({
       '@fonts': path.resolve(__dirname, './src/fonts'),
       '@types': path.resolve(__dirname, './src/types'),
       '@contexts': path.resolve(__dirname, './src/contexts'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
   server: {
