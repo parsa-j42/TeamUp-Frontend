@@ -13,6 +13,7 @@ import AboutUsPage from "@components/static/AboutUs/AboutUs.tsx";
 import PrivacyAndTermsPage from "@components/static/PrivacyAndTerms/PrivacyAndTerms.tsx";
 import CapConPage from "@components/static/CapConPage/CapConPage.tsx";
 import SignUpPage from "@components/pages/auth/SignUpPage/SignUpPage.tsx";
+import ConfirmSignUpPage from "@components/pages/auth/ConfirmSignUpPage/ConfirmSignUpPage.tsx";
 
 export const AppRouter: React.FC = () => {
     // Temporary for CapCon
@@ -34,6 +35,7 @@ export const AppRouter: React.FC = () => {
             <Route path="/AboutUs" element={<AboutUsPage />} />
             <Route path="/Privacy" element={<PrivacyAndTermsPage />} />
             <Route path="/SignUp" element={<SignUpPage />} />
+            <Route path="/confirm-signup" element={<ConfirmSignUpPage />} />
             <Route path="/LogIn" element={<LogInPage />} />
 
             {/* Protected routes */}
