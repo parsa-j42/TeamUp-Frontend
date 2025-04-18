@@ -235,7 +235,9 @@ export default function SignUpPage() {
             <Paper m="7%" p="xl" shadow="sm" w="600px" radius="lg">
                 {/* Stepper */}
                 <Stepper active={active} mx="70px" color="mainRed.6" size="xs" classNames={{ root: styles.stepper, stepIcon: styles.stepIcon, stepCompletedIcon: styles.stepCompletedIcon, separator: styles.separator }}>
-                    <Stepper.Step /> <Stepper.Step /> <Stepper.Step />
+                    <Stepper.Step label="" />
+                    <Stepper.Step label="" />
+                    <Stepper.Step label="" />
                 </Stepper>
 
                 {/* Title/Desc */}
