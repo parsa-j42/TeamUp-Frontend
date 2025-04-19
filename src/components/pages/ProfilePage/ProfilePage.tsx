@@ -40,7 +40,7 @@ function SectionCard({ title, children, onEdit, onShowAll, showAllLink = false, 
             <Stack gap="md">
                 <Group justify="space-between">
                     <Title order={3} fw={500}>{title}</Title>
-                    {onEdit && ( <ActionIcon variant="subtle" color="gray" onClick={onEdit}><IconPencil size={18} /></ActionIcon> )}
+                    {onEdit && ( <ActionIcon variant="filled" color="gray" onClick={onEdit}><IconPencil size={18} /></ActionIcon> )}
                 </Group>
                 <Divider color="black" />
                 {children}
