@@ -19,7 +19,8 @@ export function LoggedIn() {
         : ''; // Default to empty if no details yet
 
     // Get avatar URL from profile within userDetails
-    const avatarUrl = userDetails?.profile?.avatarUrl;
+    // const avatarUrl = userDetails?.profile?.avatarUrl;
+    const avatarUrl='/avatar.svg';
     // --- END MODIFIED ---
 
     // Determine if we should show loading skeletons
@@ -42,9 +43,7 @@ export function LoggedIn() {
                     {showLoadingState ? (
                         <Skeleton height={42} circle />
                     ) : (
-                        <Avatar src={avatarUrl || undefined} alt="Profile Avatar" radius="xl" size={42} style={{ cursor: 'pointer' }} color="mainPurple.1">
-                            {!avatarUrl && <IconUser size={24} />}
-                        </Avatar>
+                        <Avatar src={avatarUrl || undefined} alt="Profile Avatar" radius="xl" size={42} style={{ cursor: 'pointer' }} color="mainPurple.1" />
                     )}
                 </Menu.Target>
                 <Menu.Dropdown>
