@@ -35,6 +35,7 @@ export function ProfileMenu({ userName = "Jason Hong", avatarSrc = "/avatar.svg"
                     alt="Profile Avatar"
                     size={42}
                     className={styles.avatar}
+                    variant="filled"
                 />
             </Menu.Target>
 
