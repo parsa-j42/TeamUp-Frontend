@@ -100,9 +100,17 @@ function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProp
         try {
             const data = await apiClient<ProjectDto[]>('/projects/me');
             setProjects(data);
-            // If used in Dashboard context and no project is selected, select the first one
-            if (onSelectProject && !selectedProjectId && data.length > 0) {
-                onSelectProject(data[0].id);
+            
+            // Only auto-select the first project if specifically in Dashboard context 
+            // AND no project is currently selected or coming from navigation
+            if (onSelectProject && data.length > 0) {
+                // If a selectedProjectId is already provided, don't override it
+                if (!selectedProjectId) {
+                    console.log('[MyProjectList] No project currently selected, selecting first project');
+                    onSelectProject(data[0].id);
+                } else {
+                    console.log(`[MyProjectList] Using provided selectedProjectId: ${selectedProjectId}`);
+                }
             } else if (onSelectProject && data.length === 0) {
                 onSelectProject(null); // Inform parent if no projects
             }
@@ -113,9 +121,7 @@ function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProp
         } finally {
             setIsLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [onSelectProject]); // Rerun if onSelectProject callback changes (should be stable)
-    // Note: selectedProjectId removed from deps to avoid loop if parent updates it based on our callback
+    }, [onSelectProject, selectedProjectId]); // Add selectedProjectId to dependencies
 
     useEffect(() => {
         fetchMyProjects();
