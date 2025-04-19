@@ -4,12 +4,11 @@ import {
     Box, Stack, Title, Text, Group, PinInput, Anchor, useMantineTheme,
 } from '@mantine/core';
 import { IconMail } from '@tabler/icons-react';
-import styles from './ConfirmSignUpPage.module.css'; // Ensure path is correct
-import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx"; // Ensure path is correct
+import styles from './ConfirmSignUpPage.module.css';
+import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 
-// Define structure for errors
 type ConfirmErrors = {
     code?: string | null;
     apiError?: string | null;
@@ -20,7 +19,6 @@ export default function ConfirmSignUpPage() {
     const location = useLocation();
     const theme = useMantineTheme();
 
-    // --- State ---
     const [username] = useState<string>(location.state?.username || '');
     const [code, setCode] = useState<string>('');
     const [errors, setErrors] = useState<ConfirmErrors>({});
@@ -28,7 +26,6 @@ export default function ConfirmSignUpPage() {
     const [isResending, setIsResending] = useState<boolean>(false);
     const [resendMessage, setResendMessage] = useState<string>('');
 
-    // --- Effect to handle missing username ---
     useEffect(() => {
         if (!username) {
             console.error("[ConfirmSignUpPage] Username not found in location state. Redirecting to sign up.");
@@ -36,7 +33,6 @@ export default function ConfirmSignUpPage() {
         }
     }, [username, navigate]);
 
-    // --- Handlers ---
     const handleCodeChange = (value: string) => {
         setCode(value);
         setErrors((prev) => ({ ...prev, code: null, apiError: null }));
@@ -54,7 +50,7 @@ export default function ConfirmSignUpPage() {
         return isValid;
     };
 
-    // Handle "Confirm Account" button click
+    // --- MODIFIED ---
     const handleConfirm = async () => {
         if (isSubmitting || !validateForm()) return;
 
@@ -70,14 +66,19 @@ export default function ConfirmSignUpPage() {
             });
 
             console.log('[ConfirmSignUpPage] Account confirmed successfully!');
-            // Navigate back to SignUpPage Step 1, passing confirmation flag
-            navigate('/signup', {
-                replace: true,
+            // --- CHANGE: Navigate to LOGIN page, passing state to indicate next step ---
+            navigate('/login', {
+                replace: true, // Replace history entry
                 state: {
-                    cognitoSignUpConfirmed: true,
-                    username: username
+                    message: 'Account confirmed! Please log in to complete your profile.',
+                    nextPath: '/signup', // Tell login where to go next
+                    nextPathState: { // State to pass to signup page
+                        postLoginProfileCompletion: true, // Flag indicating why we are here
+                        username: username // Pass username along
+                    }
                 }
             });
+            // --- END CHANGE ---
 
         } catch (error: any) {
             console.error('[ConfirmSignUpPage] Cognito Confirmation failed:', error);
@@ -91,15 +92,11 @@ export default function ConfirmSignUpPage() {
             setIsSubmitting(false);
         }
     };
+    // --- END MODIFIED ---
 
-    // Handle "Resend Email" button click
     const handleResend = async () => {
         if (isResending || !username) return;
-
-        setIsResending(true);
-        setResendMessage('');
-        setErrors(prev => ({ ...prev, apiError: null }));
-
+        setIsResending(true); setResendMessage(''); setErrors(prev => ({ ...prev, apiError: null }));
         try {
             console.log('[ConfirmSignUpPage] Attempting Cognito resendSignUpCode for:', username);
             await resendSignUpCode({ username: username });
@@ -107,17 +104,11 @@ export default function ConfirmSignUpPage() {
         } catch (error: any) {
             console.error('[ConfirmSignUpPage] Cognito Resend code failed:', error);
             setResendMessage(`Failed to resend code: ${error.message || 'Please try again later.'}`);
-        } finally {
-            setIsResending(false);
-        }
+        } finally { setIsResending(false); }
     };
 
-    // Handle "Click here" to change email
-    const handleChangeEmail = () => {
-        navigate('/signup', { replace: true });
-    };
+    const handleChangeEmail = () => { navigate('/signup', { replace: true }); };
 
-    // --- Styles ---
     const emailIconContainerStyle: React.CSSProperties = {
         width: 145, height: 145, borderRadius: '50%',
         backgroundColor: theme.colors.mainPurple?.[6] || theme.primaryColor,
@@ -125,11 +116,8 @@ export default function ConfirmSignUpPage() {
         border: `10px solid ${theme.colors.gray?.[3] || '#d9d9d9'}`,
         marginBottom: theme.spacing.xl,
     };
-    const emailIconStyle = {
-        size: 80, color: theme.colors.gray?.[3] || "#d9d9d9", strokeWidth: 2.5,
-    };
+    const emailIconStyle = { size: 80, color: theme.colors.gray?.[3] || "#d9d9d9", strokeWidth: 2.5 };
 
-    // --- Render Logic ---
     return (
         <Box className={styles.container} bg="bgPurple.6">
             <Stack align="center" justify="center" style={{ minHeight: '100vh', padding: '20px' }}>
@@ -147,7 +135,7 @@ export default function ConfirmSignUpPage() {
                 {resendMessage && <Text c={resendMessage.startsWith('Failed') ? 'red' : 'green'} size="sm" ta="center" mt="xs">{resendMessage}</Text>}
                 <Group mt="xl" gap="xl">
                     <RoundedButton color="mainPurple.6" textColor="black" variant="outline" size="md" fw="400" w="175px" borderWidth="2" onClick={handleResend} loading={isResending} disabled={isResending || isSubmitting} > Resend Code </RoundedButton>
-                    <RoundedButton color="mainPurple.6" textColor="white" /* Corrected color */ variant="filled" size="md" fw="500" w="175px" borderWidth="2" onClick={handleConfirm} loading={isSubmitting} disabled={isSubmitting || isResending || code.length !== 6} > Confirm Account </RoundedButton>
+                    <RoundedButton color="mainPurple.6" textColor="white" variant="filled" size="md" fw="500" w="175px" borderWidth="2" onClick={handleConfirm} loading={isSubmitting} disabled={isSubmitting || isResending || code.length !== 6} > Confirm Account </RoundedButton>
                 </Group>
             </Stack>
         </Box>
