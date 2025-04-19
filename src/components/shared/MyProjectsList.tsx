@@ -1,37 +1,44 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     Paper, Title, Text, Button, Group, Stack, Divider, ActionIcon, Box, Flex, rem, Avatar,
-    Loader, Alert, Center, useMantineTheme // Added Loader, Alert, Center
+    Loader, Alert, Center, useMantineTheme
 } from '@mantine/core';
-import { IconBox, IconChevronRight, IconAlertCircle } from '@tabler/icons-react'; // Added IconAlertCircle
+import { IconBox, IconChevronRight, IconAlertCircle } from '@tabler/icons-react';
 import '@mantine/core/styles.css';
 import { useNavigate } from "react-router-dom";
-import { apiClient } from '@utils/apiClient'; // Adjust path
-import { ProjectDto } from '../../types/api'; // Adjust path
+import { apiClient } from '@utils/apiClient';
+import { ProjectDto } from '../../types/api';
 import dayjs from 'dayjs';
 
 // Project Item component - displays a single project in the list
-// Updated to use ProjectDto and navigate on click
-function ProjectItem({ project }: { project: ProjectDto }) {
+interface ProjectItemProps {
+    project: ProjectDto;
+    isSelected: boolean;
+    // onClick can either select (Dashboard) or navigate (Landing)
+    onClick: (id: string) => void;
+}
+
+function ProjectItem({ project, isSelected, onClick }: ProjectItemProps) {
     const theme = useMantineTheme();
-    const navigate = useNavigate();
     const formattedDate = project.createdAt ? dayjs(project.createdAt).format('DD MMM YYYY') : 'Date Unknown';
     const category = project.projectType || project.tags?.[0] || 'General';
-
-    const handleNavigate = () => {
-        navigate(`/projects/${project.id}`);
-    };
 
     return (
         <Flex
             justify="space-between"
             align="center"
             py="md"
-            onClick={handleNavigate} // Navigate on click
-            style={{ cursor: 'pointer', borderRadius: theme.radius.sm, paddingLeft: theme.spacing.md, paddingRight: theme.spacing.md }}
+            onClick={() => onClick(project.id)} // Use the passed onClick handler
+            style={{
+                cursor: 'pointer',
+                backgroundColor: isSelected ? theme.colors.mainPurple[0] : undefined,
+                borderRadius: theme.radius.sm,
+                paddingLeft: theme.spacing.md,
+                paddingRight: theme.spacing.md,
+            }}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleNavigate(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(project.id); }}
         >
             <Group>
                 <IconBox style={{ width: rem(24), height: rem(24) }} stroke={1.5} color={theme.colors.mainPurple[6]} />
@@ -44,14 +51,11 @@ function ProjectItem({ project }: { project: ProjectDto }) {
                     </Group>
                 </Box>
             </Group>
-
             <Group>
-                {/* Display actual members - limited count */}
                 <Group gap={-8} style={{ marginRight: '12px' }}>
                     {project.members?.slice(0, 4).map((member, index) => (
                         <Avatar
-                            key={member.userId} // Use userId for key if membership ID isn't stable/needed
-                            // src={member.user.avatarUrl} // Add avatar if available
+                            key={member.userId}
                             alt={`${member.user.firstName} ${member.user.lastName}`}
                             radius="xl" size="md" color={theme.colors.gray[5]}
                             style={{ marginLeft: index > 0 ? '-12px' : undefined, border: `1px solid ${theme.white}` }}
@@ -75,14 +79,15 @@ function ProjectItem({ project }: { project: ProjectDto }) {
 }
 
 // Interface for props passed to this component
-// Removed props related to selection, as this version fetches its own data
-// and handles navigation internally when used on the landing page.
 interface MyProjectListProps {
-    // No props needed for this usage context
+    // Optional: Callback to inform parent (DashboardPage) which project was selected
+    onSelectProject?: (projectId: string | null) => void;
+    // Optional: Pass the currently selected project ID from the parent
+    selectedProjectId?: string | null;
 }
 
 // Main List Component
-function MyProjectList({ }: MyProjectListProps) { // Removed props from destructuring
+function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProps) {
     const navigate = useNavigate();
     const [projects, setProjects] = useState<ProjectDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -93,46 +98,69 @@ function MyProjectList({ }: MyProjectListProps) { // Removed props from destruct
         console.log('[MyProjectList] Fetching projects...');
         setIsLoading(true); setError(null);
         try {
-            // This assumes the user is authenticated when this component renders
             const data = await apiClient<ProjectDto[]>('/projects/me');
             setProjects(data);
+            // If used in Dashboard context and no project is selected, select the first one
+            if (onSelectProject && !selectedProjectId && data.length > 0) {
+                onSelectProject(data[0].id);
+            } else if (onSelectProject && data.length === 0) {
+                onSelectProject(null); // Inform parent if no projects
+            }
         } catch (err: any) {
             console.error('[MyProjectList] Error fetching projects:', err);
             setError(err.data?.message || err.message || 'Failed to load projects.');
+            if (onSelectProject) onSelectProject(null); // Inform parent on error
         } finally {
             setIsLoading(false);
         }
-    }, []); // Empty dependency array, fetch once on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [onSelectProject]); // Rerun if onSelectProject callback changes (should be stable)
+    // Note: selectedProjectId removed from deps to avoid loop if parent updates it based on our callback
 
     useEffect(() => {
         fetchMyProjects();
     }, [fetchMyProjects]);
+
+    // Determine the action when a project item is clicked
+    const handleItemClick = (projectId: string) => {
+        if (onSelectProject) {
+            // If used in Dashboard, call the selection callback
+            onSelectProject(projectId);
+        } else {
+            // If used elsewhere (like Landing Page), navigate to Dashboard with state
+            console.log(`[MyProjectList] Navigating to Dashboard for project: ${projectId}`);
+            navigate('/dashboard', { state: { selectedProjectId: projectId } });
+        }
+    };
 
     return (
         <Paper p="xl" mt="50px" radius="lg" bg="bgGrey.3">
             <Flex justify="space-between" align="center" mb="xl">
                 <Stack gap="xs">
                     <Title order={1}>My Projects</Title>
-                    <Text size="sm" c="dimmed">Projects you own or are a member of.</Text>
+                    <Text size="sm" c="dimmed">Select a project to view its dashboard.</Text>
                 </Stack>
                 <Group>
-                    {/* <Button variant="light" color="gray" radius="md">Drafts</Button> */}
                     <Button variant="filled" color="mainPurple.6" radius="md" onClick={() => navigate('/create-project')}>
                         Create New Project
                     </Button>
-                    {/* <ActionIcon variant="subtle" color="gray"><IconDots size={20} stroke={1.5} /></ActionIcon> */}
+                    {/* Removed Drafts/Dots buttons for simplicity */}
                 </Group>
             </Flex>
 
             {isLoading && <Center><Loader my="xl" /></Center>}
             {!isLoading && error && <Alert color="red" title="Error" icon={<IconAlertCircle />}>{error}</Alert>}
             {!isLoading && !error && projects.length === 0 && (
-                <Text c="dimmed" ta="center" my="xl">You are not currently part of any projects.</Text>
+                <Text c="dimmed" ta="center" my="xl">You are not currently part of any projects. Create one to get started!</Text>
             )}
             {!isLoading && !error && projects.length > 0 && (
                 projects.map((project, index) => (
                     <Box key={project.id}>
-                        <ProjectItem project={project} />
+                        <ProjectItem
+                            project={project}
+                            isSelected={project.id === selectedProjectId} // Highlight if selected
+                            onClick={handleItemClick} // Use the conditional handler
+                        />
                         {index < projects.length - 1 && <Divider color="mainOrange.6" size="sm" />}
                     </Box>
                 ))
