@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
     Paper, Title, Text, Button, Group, Stack, Divider, ActionIcon, Box, Flex, rem, Avatar,
     Loader, Alert, Center, useMantineTheme
@@ -92,24 +92,27 @@ function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProp
     const [projects, setProjects] = useState<ProjectDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasAutoSelectedRef = useRef(false);
 
     // Fetch projects associated with the current user
     const fetchMyProjects = useCallback(async () => {
-        console.log('[MyProjectList] Fetching projects...');
+        console.log('[MyProjectList] Fetching projects...', { selectedProjectId });
         setIsLoading(true); setError(null);
         try {
             const data = await apiClient<ProjectDto[]>('/projects/me');
             setProjects(data);
             
-            // Only auto-select the first project if specifically in Dashboard context 
-            // AND no project is currently selected or coming from navigation
-            if (onSelectProject && data.length > 0) {
-                // If a selectedProjectId is already provided, don't override it
-                if (!selectedProjectId) {
-                    console.log('[MyProjectList] No project currently selected, selecting first project');
-                    onSelectProject(data[0].id);
+            // Only auto-select if we're in Dashboard context and no project is already selected
+            if (onSelectProject && data.length > 0 && !hasAutoSelectedRef.current) {
+                if (selectedProjectId) {
+                    // The Dashboard already has a selection (likely from navigation state)
+                    console.log(`[MyProjectList] Dashboard already has selection: ${selectedProjectId}`);
+                    hasAutoSelectedRef.current = true;
                 } else {
-                    console.log(`[MyProjectList] Using provided selectedProjectId: ${selectedProjectId}`);
+                    // No selection, select the first project
+                    console.log('[MyProjectList] Auto-selecting first project');
+                    onSelectProject(data[0].id);
+                    hasAutoSelectedRef.current = true;
                 }
             } else if (onSelectProject && data.length === 0) {
                 onSelectProject(null); // Inform parent if no projects
@@ -121,7 +124,14 @@ function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProp
         } finally {
             setIsLoading(false);
         }
-    }, [onSelectProject, selectedProjectId]); // Add selectedProjectId to dependencies
+    }, [onSelectProject, selectedProjectId]);
+
+    // Reset the auto-selection flag when selectedProjectId changes externally
+    useEffect(() => {
+        if (selectedProjectId) {
+            hasAutoSelectedRef.current = true;
+        }
+    }, [selectedProjectId]);
 
     useEffect(() => {
         fetchMyProjects();
