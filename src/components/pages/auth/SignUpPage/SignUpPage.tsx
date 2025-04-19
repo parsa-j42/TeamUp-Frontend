@@ -3,12 +3,12 @@ import {
     Box, Paper, Stack, Stepper, Title, Text, TextInput, Group,
     MultiSelect, Textarea, PasswordInput
 } from '@mantine/core';
-import styles from './SignUpPage.module.css';
-import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
+import styles from './SignUpPage.module.css'; // Ensure this path is correct
+import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx"; // Ensure path is correct
 import { useNavigate, useLocation } from "react-router-dom";
-import UserTypeToggle from "@components/shared/UserTypeToggle/UserTypeToggle.tsx";
-import { signUp } from 'aws-amplify/auth';
-import { apiClient } from '@utils/apiClient';
+import UserTypeToggle from "@components/shared/UserTypeToggle/UserTypeToggle.tsx"; // Ensure path is correct
+import { signUp } from 'aws-amplify/auth'; // Only need signUp
+import { apiClient } from '@utils/apiClient'; // Ensure path is correct
 
 // --- Frontend DTOs/Payloads (Mirroring Backend) ---
 interface CompleteSignupProfilePayload {
@@ -20,6 +20,7 @@ interface CompleteSignupProfilePayload {
 }
 
 // Expected response structure from backend (can be simplified if needed)
+// Make sure this matches what your backend actually returns for the profile endpoint
 interface UserProfileDto {
     id: string;
     userId: string;
@@ -31,10 +32,10 @@ interface UserProfileDto {
     bio?: string;
     avatarUrl?: string;
     bannerUrl?: string;
-    updatedAt: Date;
+    updatedAt: string; // Expect string from JSON
     skills?: { id: string; name: string; description?: string }[];
     interests?: { id: string; name: string; description?: string }[];
-    workExperiences?: any[];
+    workExperiences?: any[]; // Add specific type if needed
 }
 
 // --- Form Data & Errors ---
@@ -59,25 +60,22 @@ export default function SignUpPage() {
     // --- Effect to handle return from confirmation page ---
     useEffect(() => {
         const state = location.state as { cognitoSignUpConfirmed?: boolean; username?: string } | null;
-        // Check if returning from confirmation and user isn't already marked confirmed here
         if (state?.cognitoSignUpConfirmed && state?.username && !isConfirmed) {
             console.log('[SignUpPage] Detected return from successful confirmation for user:', state.username);
             setIsConfirmed(true);
-            setActive(1); // Move to step 1
-            // Store email from state if formData isn't populated yet (e.g., page reload scenario)
+            setActive(1);
             if (!formData.email) {
                 setFormData(prev => ({ ...prev, email: state.username }));
             }
-            navigate(location.pathname, { replace: true, state: {} }); // Clear location state
+            navigate(location.pathname, { replace: true, state: {} });
         }
-        // Redirect back to step 0 if trying to access later steps without confirmation flag
         else if (active > 0 && !isConfirmed) {
             console.warn('[SignUpPage] User is on profile steps but not confirmed. Resetting to Step 0.');
             setActive(0);
         }
     }, [location.state, navigate, active, isConfirmed, formData.email]);
 
-    // --- Handlers (handleInputChange, handleMultiSelectChange, handleUserTypeChange) ---
+    // --- Handlers ---
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.currentTarget;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -92,7 +90,7 @@ export default function SignUpPage() {
         setErrors((prevErrors) => ({ ...prevErrors, userType: null, apiError: null }));
     };
 
-    // --- Validation (validateStep) ---
+    // --- Validation ---
     const validateStep = (step: number): boolean => {
         const newErrors: FormErrors = {};
         let isValid = true;
@@ -107,13 +105,12 @@ export default function SignUpPage() {
             if (!formData.password || !passwordRegex.test(formData.password)) { newErrors.password = 'Password must be at least 8 characters'; isValid = false; }
             if (formData.password !== formData.confirmPassword) { newErrors.confirmPassword = 'Passwords do not match'; isValid = false; }
         }
-        // Only validate steps 1 & 2 if user is confirmed
-        if (step === 1 && isConfirmed) {
+        if (step === 1 && isConfirmed) { // Check isConfirmed here
             if (!formData.userType) { newErrors.userType = 'Please select a user type'; isValid = false; }
             if (!formData.interests || formData.interests.length === 0) { newErrors.interests = 'Please select at least one interest'; isValid = false; }
             if (!formData.program?.trim()) { newErrors.program = 'Program is required'; isValid = false; }
         }
-        if (step === 2 && isConfirmed) {
+        if (step === 2 && isConfirmed) { // Check isConfirmed here
             if (!formData.skills || formData.skills.length === 0) { newErrors.skills = 'Please select at least one skill'; isValid = false; }
             if (!formData.experience?.trim()) { newErrors.experience = 'Experience is required'; isValid = false; }
         }
@@ -130,10 +127,10 @@ export default function SignUpPage() {
         setErrors(prev => ({ ...prev, apiError: null }));
         setIsSubmitting(true);
 
-        // Step 0: Call Cognito signUp
+        // Step 0: Call Cognito signUp WITH autoSignIn
         if (active === 0) {
             try {
-                console.log('[SignUpPage] Attempting Cognito Sign Up...');
+                console.log('[SignUpPage] Attempting Cognito Sign Up with autoSignIn...');
                 await signUp({
                     username: formData.email!, password: formData.password!,
                     options: {
@@ -141,11 +138,12 @@ export default function SignUpPage() {
                             email: formData.email!, given_name: formData.firstName!,
                             family_name: formData.lastName!, preferred_username: formData.preferredUsername!,
                         },
+                        autoSignIn: true // Attempt auto sign-in after confirmation
                     }
                 });
                 console.log('[SignUpPage] Cognito Sign Up successful. Redirecting to confirmation...');
                 navigate('/confirm-signup', { state: { username: formData.email } });
-                // Keep isSubmitting true as we navigate away
+                // Keep isSubmitting true
             } catch (error: any) {
                 console.error('[SignUpPage] Cognito Sign up failed:', error);
                 let apiErrorMessage = 'Sign up failed. Please try again.';
@@ -154,13 +152,13 @@ export default function SignUpPage() {
                 else if (error.name === 'InvalidParameterException') { apiErrorMessage = `Invalid input: ${error.message}`; }
                 else { apiErrorMessage = error.message || 'An unknown error occurred.'; }
                 setErrors({ apiError: apiErrorMessage });
-                setIsSubmitting(false); // Allow retry
+                setIsSubmitting(false);
             }
         }
         // Step 1: Advance to Step 2 (if confirmed)
         else if (active === 1 && isConfirmed) {
             setActive(2);
-            setIsSubmitting(false); // Ready for next step
+            setIsSubmitting(false);
         }
         // Step 2: Call Backend API to complete profile (if confirmed)
         else if (active === 2 && isConfirmed) {
@@ -169,41 +167,42 @@ export default function SignUpPage() {
                 const profilePayload: CompleteSignupProfilePayload = {
                     userType: formData.userType!,
                     program: formData.program!,
-                    signupExperience: formData.experience!, // Map frontend 'experience'
+                    signupExperience: formData.experience!,
                     interests: formData.interests!,
                     skills: formData.skills!,
                 };
 
-                // Call the backend API using the helper.
-                // This requires the user to have a valid session token.
-                // If the user just confirmed, they might need to log in first
-                // if the session isn't automatically established/available.
                 console.log('[SignUpPage] Calling POST /profiles/me/complete-signup with payload:', profilePayload);
+                // apiClient will attempt to get the session token.
                 await apiClient<UserProfileDto>('/profiles/me/complete-signup', {
                     method: 'POST',
                     body: profilePayload,
                 });
 
                 console.log('[SignUpPage] Profile data saved successfully via backend.');
+                // Navigate to login page with success message after successful profile save
                 navigate('/login', { state: { message: 'Sign up complete! Please log in.' } });
-                // Keep isSubmitting true as we navigate away
+                // Keep isSubmitting true
 
             } catch (error: any) {
                 console.error('[SignUpPage] Failed to save profile data via backend:', error);
-                // Extract message from backend error if possible
-                const backendMessage = error?.data?.message || error?.message || 'Please try again.';
-                // Check for auth error specifically (status 401)
+                const backendMessage = error?.data?.message || error?.message || 'An unknown error occurred.';
+
+                // --- Explicitly handle 401 Unauthorized ---
                 if (error.status === 401) {
-                    setErrors({ apiError: `Authentication error. Please log in and try completing your profile again from the profile page.` });
-                    // Consider redirecting to login or showing a specific message
-                    // navigate('/login');
+                    console.warn('[SignUpPage] Received 401 Unauthorized. User likely needs to log in.');
+                    setErrors({ apiError: `Account confirmed, but automatic login failed. Please log in to complete your profile.` });
+                    // Force navigation to login page after showing the error briefly
+                    setTimeout(() => {
+                        navigate('/login', { state: { message: 'Please log in to complete setup.', username: formData.email } });
+                    }, 3000); // Delay allows user to see the error
                 } else {
+                    // Handle other backend errors
                     setErrors({ apiError: `Failed to save profile data: ${backendMessage}` });
                 }
-                setIsSubmitting(false); // Allow retry
+                setIsSubmitting(false); // Allow retry only for non-401 errors or let user log in
             }
         } else {
-            // This case should ideally not be reachable if button disabled states are correct
             console.error('[SignUpPage] handleNext called in unexpected state:', { active, isConfirmed });
             setIsSubmitting(false);
         }
@@ -211,14 +210,13 @@ export default function SignUpPage() {
 
     // --- handleBack, handleCancel ---
     const handleBack = () => {
-        // Prevent going back to step 0 after confirmation
-        if (active === 1 && isConfirmed) return;
+        if (active === 1 && isConfirmed) return; // Prevent back after confirm
         setActive((current) => Math.max(0, current - 1));
-        setErrors({}); // Clear errors on navigation
+        setErrors({});
     };
     const handleCancel = () => { navigate("/landing"); };
 
-    // --- Dynamic Content (getStepContent) ---
+    // --- Dynamic Content ---
     const getStepContent = () => {
         switch (active) {
             case 0: return { title: "Lets Get Started", description: "Create your account credentials. You will need to verify your email." };
@@ -229,15 +227,16 @@ export default function SignUpPage() {
     };
     const { title, description } = getStepContent();
 
-    // --- Render Logic (No UI Changes) ---
+    // --- Render Logic ---
     return (
         <Box className={styles.container} bg="bgPurple.6">
             <Paper m="7%" p="xl" shadow="sm" w="600px" radius="lg">
                 {/* Stepper */}
                 <Stepper active={active} mx="70px" color="mainRed.6" size="xs" classNames={{ root: styles.stepper, stepIcon: styles.stepIcon, stepCompletedIcon: styles.stepCompletedIcon, separator: styles.separator }}>
-                    <Stepper.Step label="" />
-                    <Stepper.Step label="" />
-                    <Stepper.Step label="" />
+                    {/* Add empty Step components if needed by Mantine Stepper */}
+                    <Stepper.Step />
+                    <Stepper.Step />
+                    <Stepper.Step />
                 </Stepper>
 
                 {/* Title/Desc */}
