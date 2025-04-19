@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import {
     Box, Stack, useMantineTheme, Title, Text, Group, Avatar, SimpleGrid, ActionIcon,
     Timeline, Paper, ThemeIcon, Divider, Button, Select, SegmentedControl, // Keep Select for app filtering
@@ -40,18 +40,19 @@ export default function DashboardPage() {
     // State to store project options for the application filter dropdown
     const [projectOptionsForFilter, setProjectOptionsForFilter] = useState<{ value: string; label: string }[]>([]);
 
-    // Pull state from navigation immediately on first render, before any effects run
-    // Immediately process the navigation state when component mounts
-    useEffect(() => {
+    // Use useLayoutEffect to ensure this runs BEFORE render and other effects
+    useLayoutEffect(() => {
         const navState = location.state as { selectedProjectId?: string } | null;
         if (navState?.selectedProjectId) {
-            console.log(`[Dashboard] Received selectedProjectId from navigation state: ${navState.selectedProjectId}`);
+            console.log(`[Dashboard] Received selectedProjectId from navigation: ${navState.selectedProjectId}`);
             // Set the selected project ID from navigation state
             setSelectedProjectId(navState.selectedProjectId);
-            // Clear the state after using it to prevent reselection on refresh/navigation
-            navigate(location.pathname, { replace: true, state: {} });
+            // Clear the state to avoid reapplying on refresh
+            setTimeout(() => {
+                navigate(location.pathname, { replace: true, state: {} });
+            }, 0);
         }
-    }, [location.state, navigate]); // Run only when location.state changes
+    }, [location, navigate]); // Include full location object
 
     // --- Data Fetching ---
     // Fetching MyProjects list is now handled inside MyProjectList component
@@ -301,3 +302,4 @@ export default function DashboardPage() {
         </Stack>
     );
 }
+
