@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Avatar, Badge, Box, Button, Container, Divider, Group, Paper, Stack, Text, Title,
     useMantineTheme, ActionIcon, AspectRatio, Modal, ScrollArea, TextInput, Textarea,
-    Loader, Alert, TagsInput, Center // Added Center
+    Loader, Alert, TagsInput, Center // Removed unused SimpleGrid
 } from '@mantine/core';
 import {
     IconPhoto, IconPencil, IconArrowRight, IconClock, IconX, IconPlus, IconAlertCircle
@@ -11,13 +11,14 @@ import WavyBackground from "@components/shared/WavyBackground/WavyBackground.tsx
 import { useDisclosure } from '@mantine/hooks';
 import { apiClient } from '@utils/apiClient'; // Ensure path is correct
 import { useAuth } from '@contexts/AuthContext'; // Ensure path is correct
-import { useNavigate, useLocation } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 // Import types (adjust path if needed)
 import {
     UserDto, WorkExperienceDto, PortfolioProjectDto,
     UpdateProfilePayload, CreateWorkExperiencePayload, UpdateWorkExperiencePayload,
     CreatePortfolioProjectPayload, UpdatePortfolioProjectPayload
+    // Removed unused SkillDto, InterestDto, UserProfileDto as they are part of UserDto
 } from '../../../types/api'; // Adjust path as needed
 
 const TOP_WAVE_PATH = "M 0,6 Q 15,8 40,7 C 60,5 80,5 130,7 L 100,0 L 0,0 Z";
@@ -52,79 +53,77 @@ function SectionCard({ title, children, onEdit, onShowAll, showAllLink = false, 
 // --- Main Profile Page Component ---
 export default function ProfilePage() {
     const theme = useMantineTheme();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+    // const navigate = useNavigate(); // Keep navigate for project details button
+    // const location = useLocation(); // Removed, not used
+    const { isAuthenticated, isLoading: isAuthLoading, initialCheckComplete } = useAuth(); // Use initialCheckComplete
 
     // --- State for API Data ---
     const [userData, setUserData] = useState<UserDto | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true); // Separate loading state for profile data fetching
-    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true); // Local loading state for fetch
+    const [error, setError] = useState<string | null>(null); // General page/fetch error
 
     // --- State for Modals & Editing ---
     const [profileEditOpened, { open: openProfileEditModal, close: closeProfileEdit }] = useDisclosure(false);
     const [profileEditData, setProfileEditData] = useState<Partial<UpdateProfilePayload>>({});
     const [isSavingProfile, setIsSavingProfile] = useState(false);
+    const [profileModalError, setProfileModalError] = useState<string | null>(null);
 
     const [skillsEditOpened, { open: openSkillsEditModal, close: closeSkillsEdit }] = useDisclosure(false);
     const [skillsEditData, setSkillsEditData] = useState<string[]>([]);
     const [isSavingSkills, setIsSavingSkills] = useState(false);
+    const [skillsModalError, setSkillsModalError] = useState<string | null>(null);
 
     const [interestsEditOpened, { open: openInterestsEditModal, close: closeInterestsEdit }] = useDisclosure(false);
     const [interestsEditData, setInterestsEditData] = useState<string[]>([]);
     const [isSavingInterests, setIsSavingInterests] = useState(false);
+    const [interestsModalError, setInterestsModalError] = useState<string | null>(null);
 
     const [experienceEditOpened, { open: openExperienceModal, close: closeExperienceEdit }] = useDisclosure(false);
     const [currentExperience, setCurrentExperience] = useState<Partial<CreateWorkExperiencePayload & { id?: string }>>({});
     const [isEditingExperience, setIsEditingExperience] = useState(false);
     const [isSavingExperience, setIsSavingExperience] = useState(false);
+    const [experienceModalError, setExperienceModalError] = useState<string | null>(null);
 
     const [portfolioProjectAddOpened, { open: openPortfolioProjectAddModal, close: closePortfolioProjectAdd }] = useDisclosure(false);
     const [newPortfolioProjectData, setNewPortfolioProjectData] = useState<Partial<CreatePortfolioProjectPayload>>({});
     const [isSavingNewPortfolioProject, setIsSavingNewPortfolioProject] = useState(false);
+    const [portfolioAddModalError, setPortfolioAddModalError] = useState<string | null>(null);
 
     const [portfolioProjectEditOpened, { open: openPortfolioProjectEditModal, close: closePortfolioProjectEdit }] = useDisclosure(false);
     const [editingPortfolioProject, setEditingPortfolioProject] = useState<PortfolioProjectDto | null>(null);
     const [editingPortfolioProjectData, setEditingPortfolioProjectData] = useState<Partial<UpdatePortfolioProjectPayload>>({});
     const [isSavingEditedPortfolioProject, setIsSavingEditedPortfolioProject] = useState(false);
+    const [portfolioEditModalError, setPortfolioEditModalError] = useState<string | null>(null);
 
     const [skillsShowAllOpened, { open: openSkillsShowAll, close: closeSkillsShowAll }] = useDisclosure(false);
     const [interestsShowAllOpened, { open: openInterestsShowAll, close: closeInterestsShowAll }] = useDisclosure(false);
     const [experienceShowAllOpened, { open: openExperienceShowAll, close: closeExperienceShowAll }] = useDisclosure(false);
 
     // --- Fetch User Data ---
-    const fetchData = useCallback(async (showLoadingIndicator = true) => { // Option to disable loading indicator on refetch
-        console.log('[ProfilePage] Fetching user data...');
+    const fetchData = useCallback(async (showLoadingIndicator = true) => {
         if (showLoadingIndicator) setIsLoading(true);
-        setError(null); // Clear previous errors on fetch
+        setError(null);
         try {
-            // /users/me returns profile with portfolioProjects, skills, interests, workExperiences
             const data = await apiClient<UserDto>('/users/me');
             setUserData(data);
-            console.log('[ProfilePage] User data fetched successfully.');
         } catch (err: any) {
             console.error('[ProfilePage] Error fetching data:', err);
             setError(err.data?.message || err.message || 'Failed to load profile data.');
-            // Don't redirect here, let the effect handle it based on auth state
         } finally {
-            // Only set loading false if we showed the indicator
             if (showLoadingIndicator) setIsLoading(false);
         }
-    }, []); // Removed navigate/location as dependencies, handled in useEffect
+    }, []); // Removed navigate/location
 
     useEffect(() => {
-        if (!isAuthLoading && isAuthenticated) {
-            fetchData(true); // Fetch data with loading indicator on initial auth confirmation
-        } else if (!isAuthLoading && !isAuthenticated) {
-            console.log('[ProfilePage] User not authenticated, redirecting to login.');
-            navigate('/login', { state: { from: location }, replace: true });
+        if (initialCheckComplete && isAuthenticated) {
+            fetchData(true);
         }
-        // No else needed: if auth is loading, we wait.
-    }, [isAuthLoading, isAuthenticated, fetchData, navigate, location]); // Dependencies
+        // No redirect needed here, ProtectedRoute handles it
+    }, [initialCheckComplete, isAuthenticated, fetchData]); // Dependencies
 
     // --- Modal Open Handlers ---
     const handleOpenProfileEdit = () => {
-        setError(null); // Clear errors when opening modal
+        setProfileModalError(null);
         setProfileEditData({
             firstName: userData?.firstName || '', lastName: userData?.lastName || '',
             status: userData?.profile?.status || '', institution: userData?.profile?.institution || '',
@@ -133,71 +132,67 @@ export default function ProfilePage() {
         openProfileEditModal();
     };
     const handleOpenSkillsEdit = () => {
-        setError(null);
+        setSkillsModalError(null);
         setSkillsEditData(userData?.profile?.skills?.map(s => s.name) || []);
         openSkillsEditModal();
     };
     const handleOpenInterestsEdit = () => {
-        setError(null);
+        setInterestsModalError(null);
         setInterestsEditData(userData?.profile?.interests?.map(i => i.name) || []);
         openInterestsEditModal();
     };
     const handleOpenExperienceAdd = () => {
-        setError(null);
+        setExperienceModalError(null);
         setCurrentExperience({}); setIsEditingExperience(false); openExperienceModal();
     };
     const handleOpenExperienceEdit = (exp: WorkExperienceDto) => {
-        setError(null);
+        setExperienceModalError(null);
         setCurrentExperience({ ...exp }); setIsEditingExperience(true); openExperienceModal();
     };
     const handleOpenPortfolioProjectAdd = () => {
-        setError(null);
+        setPortfolioAddModalError(null);
         setNewPortfolioProjectData({}); openPortfolioProjectAddModal();
     };
     const handleOpenPortfolioProjectEdit = (project: PortfolioProjectDto) => {
-        setError(null);
+        setPortfolioEditModalError(null);
         setEditingPortfolioProject(project);
         setEditingPortfolioProjectData({ title: project.title, description: project.description, tags: project.tags || [] });
         openPortfolioProjectEditModal();
     };
 
     // --- Save Handlers (API Calls) ---
-    // FIX #1: Always call fetchData() on success instead of setUserData(response)
     const handleProfileInfoSave = async () => {
-        setIsSavingProfile(true); setError(null);
+        setIsSavingProfile(true); setProfileModalError(null);
         try {
             await apiClient<UserDto>('/profiles/me', { method: 'PATCH', body: profileEditData as UpdateProfilePayload });
-            closeProfileEdit();
-            fetchData(false); // Refetch data without main loading indicator
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to save profile information.'); }
+            closeProfileEdit(); fetchData(false);
+        } catch (err: any) { setProfileModalError(err.data?.message || err.message || 'Failed to save profile information.'); }
         finally { setIsSavingProfile(false); }
     };
     const handleSkillsSave = async () => {
-        setIsSavingSkills(true); setError(null);
+        setIsSavingSkills(true); setSkillsModalError(null);
         try {
             await apiClient<UserDto>('/profiles/me', { method: 'PATCH', body: { skills: skillsEditData } });
-            closeSkillsEdit();
-            fetchData(false); // Refetch
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to save skills.'); }
+            closeSkillsEdit(); fetchData(false);
+        } catch (err: any) { setSkillsModalError(err.data?.message || err.message || 'Failed to save skills.'); }
         finally { setIsSavingSkills(false); }
     };
     const handleInterestsSave = async () => {
-        setIsSavingInterests(true); setError(null);
+        setIsSavingInterests(true); setInterestsModalError(null);
         try {
             await apiClient<UserDto>('/profiles/me', { method: 'PATCH', body: { interests: interestsEditData } });
-            closeInterestsEdit();
-            fetchData(false); // Refetch
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to save interests.'); }
+            closeInterestsEdit(); fetchData(false);
+        } catch (err: any) { setInterestsModalError(err.data?.message || err.message || 'Failed to save interests.'); }
         finally { setIsSavingInterests(false); }
     };
     const handleExperienceSave = async () => {
-        setIsSavingExperience(true); setError(null);
+        setIsSavingExperience(true); setExperienceModalError(null);
         const { id, ...payloadData } = currentExperience;
         const payload: CreateWorkExperiencePayload | UpdateWorkExperiencePayload = {
             dateRange: payloadData.dateRange || '', workName: payloadData.workName || '', description: payloadData.description || '',
         };
         if (!payload.dateRange || !payload.workName || !payload.description) {
-            setError("All experience fields are required."); setIsSavingExperience(false); return;
+            setExperienceModalError("All experience fields are required."); setIsSavingExperience(false); return;
         }
         try {
             if (isEditingExperience && id) {
@@ -205,22 +200,22 @@ export default function ProfilePage() {
             } else {
                 await apiClient<WorkExperienceDto>('/profiles/me/work-experiences', { method: 'POST', body: payload });
             }
-            closeExperienceEdit(); fetchData(false); // Refetch
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to save experience.'); }
+            closeExperienceEdit(); fetchData(false);
+        } catch (err: any) { setExperienceModalError(err.data?.message || err.message || 'Failed to save experience.'); }
         finally { setIsSavingExperience(false); }
     };
     const handleExperienceDelete = async (experienceId: string) => {
-        setIsSavingExperience(true); setError(null);
+        setIsSavingExperience(true); setExperienceModalError(null);
         try {
             await apiClient<void>(`/profiles/me/work-experiences/${experienceId}`, { method: 'DELETE' });
-            fetchData(false); // Refetch
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to delete experience.'); }
+            fetchData(false);
+        } catch (err: any) { setExperienceModalError(err.data?.message || err.message || 'Failed to delete experience.'); }
         finally { setIsSavingExperience(false); }
     };
     const handlePortfolioProjectAddSave = async () => {
-        setIsSavingNewPortfolioProject(true); setError(null);
+        setIsSavingNewPortfolioProject(true); setPortfolioAddModalError(null);
         if (!newPortfolioProjectData.title || !newPortfolioProjectData.description) {
-            setError("Portfolio Project Title and Description are required."); setIsSavingNewPortfolioProject(false); return;
+            setPortfolioAddModalError("Portfolio Project Title and Description are required."); setIsSavingNewPortfolioProject(false); return;
         }
         try {
             const payload: CreatePortfolioProjectPayload = {
@@ -228,15 +223,15 @@ export default function ProfilePage() {
                 tags: newPortfolioProjectData.tags || [],
             };
             await apiClient<PortfolioProjectDto>('/profiles/me/portfolio-projects', { method: 'POST', body: payload });
-            closePortfolioProjectAdd(); fetchData(false); // Refetch
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to add portfolio project.'); }
+            closePortfolioProjectAdd(); fetchData(false);
+        } catch (err: any) { setPortfolioAddModalError(err.data?.message || err.message || 'Failed to add portfolio project.'); }
         finally { setIsSavingNewPortfolioProject(false); }
     };
     const handlePortfolioProjectEditSave = async () => {
         if (!editingPortfolioProject) return;
-        setIsSavingEditedPortfolioProject(true); setError(null);
+        setIsSavingEditedPortfolioProject(true); setPortfolioEditModalError(null);
         if (!editingPortfolioProjectData.title || !editingPortfolioProjectData.description) {
-            setError("Portfolio Project Title and Description are required."); setIsSavingEditedPortfolioProject(false); return;
+            setPortfolioEditModalError("Portfolio Project Title and Description are required."); setIsSavingEditedPortfolioProject(false); return;
         }
         try {
             const payload: UpdatePortfolioProjectPayload = {
@@ -244,40 +239,33 @@ export default function ProfilePage() {
                 tags: editingPortfolioProjectData.tags || [],
             };
             await apiClient<PortfolioProjectDto>(`/profiles/me/portfolio-projects/${editingPortfolioProject.id}`, { method: 'PATCH', body: payload });
-            closePortfolioProjectEdit(); fetchData(false); // Refetch
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to update portfolio project.'); }
+            closePortfolioProjectEdit(); fetchData(false);
+        } catch (err: any) { setPortfolioEditModalError(err.data?.message || err.message || 'Failed to update portfolio project.'); }
         finally { setIsSavingEditedPortfolioProject(false); }
     };
     const handlePortfolioProjectDelete = async (projectId: string) => {
-        setIsSavingEditedPortfolioProject(true); setError(null); // Reuse loading state
+        setIsSavingEditedPortfolioProject(true); setPortfolioEditModalError(null);
         try {
             await apiClient<void>(`/profiles/me/portfolio-projects/${projectId}`, { method: 'DELETE' });
-            fetchData(false); // Refetch
+            fetchData(false);
             if (editingPortfolioProject?.id === projectId) { closePortfolioProjectEdit(); }
-        } catch (err: any) { setError(err.data?.message || err.message || 'Failed to delete portfolio project.'); }
+        } catch (err: any) { setPortfolioEditModalError(err.data?.message || err.message || 'Failed to delete portfolio project.'); }
         finally { setIsSavingEditedPortfolioProject(false); }
     };
 
-    // FIX #2: Correct onChange handler for controlled inputs in Experience Modal
+    // Correct onChange handlers for controlled inputs
     const handleExperienceInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.currentTarget; // Extract value synchronously
-        setCurrentExperience(prev => ({ ...prev, [name]: value }));
+        const { name, value } = e.currentTarget; setCurrentExperience(prev => ({ ...prev, [name]: value }));
     };
-    // FIX #2: Correct onChange handler for controlled inputs in Project Modals
     const handleNewPortfolioProjectInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.currentTarget;
-        setNewPortfolioProjectData(prev => ({ ...prev, [name]: value }));
+        const { name, value } = e.currentTarget; setNewPortfolioProjectData(prev => ({ ...prev, [name]: value }));
     };
     const handleEditingPortfolioProjectInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.currentTarget;
-        setEditingPortfolioProjectData(prev => ({ ...prev, [name]: value }));
+        const { name, value } = e.currentTarget; setEditingPortfolioProjectData(prev => ({ ...prev, [name]: value }));
     };
-    // FIX #2: Correct onChange handler for controlled inputs in Profile Modal
     const handleProfileInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.currentTarget;
-        setProfileEditData(prev => ({ ...prev, [name]: value }));
+        const { name, value } = e.currentTarget; setProfileEditData(prev => ({ ...prev, [name]: value }));
     };
-
 
     // --- Wave Background Setup ---
     const topWaveHeight = 25000;
@@ -287,10 +275,11 @@ export default function ProfilePage() {
     const initialItemsToShow = 2;
 
     // --- Render Loading/Error States ---
-    if (isLoading || isAuthLoading) { return ( <Center style={{ height: '80vh' }}> <Loader color="mainPurple.6" /> </Center> ); }
-    // FIX #1 & #4: Show error only if initial load failed, otherwise rely on modal errors or refetch
-    if (error && !userData) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Error Loading Profile" color="red" radius="md"> {error} </Alert> </Container> ); }
-    if (!userData || !userData.profile) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Profile Not Found" color="orange" radius="md"> User profile data could not be loaded. It might be incomplete. Please try logging out and back in, or contact support. </Alert> </Container> ); }
+    if (isAuthLoading || !initialCheckComplete) { return ( <Center style={{ height: '80vh' }}> <Loader color="mainPurple.6" /> </Center> ); }
+    if (!isAuthenticated) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Unauthorized" color="red" radius="md"> Please log in to view your profile. </Alert> </Container> ); }
+    if (isLoading) { return ( <Center style={{ height: '80vh' }}> <Loader color="mainPurple.6" /> </Center> ); } // Show loader while fetching profile data
+    if (error && !userData) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Error Loading Profile" color="red" radius="md"> {error} <Button onClick={() => fetchData(true)} mt="sm">Retry</Button> </Alert> </Container> ); }
+    if (!userData || !userData.profile) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Profile Data Missing" color="orange" radius="md"> User profile data could not be fully loaded. Please try refreshing or contact support. </Alert> </Container> ); }
 
     // --- Destructure data ---
     const { firstName, lastName, profile } = userData;
@@ -301,7 +290,7 @@ export default function ProfilePage() {
     return (
         <WavyBackground wavePath={TOP_WAVE_PATH} waveHeight={topWaveHeight} backgroundColor={theme.colors.mainPurple[6]} contentPaddingTop={topSectionPadding} extraBottomPadding="0px" >
             <Container size="100%" style={{ borderRadius: theme.radius.md }} p="xl">
-                {/* General Error Alert - Only show if no modal is open and an error exists from a previous save attempt */}
+                {/* General Page Error - Only show if no modal is open */}
                 {error && !profileEditOpened && !skillsEditOpened && !interestsEditOpened && !experienceEditOpened && !portfolioProjectAddOpened && !portfolioProjectEditOpened && (
                     <Alert icon={<IconAlertCircle size="1rem" />} title="Operation Error" color="red" radius="md" withCloseButton onClose={() => setError(null)} mb="lg"> {error} </Alert>
                 )}
@@ -371,7 +360,7 @@ export default function ProfilePage() {
                 </Stack>
             </Container>
 
-            {/* --- Portfolio Projects Section --- FIX #3: Added Rendering Logic --- */}
+            {/* --- Portfolio Projects Section --- */}
             <Container size="100%" mt="lg" p="xl" pt="0">
                 <Paper radius="md" p="lg" shadow="sm">
                     <Stack gap="lg">
@@ -408,9 +397,7 @@ export default function ProfilePage() {
             {/* Profile Info Edit Modal */}
             <Modal opened={profileEditOpened} onClose={closeProfileEdit} title="Edit Profile Information" centered size="md">
                 <Stack>
-                    {/* FIX #1: Show error inside modal */}
-                    {error && isSavingProfile && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setError(null)}>{error}</Alert>}
-                    {/* FIX #2: Use correct onChange */}
+                    {profileModalError && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setProfileModalError(null)}>{profileModalError}</Alert>}
                     <TextInput name="firstName" label="First Name" value={profileEditData.firstName || ''} onChange={handleProfileInputChange} />
                     <TextInput name="lastName" label="Last Name" value={profileEditData.lastName || ''} onChange={handleProfileInputChange} />
                     <TextInput name="status" label="Status (e.g., Undergraduate)" value={profileEditData.status || ''} onChange={handleProfileInputChange} />
@@ -423,7 +410,7 @@ export default function ProfilePage() {
             {/* Skills Edit Modal */}
             <Modal opened={skillsEditOpened} onClose={closeSkillsEdit} title="Edit Skills" centered size="lg">
                 <Stack>
-                    {error && isSavingSkills && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setError(null)}>{error}</Alert>}
+                    {skillsModalError && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setSkillsModalError(null)}>{skillsModalError}</Alert>}
                     <TagsInput label="Your Skills" placeholder="Enter skills and press Enter" description="Add relevant skills one by one." data={[]} value={skillsEditData} onChange={setSkillsEditData} clearable />
                     <Group justify="flex-end" mt="md"> <Button variant="default" onClick={closeSkillsEdit} disabled={isSavingSkills}>Cancel</Button> <Button color="mainPurple.6" onClick={handleSkillsSave} loading={isSavingSkills}>Save Skills</Button> </Group>
                 </Stack>
@@ -437,7 +424,7 @@ export default function ProfilePage() {
             {/* Interests Edit Modal */}
             <Modal opened={interestsEditOpened} onClose={closeInterestsEdit} title="Edit Interests" centered size="lg">
                 <Stack>
-                    {error && isSavingInterests && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setError(null)}>{error}</Alert>}
+                    {interestsModalError && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setInterestsModalError(null)}>{interestsModalError}</Alert>}
                     <TagsInput label="Your Interests" placeholder="Enter interests and press Enter" description="Add relevant interests one by one." data={[]} value={interestsEditData} onChange={setInterestsEditData} clearable />
                     <Group justify="flex-end" mt="md"> <Button variant="default" onClick={closeInterestsEdit} disabled={isSavingInterests}>Cancel</Button> <Button color="mainPurple.6" onClick={handleInterestsSave} loading={isSavingInterests}>Save Interests</Button> </Group>
                 </Stack>
@@ -451,8 +438,7 @@ export default function ProfilePage() {
             {/* Experience Edit/Add Modal */}
             <Modal opened={experienceEditOpened} onClose={closeExperienceEdit} title={isEditingExperience ? "Edit Experience" : "Add Experience"} centered size="lg">
                 <Stack>
-                    {error && isSavingExperience && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setError(null)}>{error}</Alert>}
-                    {/* FIX #2: Use correct onChange */}
+                    {experienceModalError && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setExperienceModalError(null)}>{experienceModalError}</Alert>}
                     <TextInput required name="dateRange" label="Date Range" placeholder="e.g., May 2022 - Present" value={currentExperience.dateRange || ''} onChange={handleExperienceInputChange} />
                     <TextInput required name="workName" label="Work/Position Title" placeholder="e.g., Software Developer at XYZ" value={currentExperience.workName || ''} onChange={handleExperienceInputChange} />
                     <Textarea required name="description" label="Description" placeholder="Describe your responsibilities and achievements" value={currentExperience.description || ''} onChange={handleExperienceInputChange} minRows={3} />
@@ -469,8 +455,7 @@ export default function ProfilePage() {
             <Modal opened={portfolioProjectEditOpened} onClose={closePortfolioProjectEdit} title={`Edit Portfolio Project: ${editingPortfolioProject?.title || ''}`} centered size="lg">
                 {editingPortfolioProject && (
                     <Stack>
-                        {error && isSavingEditedPortfolioProject && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setError(null)}>{error}</Alert>}
-                        {/* FIX #2: Use correct onChange */}
+                        {portfolioEditModalError && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setPortfolioEditModalError(null)}>{portfolioEditModalError}</Alert>}
                         <TextInput required name="title" label="Project Title" value={editingPortfolioProjectData.title || ''} onChange={handleEditingPortfolioProjectInputChange} />
                         <Textarea required name="description" label="Description" value={editingPortfolioProjectData.description || ''} onChange={handleEditingPortfolioProjectInputChange} minRows={4} />
                         <TagsInput label="Tags" placeholder="Enter tags and press Enter" data={[]} value={editingPortfolioProjectData.tags || []} onChange={(value) => setEditingPortfolioProjectData(d => ({ ...d, tags: value }))} clearable />
@@ -485,8 +470,7 @@ export default function ProfilePage() {
 
             <Modal opened={portfolioProjectAddOpened} onClose={closePortfolioProjectAdd} title="Add Portfolio Project" centered size="lg">
                 <Stack>
-                    {error && isSavingNewPortfolioProject && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setError(null)}>{error}</Alert>}
-                    {/* FIX #2: Use correct onChange */}
+                    {portfolioAddModalError && <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton onClose={() => setPortfolioAddModalError(null)}>{portfolioAddModalError}</Alert>}
                     <TextInput required name="title" label="Project Title" placeholder="Enter project title" value={newPortfolioProjectData.title || ''} onChange={handleNewPortfolioProjectInputChange} />
                     <Textarea required name="description" label="Description" placeholder="Enter project description" value={newPortfolioProjectData.description || ''} onChange={handleNewPortfolioProjectInputChange} minRows={4} />
                     <TagsInput label="Tags" placeholder="Enter tags and press Enter" data={[]} value={newPortfolioProjectData.tags || []} onChange={(value) => setNewPortfolioProjectData(d => ({ ...d, tags: value }))} clearable />
