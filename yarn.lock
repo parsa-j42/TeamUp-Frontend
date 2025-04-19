@@ -1386,6 +1386,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mantine/dates@npm:^7.17.4":
+  version: 7.17.4
+  resolution: "@mantine/dates@npm:7.17.4"
+  dependencies:
+    clsx: "npm:^2.1.1"
+  peerDependencies:
+    "@mantine/core": 7.17.4
+    "@mantine/hooks": 7.17.4
+    dayjs: ">=1.0.0"
+    react: ^18.x || ^19.x
+    react-dom: ^18.x || ^19.x
+  checksum: 10c0/a9d9964525be159520e272898ac090b59336fcf8c10542d571963f7a6b1b42019e1951deec78d3c08b8e6c149b2708f31222b719e651088579ef260cf108febe
+  languageName: node
+  linkType: hard
+
 "@mantine/hooks@npm:7.17.2":
   version: 7.17.2
   resolution: "@mantine/hooks@npm:7.17.2"
@@ -4141,6 +4156,7 @@ __metadata:
   dependencies:
     "@aws-amplify/auth": "npm:^6.12.2"
     "@mantine/core": "npm:7.17.2"
+    "@mantine/dates": "npm:^7.17.4"
     "@mantine/hooks": "npm:7.17.2"
     "@tabler/icons-react": "npm:^3.31.0"
     "@types/react": "npm:^19.0.7"
