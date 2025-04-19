@@ -4,7 +4,7 @@ import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import { useNavigate } from 'react-router-dom';
 
 // props interface for type safety
-interface ProjectCardProps {
+export interface ProjectCardProps {
     title: string;
     description: string;
     tags: string[];
