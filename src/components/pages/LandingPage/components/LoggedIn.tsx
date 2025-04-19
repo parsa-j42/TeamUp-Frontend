@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-    Box, Stack, Title, Text, useMantineTheme, ScrollArea, Loader, Alert, Center
-} from '@mantine/core';
+import { Box, Stack, Title, Text, useMantineTheme, ScrollArea, Loader, Alert, Center } from '@mantine/core';
 import RoundedButton from '@components/shared/RoundedButton/RoundedButton.tsx'; // Adjust path
 import WavyBackground from '@components/shared/WavyBackground/WavyBackground.tsx'; // Adjust path
 import { ProjectCard, ProjectCardProps } from '@components/shared/ProjectCard/ProjectCard.tsx'; // Adjust path, import Props type
@@ -20,20 +18,17 @@ const SECONDARY_WAVE_PATH = "M 0 0 L 0 53 Q 50 83 100 53 L 100 0 Q 50 0 0 0 Z";
 const THIRD_WAVE_PATH = "M 0 0 L 0 53 Q 50 53 100 53 L 100 0 Q 50 0 0 0 Z";
 
 // Mock project data for recommendations
-// Ensure it matches the structure expected by ProjectCardProps, providing defaults for optional fields
-const MOCK_PROJECT_DATA: Omit<ProjectCardProps, 'key'> = { // Use ProjectCardProps structure
+const MOCK_PROJECT_DATA: Omit<ProjectCardProps, 'key'> = {
     title: "Recommended Project",
     description: "Brief Introduction of project. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vestibulum leo a nisi faucibus.",
-    tags: ['Figma', 'Design'], // Ensure tags is always an array
-    showFeedbackBadge: true, // Assuming ProjectCard uses this
-    // Add other required fields from ProjectCardProps if any, e.g., id
+    tags: ['Figma', 'Design'],
+    showFeedbackBadge: true,
     // id: 'mock-id', // Example if ProjectCard needs an ID
 };
 
 export function LoggedIn() {
     const theme = useMantineTheme();
     const navigate = useNavigate();
-    // Removed unused isAuthLoading
     const { isAuthenticated, initialCheckComplete } = useAuth();
 
     const [myProjects, setMyProjects] = useState<ProjectDto[] | null>(null);
@@ -73,10 +68,7 @@ export function LoggedIn() {
     const secondarySectionPadding = `calc(${secondaryWaveOffset}px + ${theme.spacing.xl})`;
     const thirdSectionPadding = `calc(${thirdWaveOffset}px + ${theme.spacing.xl})`;
 
-    // Determine if we should show the initial CTA
-    // Show CTA if loading OR if loading is done and there are no projects (or fetch failed)
     const showInitialCTA = isLoadingProjects || (initialCheckComplete && (!myProjects || myProjects.length === 0));
-    // Removed unused hasProjects variable
 
     return (
         <Stack gap={0}>
@@ -107,7 +99,7 @@ export function LoggedIn() {
             ) : (
                 // User has projects, show MyProjectList first
                 <Box>
-                    {/* MyProjectList fetches its own data */}
+                    {/* Pass NO props, MyProjectList handles fetch and navigation */}
                     <MyProjectList />
                     {/* Recommendations below MyProjectList */}
                     <WavyBackground wavePath={THIRD_WAVE_PATH} waveHeight={thirdWaveHeight} backgroundColor={theme.colors.mainPurple[6]} contentPaddingTop={thirdSectionPadding} extraBottomPadding="0px" >
@@ -125,7 +117,6 @@ export function LoggedIn() {
             <WavyBackground wavePath={SECONDARY_WAVE_PATH} waveHeight={secondaryWaveHeight} backgroundColor={theme.colors.mainPurple[6]} contentPaddingTop={secondarySectionPadding} extraBottomPadding="0px" >
                 <Box mb="50px">
                     <Title order={2} ta="center" mt="xl" mb="50px" size="36px" fw={400}> New Projects on The Board </Title>
-                    {/* This needs integration later to fetch public projects */}
                     <ProjectListContainer />
                 </Box>
             </WavyBackground>
@@ -134,10 +125,10 @@ export function LoggedIn() {
 }
 
 // Horizontal Scroll Component
-// FIX #3: Update props to match ProjectCardProps more closely, ensure tags is always array
 interface HorizontalProjectScrollProps {
     theme: any;
-    projects: (ProjectCardProps & { id: string })[]; // Use ProjectCardProps + ensure id
+    // Use a type compatible with ProjectCardProps + id
+    projects: (Partial<ProjectCardProps> & { id: string })[];
 }
 
 function HorizontalProjectScroll({ theme, projects }: HorizontalProjectScrollProps) {
@@ -145,8 +136,8 @@ function HorizontalProjectScroll({ theme, projects }: HorizontalProjectScrollPro
         <Box style={{ marginRight: '-13%', width: 'calc(100% + 18%)' }} >
             <ScrollArea scrollbarSize={11} offsetScrollbars="x" scrollbars="x" w="100%" overscrollBehavior="contain" classNames={{ viewport: styles.scrollbarViewport, scrollbar: styles.scrollbar, thumb: styles.scrollbarThumb }} >
                 <Box style={{ display: 'flex', gap: theme.spacing.md, paddingRight: theme.spacing.xl }}>
+                    {/* Spread props, ensuring tags is an array */}
                     {projects.map((project) => (
-                        // Ensure tags is an array before passing
                         <ProjectCard key={project.id} {...project} tags={project.tags ?? []} />
                     ))}
                 </Box>
@@ -155,5 +146,4 @@ function HorizontalProjectScroll({ theme, projects }: HorizontalProjectScrollPro
     );
 }
 
-// Default export remains LoggedIn
 export default LoggedIn;

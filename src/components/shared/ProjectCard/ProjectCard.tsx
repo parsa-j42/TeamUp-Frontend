@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 // props interface for type safety
 export interface ProjectCardProps {
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
     tags: string[];
     showFeedbackBadge?: boolean;
 }
