@@ -175,9 +175,9 @@ export interface CreateProjectPayload { // For POST /projects
     requiredSkills?: string[];
     tags?: string[];
     requiredRoles?: string;
-    startDate?: string; // ISO Date String
-    endDate?: string; // ISO Date String
-    // imageUrl handled separately
+    startDate?: string;
+    endDate?: string;
+    milestones?: CreateMilestoneInput[];
 }
 
 export interface UpdateProjectPayload { // For PATCH /projects/:id
@@ -233,4 +233,9 @@ export interface UpdateApplicationStatusPayload { // For PATCH /applications/:id
 export interface CreateApplicationPayload { // For POST /applications/apply/:projectId
     roleAppliedFor?: string;
     message?: string; // Optional message field
+}
+
+export interface CreateMilestoneInput {
+    title: string;
+    date: string;
 }
