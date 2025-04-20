@@ -1,11 +1,15 @@
 // --- Shared ---
-export interface SimpleUserDto { // For embedding in other DTOs
+export interface SimpleUserDto { // For embedding and GET /users response
     id: string;
+    // Add name fields based on backend DTO mapping
     firstName: string;
     lastName: string;
-    preferredUsername?: string;
-    // avatarUrl?: string; // Add later if needed for member lists etc.
+    preferredUsername: string;
+    // Add 'name' field if backend provides it directly in GET /users
+    name?: string; // Optional: if GET /users provides a combined name
+    // avatarUrl?: string; // Add later if needed
 }
+
 
 // --- Skills ---
 export interface SkillDto {
@@ -118,7 +122,7 @@ export interface ProjectMemberDto { // For ProjectDto.members array
     projectId: string;
     userId: string;
     role: string; // e.g., 'Owner', 'Member', 'Mentor'
-    user: SimpleUserDto; // Embed simplified user info (no email)
+    user: SimpleUserDto; // Embed simplified user info
     joinedAt: string; // ISO Date String
 }
 
@@ -129,7 +133,7 @@ export interface TaskDto { // For MilestoneDto.tasks array
     description: string;
     status: string; // e.g., 'To Do'
     assigneeId?: string | null;
-    assignee?: SimpleUserDto | null; // Embed simplified user info (no email)
+    assignee?: SimpleUserDto | null; // Embed simplified user info
     createdAt: string; // ISO Date String
     updatedAt: string; // ISO Date String
 }
@@ -158,7 +162,7 @@ export interface ProjectDto { // For GET /projects and GET /projects/:id
     imageUrl?: string;
     startDate?: string; // ISO Date String
     endDate?: string; // ISO Date String
-    owner: SimpleUserDto; // Use simplified owner DTO (no email)
+    owner: SimpleUserDto; // Use simplified owner DTO
     members: ProjectMemberDto[];
     milestones?: MilestoneDto[];
     createdAt: string; // ISO Date String
@@ -200,16 +204,20 @@ export interface BookmarkDto { // For GET /users/me/bookmarks
     id: string;
     userId: string;
     projectId: string;
-    project: Omit<ProjectDto, 'members' | 'milestones'>; // Embed simplified project
+    project: Omit<ProjectDto, 'members' | 'milestones'>; // Embed simplified project (owner IS included)
     createdAt: string; // ISO Date String
 }
 
 // --- Applications ---
+// Define a type for the nested project within ApplicationDto
+// It omits members/milestones but includes the owner
+type ApplicationProjectDto = Omit<ProjectDto, 'members' | 'milestones'>;
+
 export interface ApplicationDto { // For GET /applications
     id: string;
-    applicant: SimpleUserDto; // Use simplified DTO (no email)
+    applicant: SimpleUserDto; // Use simplified DTO
     applicantId: string;
-    project: Omit<ProjectDto, 'owner' | 'members' | 'milestones'>; // Simplified project
+    project: ApplicationProjectDto; // Use the specific nested type
     projectId: string;
     status: string; // e.g., 'Pending'
     roleAppliedFor?: string;
@@ -238,4 +246,17 @@ export interface CreateApplicationPayload { // For POST /applications/apply/:pro
 export interface CreateMilestoneInput {
     title: string;
     date: string;
+}
+
+// --- Project Membership (for adding members) ---
+export interface AddMemberDto { // For POST /projects/:id/members
+    userId: string;
+    role: string; // e.g., 'Member', 'Mentor' (ProjectRole enum on backend)
+}
+
+// --- Generic API Error Structure (Example) ---
+export interface ApiErrorData {
+    statusCode: number;
+    message: string | string[]; // Message can be a string or array of validation errors
+    error?: string; // e.g., "Bad Request", "Not Found"
 }

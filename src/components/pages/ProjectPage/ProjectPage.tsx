@@ -8,8 +8,8 @@ import WavyBackground from '@components/shared/WavyBackground/WavyBackground';
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ProjectSectionCard } from './components/ProjectSectionCard';
 import { apiClient } from '@utils/apiClient';
-import { ProjectDto, ApplicationDto, BookmarkDto } from '../../../types/api';
-import { useAuth } from '@contexts/AuthContext';
+import { ProjectDto, ApplicationDto, BookmarkDto } from '../../../types/api'; // Ensure correct path
+import { useAuth } from '@contexts/AuthContext'; // Ensure correct path
 
 // Define the SVG path for the wave shape
 const WAVE_PATH = "M 0 39 Q 24 58 52 35 C 59 28 88 23 100 39 L 100 0 L 0 0 Z";
@@ -19,7 +19,6 @@ export default function ProjectPage() {
     const navigate = useNavigate();
     const location = useLocation(); // Get location for redirect state
     const { projectId } = useParams<{ projectId: string }>();
-    // FIX: Get userDetails (which contains the backend UUID) and isAuthenticated status
     const { isAuthenticated, userDetails, isLoading: isAuthLoading, initialCheckComplete } = useAuth();
 
     const [projectData, setProjectData] = useState<ProjectDto | null>(null);
@@ -27,7 +26,7 @@ export default function ProjectPage() {
     const [error, setError] = useState<string | null>(null);
     const [isApplying, setIsApplying] = useState(false);
     const [isBookmarking, setIsBookmarking] = useState(false);
-    const [isBookmarked, setIsBookmarked] = useState(false); // TODO: Implement check/toggle logic
+    const [isBookmarked, setIsBookmarked] = useState(false); // Track bookmark status
 
     const lgPadding = theme.spacing.lg;
 
@@ -43,11 +42,6 @@ export default function ProjectPage() {
         try {
             const data = await apiClient<ProjectDto>(`/projects/${projectId}`);
             setProjectData(data);
-            // TODO: Check if user has bookmarked this project
-            // This requires fetching user bookmarks or a dedicated check endpoint
-            // Example placeholder:
-            // const bookmarks = await apiClient<BookmarkDto[]>('/users/me/bookmarks');
-            // setIsBookmarked(bookmarks.some(b => b.projectId === projectId));
         } catch (err: any) {
             console.error('[ProjectPage] Error fetching project data:', err);
             setError(err.data?.message || err.message || 'Failed to load project details.');
@@ -56,10 +50,35 @@ export default function ProjectPage() {
         }
     }, [projectId]);
 
+    // --- Fetch Initial Bookmark Status ---
+    const fetchInitialBookmarkStatus = useCallback(async () => {
+        if (!projectId || !isAuthenticated || !initialCheckComplete) {
+            setIsBookmarked(false); // Ensure it's false if not logged in or check not complete
+            return;
+        }
+        console.log(`[ProjectPage] Fetching initial bookmark status for project: ${projectId}`);
+        try {
+            const bookmarks = await apiClient<BookmarkDto[]>('/users/me/bookmarks');
+            const bookmarked = bookmarks.some(b => b.projectId === projectId);
+            setIsBookmarked(bookmarked);
+            console.log(`[ProjectPage] Project ${projectId} is initially bookmarked: ${bookmarked}`);
+        } catch (err: any) {
+            // Don't block page load for bookmark status error, just log it
+            console.error('[ProjectPage] Error fetching initial bookmark status:', err);
+            setIsBookmarked(false); // Assume not bookmarked on error
+        }
+    }, [projectId, isAuthenticated, initialCheckComplete]);
+
+
     useEffect(() => {
         // Fetch project data once projectId is available
         fetchProject();
-    }, [fetchProject]); // Re-run if projectId changes (though unlikely in this setup)
+    }, [fetchProject]); // Re-run if projectId changes
+
+    useEffect(() => {
+        // Fetch bookmark status when projectId or auth status changes
+        fetchInitialBookmarkStatus();
+    }, [fetchInitialBookmarkStatus]); // Dependencies handle re-fetching
 
     // --- Event Handlers ---
     const handleApplyClick = async () => {
@@ -71,8 +90,10 @@ export default function ProjectPage() {
         setIsApplying(true); setError(null);
         console.log(`[ProjectPage] Applying to project: ${projectId}`);
         try {
+            // Use empty object {} for body as CreateApplicationDto is optional/empty
             await apiClient<ApplicationDto>(`/applications/apply/${projectId}`, {
                 method: 'POST',
+                body: {}
             });
             navigate('/submitted', { state: { action: 'Applied' } });
         } catch (err: any) {
@@ -80,6 +101,7 @@ export default function ProjectPage() {
             setError(err.data?.message || err.message || 'Failed to submit application.');
             setIsApplying(false);
         }
+        // No finally block needed for setIsApplying(false) here because we navigate away on success
     };
 
     const handleBookmarkClick = async () => {
@@ -120,25 +142,29 @@ export default function ProjectPage() {
     // --- Render Loading/Error ---
     // Wait for auth check AND project fetch
     if (isAuthLoading || isLoading || !initialCheckComplete) {
-        return ( <Center style={{ height: '80vh' }}> <Loader color="white" /> </Center> );
+        return ( <Center style={{ height: '80vh' }}> <Loader color="mainPurple.6" /> </Center> );
     }
-    if (error) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Error" color="red" radius="md"> {error} </Alert> </Container> ); }
-    if (!projectData) { return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Not Found" color="orange" radius="md"> Project details could not be loaded. </Alert> </Container> ); }
+    if (error && !projectData) { // Only show full page error if project data failed to load initially
+        return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Error" color="red" radius="md"> {error} </Alert> </Container> );
+    }
+    if (!projectData) {
+        return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Not Found" color="orange" radius="md"> Project details could not be loaded or the project does not exist. </Alert> </Container> );
+    }
 
     // --- Prepare data for rendering ---
     const { title, tags = [], owner, members = [], description, requiredRoles, requiredSkills = [] } = projectData;
-    // FIX: Use userDetails.id for comparison
-    const currentUserId = userDetails?.id;
-    const isOwner = currentUserId === owner.id;
-    const isMember = members.some(m => m.userId === currentUserId);
-    const ownerName = `${owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Owner Name';
+    const currentUserId = userDetails?.id; // Use the backend ID from userDetails
+    const isOwner = !!currentUserId && currentUserId === owner.id;
+    const isMember = !!currentUserId && members.some(m => m.userId === currentUserId);
+    // Use preferredUsername + lastName for owner name
+    const ownerName = `${owner.preferredUsername || owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Owner Name';
 
     // --- Render Logic ---
     return (
         <WavyBackground wavePath={WAVE_PATH} waveHeight={1425} contentPaddingTop={0} extraBottomPadding={0} flipWave={true} >
             <Box p="xl">
                 <Container size="md" py="xl" px="xl" bg="rgba(217, 217, 217, 0.40)" style={{ borderRadius: theme.radius.md }} >
-                    {/* Display API error for actions */}
+                    {/* Display API error for actions (e.g., apply/bookmark failure) */}
                     {error && ( <Alert icon={<IconAlertCircle size="1rem" />} title="Action Error" color="red" withCloseButton onClose={() => setError(null)} mb="lg"> {error} </Alert> )}
 
                     {/* Project Header */}
@@ -157,7 +183,7 @@ export default function ProjectPage() {
                                 <Avatar src={undefined /* owner.avatarUrl? */} radius="xl" size="lg" color="gray" />
                                 <Stack gap={0}>
                                     <Text size="sm" c="dimmed">Project Owner</Text>
-                                    <Text fw={500}>{ownerName}</Text>
+                                    <Text fw={500}>{ownerName}</Text> {/* Updated name format */}
                                 </Stack>
                             </Group>
                         </Paper>
@@ -165,13 +191,14 @@ export default function ProjectPage() {
                         {/* Current Members Section */}
                         <ProjectSectionCard title="Current Members" contentGap="md">
                             {members.length === 0 ? (
-                                <Text size="sm" c="dimmed">No members yet.</Text> // Simplified message
+                                <Text size="sm" c="dimmed">No members yet.</Text>
                             ) : (
                                 <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
                                     {members.map((member) => (
                                         <Stack key={member.id} align="left" ta="left" gap="xs">
                                             <Avatar src={undefined /* member.user.avatarUrl? */} radius="xl" size="lg" color="gray" />
-                                            <Text fw={500} mt="xs" lh={1.2}>{`${member.user.firstName} ${member.user.lastName}`}</Text>
+                                            {/* Use preferredUsername + lastName */}
+                                            <Text fw={500} mt="xs" lh={1.2}>{`${member.user.preferredUsername} ${member.user.lastName}`}</Text>
                                             <Text size="sm" c="dimmed">{member.role}</Text>
                                         </Stack>
                                     ))}
@@ -199,11 +226,27 @@ export default function ProjectPage() {
                                 </Group>
                             )}
                             <Group justify="flex-end" mt="md">
-                                <Button variant="outline" radius="xl" color="mainPurple.6" fw={400} onClick={handleBookmarkClick} loading={isBookmarking} leftSection={isBookmarked ? <IconBookmarkFilled size={16} /> : <IconBookmark size={16} />}>
+                                <Button
+                                    variant="outline"
+                                    radius="xl"
+                                    color="mainPurple.6"
+                                    fw={400}
+                                    onClick={handleBookmarkClick}
+                                    loading={isBookmarking}
+                                    disabled={!isAuthenticated || isBookmarking} // Disable if not logged in or action in progress
+                                    leftSection={isBookmarked ? <IconBookmarkFilled size={16} /> : <IconBookmark size={16} />}
+                                >
                                     {isBookmarked ? 'Bookmarked' : 'Bookmark'}
                                 </Button>
-                                {/* FIX: Use isOwner and isMember flags */}
-                                <Button color="mainPurple.6" variant="filled" radius="xl" fw={400} onClick={handleApplyClick} loading={isApplying} disabled={!isAuthenticated || isOwner || isMember}>
+                                <Button
+                                    color="mainPurple.6"
+                                    variant="filled"
+                                    radius="xl"
+                                    fw={400}
+                                    onClick={handleApplyClick}
+                                    loading={isApplying}
+                                    disabled={!isAuthenticated || isOwner || isMember || isApplying} // Disable if not logged in, owner, member, or applying
+                                >
                                     Apply
                                 </Button>
                             </Group>
