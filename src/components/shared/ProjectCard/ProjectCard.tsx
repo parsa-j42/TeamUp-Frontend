@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 // props interface for type safety
 export interface ProjectCardProps {
+    id?: string; // Add optional id prop
     title?: string;
     description?: string;
     tags: string[];
@@ -15,17 +16,30 @@ export interface ProjectCardProps {
  * ProjectCard Component
  *
  * Displays project information including title, description, tags,
- * an optional feedback status badge, and an apply button.
+ * an optional feedback status badge, and an apply button that navigates
+ * to the project's page if an ID is provided.
  * Uses Mantine UI components for styling.
  *
+ * @param id - (Optional) The unique identifier of the project.
  * @param title - The main title of the project.
  * @param description - A brief description of the project.
  * @param tags - An array of strings representing the project tags (e.g., tools used).
  * @param showFeedbackBadge - (Optional) If true, displays the "Looking for Feedback" badge. Defaults to false.
  * @param otherProps
  */
-export function ProjectCard({ title, description, tags, showFeedbackBadge = false, ...otherProps }: ProjectCardProps) {
+export function ProjectCard({ id, title, description, tags, showFeedbackBadge = false, ...otherProps }: ProjectCardProps) {
     const navigate = useNavigate();
+
+    const handleApplyClick = () => {
+        if (id) {
+            navigate(`/project/${id}`); // Navigate to specific project page
+        } else {
+            console.warn('ProjectCard: Missing project ID, cannot navigate.');
+            // Optionally navigate to a generic discover page or do nothing
+            // navigate('/discover');
+        }
+    };
+
     return (
         // Use Mantine Card as the main container
         <Card shadow="sm" padding="lg" radius="lg" bg="lightPurple.6" withBorder h="400" w="400"
@@ -48,17 +62,15 @@ export function ProjectCard({ title, description, tags, showFeedbackBadge = fals
                 </Group>
 
                 {/* Project Description */}
-                <Text size="sm" c="dimmed"> {/* Use Mantine Text for the description */}
+                <Text size="sm" c="dimmed" lineClamp={4}> {/* Use Mantine Text for the description, limit lines */}
                     {description}
                 </Text>
 
             </Stack>
 
             {/* Feedback Status and Apply Button Section */}
-            {/* Group justifies content: space-between pushes items to opposite ends */}
-            {/*<Group justify="space-between" mt="md">*/}
-            {/* Conditionally render the Feedback Badge */}
-            <Group justify="space-between" mt="xl">
+            <Group justify="space-between" mt="xl" style={{ marginTop: 'auto' }}> {/* Push to bottom */}
+                {/* Conditionally render the Feedback Badge */}
                 {showFeedbackBadge && (
                     <Badge
                         variant="filled"
@@ -73,12 +85,18 @@ export function ProjectCard({ title, description, tags, showFeedbackBadge = fals
                         Looking for Feedback
                     </Badge>
                 )}
-                {/* Apply Button - will be pushed right by justify="space-between" */}
-                {/* If showFeedbackBadge is false, this becomes the only item on the right */}
-                {!showFeedbackBadge && <div style={{ flexGrow: 1 }}></div> /* Spacer to push button right when badge is hidden */}
-                <RoundedButton color="mainPurple.6" variant="filled" size="md" fw="400" mt="35px"
-                               onClick={() => navigate('/project')}
-                >Apply</RoundedButton>
+                {/* Spacer to push button right when badge is hidden */}
+                {!showFeedbackBadge && <div style={{ flexGrow: 1 }}></div>}
+                {/* Apply Button */}
+                <RoundedButton
+                    color="mainPurple.6"
+                    variant="filled"
+                    size="md"
+                    fw="400"
+                    onClick={handleApplyClick} // Use the new handler
+                >
+                    Apply
+                </RoundedButton>
             </Group>
         </Card>
     );
