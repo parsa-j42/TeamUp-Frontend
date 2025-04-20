@@ -41,10 +41,14 @@ export const AppRouter: React.FC = () => {
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/project" element={<ProjectPage />} />
+                {/* --- MODIFIED: Add :projectId parameter --- */}
+                <Route path="/project/:projectId" element={<ProjectPage />} />
+                {/* --- END MODIFIED --- */}
                 <Route path="/submitted" element={<SuccessPage />} />
                 <Route path="/create-project" element={<CreateProjectPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                {/* Add route for viewing other user profiles */}
+                <Route path="/profile/:userId" element={<ProfilePage />} />
 
             </Route>
 
