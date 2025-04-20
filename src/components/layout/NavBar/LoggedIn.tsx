@@ -13,9 +13,9 @@ export function LoggedIn() {
     // Get userDetails and the specific isLoading flag from context
     const { logout, userDetails, isLoading, initialCheckComplete } = useAuth();
 
-    // --- MODIFIED: Get user name and avatar from userDetails ---
+    // --- Get username and avatar from userDetails ---
     const displayName = userDetails
-        ? `${userDetails.preferredUsername || userDetails.firstName} ${userDetails.lastName}`.trim()
+        ? `${userDetails.preferredUsername || userDetails.firstName} ${userDetails.lastName}`.trim() // Use preferredUsername first
         : ''; // Default to empty if no details yet
 
     // Get avatar URL from profile within userDetails
