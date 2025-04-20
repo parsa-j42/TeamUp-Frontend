@@ -151,7 +151,7 @@ export function CreateProjectForm() {
                 <Stack gap="sm">
                     <Group justify="space-between">
                         <Title order={4} size="16px" fw={500}>Project Milestones (Optional)</Title>
-                        <Button size="xs" variant="light" onClick={addMilestone} leftSection={<IconPlus size={14} />}> Add Milestone </Button>
+                        <Button color="mainPurple.6" size="xs" variant="light" onClick={addMilestone} leftSection={<IconPlus size={14} />}> Add Milestone </Button>
                     </Group>
                     <Text size="xs" c="dimmed">Define key dates and deliverables for your project.</Text>
                     {validationErrors.milestones && <Text c="red" size="xs">{validationErrors.milestones}</Text>}
