@@ -211,6 +211,17 @@ export interface UpdateProjectPayload {
   endDate?: string;
 }
 
+export interface FindProjectsQueryDto {
+  search?: string;
+  skill?: string;
+  tag?: string;
+  ownerId?: string;
+  memberId?: string;
+  mentorRequest?: string;
+  skip?: number;
+  take?: number;
+}
+
 // --- Bookmarks ---
 export interface BookmarkDto {
   id: string;
@@ -277,3 +288,4 @@ export interface ApiErrorData {
   message: string | string[];
   error?: string;
 }
+

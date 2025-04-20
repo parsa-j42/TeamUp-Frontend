@@ -1,0 +1,83 @@
+.pageWrapper {
+    padding-top: var(--mantine-spacing-xl);
+    padding-bottom: var(--mantine-spacing-xl);
+}
+
+.filterButton {
+    margin-bottom: var(--mantine-spacing-lg);
+}
+
+.filterSection {
+    background-color: var(--mantine-color-gray-0);
+    padding: var(--mantine-spacing-lg);
+    border-radius: var(--mantine-radius-md);
+    border: 1px solid var(--mantine-color-gray-3);
+    margin-bottom: var(--mantine-spacing-xl);
+}
+
+.resultsSection {
+    margin-top: var(--mantine-spacing-xl);
+}
+
+.sectionTitle {
+    margin-bottom: var(--mantine-spacing-lg);
+    font-weight: 500;
+    color: var(--mantine-color-black);
+}
+
+.horizontalScrollContainer {
+    /* Styles for the horizontal scroll area container */
+    margin-right: calc(-1 * var(--mantine-spacing-md)); /* Adjust based on page padding if needed */
+    margin-left: calc(-1 * var(--mantine-spacing-md));
+}
+
+.scrollbarViewport {
+    padding-bottom: 20px !important; /* Ensure space for scrollbar */
+    padding-left: var(--mantine-spacing-md);
+}
+
+.scrollbar {
+    background-color: transparent;
+    border-radius: 10px;
+    height: 11px !important; /* Match landing page */
+    @mixin hover {
+        background-color: var(--mantine-color-mainGreen-6) !important;
+        & .scrollbarThumb {
+            background-color: var(--mantine-color-mainOrange-6) !important;
+        }
+    }
+}
+
+.scrollbarThumb {
+    background-color: var(--mantine-color-mainGreen-6) !important; /* Use !important if needed */
+    border-radius: 10px;
+    margin: 0px 8px 0px 8px; /* Match landing page */
+    @mixin hover {
+        background-color: var(--mantine-color-mainOrange-6) !important;
+    }
+}
+
+.verticalProjectList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Responsive grid */
+    gap: var(--mantine-spacing-lg);
+}
+
+/* Consistent styling for filter inputs */
+.filterInput {
+    /* Add common styles if needed */
+}
+
+.filterChip {
+    /* Styles for ChipGroup chips */
+    font-family: "Noto Sans", sans-serif;
+    font-size: 13px;
+}
+.filterChip[data-checked] {
+    background-color: var(--mantine-color-mainPurple-1);
+    border-color: var(--mantine-color-mainPurple-6);
+    color: var(--mantine-color-mainPurple-9);
+}
+.filterChip:not([data-checked]):hover {
+    background-color: var(--mantine-color-gray-1);
+}
