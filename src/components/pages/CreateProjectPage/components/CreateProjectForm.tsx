@@ -1,11 +1,11 @@
-import { useState } from 'react'; // Import React
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Stack, TextInput, Textarea, Button, Group, Title, Text, TagsInput, Alert,
-    Paper, ActionIcon,
+    Paper, ActionIcon, Box, // Added Box
 } from '@mantine/core';
-import { DateInput } from '@mantine/dates'; // Import DateInput
-import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-react'; // Added IconPlus, IconTrash
+import { DateInput } from '@mantine/dates';
+import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-react';
 import { ChipGroupField } from './ChipGroupField';
 import styles from '../CreateProjectPage.module.css';
 import {
@@ -32,7 +32,7 @@ export function CreateProjectForm() {
     const [mentorRequestValue, setMentorRequestValue] = useState<string>('');
     const [preferredMentorValue, setPreferredMentorValue] = useState<string>('');
     const [tags, setTags] = useState<string[]>([]);
-    const [milestones, setMilestones] = useState<CreateMilestoneInput[]>([{ title: '', date: '' }]); // Initialize with one empty milestone
+    const [milestones, setMilestones] = useState<CreateMilestoneInput[]>([{ title: '', date: '' }]);
 
     // --- Submission State ---
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +45,7 @@ export function CreateProjectForm() {
         const stringValue = value instanceof Date ? value.toISOString() : value ?? '';
         newMilestones[index] = { ...newMilestones[index], [field]: stringValue };
         setMilestones(newMilestones);
-        setValidationErrors(p => ({ ...p, milestones: null })); // Clear milestone error on change
+        setValidationErrors(p => ({ ...p, milestones: null }));
     };
 
     const addMilestone = () => {
@@ -57,7 +57,7 @@ export function CreateProjectForm() {
             const newMilestones = milestones.filter((_, i) => i !== index);
             setMilestones(newMilestones);
         } else {
-            setMilestones([{ title: '', date: '' }]); // Clear the last row instead of removing
+            setMilestones([{ title: '', date: '' }]);
         }
     };
 
@@ -71,13 +71,10 @@ export function CreateProjectForm() {
         if (!requiredRoles.trim()) errors.requiredRoles = 'Required Roles description is required.';
         if (!projectTypeValue) errors.projectType = 'Project Type selection is required.';
 
-        // Validate milestones: check for partially filled rows
         const partiallyFilled = milestones.some(m => (m.title.trim() && !m.date) || (!m.title.trim() && m.date));
         if (partiallyFilled) {
             errors.milestones = 'Please complete both title and date for all added milestones, or remove incomplete ones.';
         }
-        // Note: We allow submitting with NO milestones if the first row is empty.
-        // If at least one milestone is *required*, add that check here.
 
         setValidationErrors(errors);
         return Object.keys(errors).length === 0;
@@ -85,7 +82,7 @@ export function CreateProjectForm() {
 
     // --- Event Handlers ---
     const handleCancel = () => {
-        navigate('/Dashboard'); // Use correct casing
+        navigate('/Dashboard');
     };
 
     const handleCreate = async () => {
@@ -96,7 +93,6 @@ export function CreateProjectForm() {
         }
         setIsSubmitting(true);
 
-        // Filter out milestones that are completely empty before sending
         const milestonesToSend = milestones.filter(m => m.title.trim() && m.date);
 
         const payload: CreateProjectPayload = {
@@ -117,15 +113,13 @@ export function CreateProjectForm() {
         try {
             const newProject = await apiClient<ProjectDto>('/projects', { method: 'POST', body: payload });
             console.log('Project created successfully:', newProject);
-            // --- CHANGE: Navigate to Dashboard with new project ID in state ---
-            navigate('/Dashboard', { // Use correct casing
-                replace: true, // Replace create page in history
+            navigate('/Dashboard', {
+                replace: true,
                 state: {
-                    selectedProjectId: newProject.id, // Pass ID to dashboard
-                    message: 'Project created successfully!' // Optional message
+                    selectedProjectId: newProject.id,
+                    message: 'Project created successfully!'
                 }
             });
-            // --- END CHANGE ---
         } catch (err: any) {
             console.error('Project creation failed:', err);
             setError(err.data?.message || err.message || 'Failed to create project. Please try again.');
@@ -157,41 +151,43 @@ export function CreateProjectForm() {
                 <Stack gap="sm">
                     <Group justify="space-between">
                         <Title order={4} size="16px" fw={500}>Project Milestones (Optional)</Title>
-                        <Button size="xs" variant="light" onClick={addMilestone} leftSection={<IconPlus size={14} />}>
-                            Add Milestone
-                        </Button>
+                        <Button size="xs" variant="light" onClick={addMilestone} leftSection={<IconPlus size={14} />}> Add Milestone </Button>
                     </Group>
                     <Text size="xs" c="dimmed">Define key dates and deliverables for your project.</Text>
                     {validationErrors.milestones && <Text c="red" size="xs">{validationErrors.milestones}</Text>}
                     {milestones.map((milestone, index) => (
                         <Paper key={index} p="sm" withBorder radius="sm" >
-                            <Group align="flex-start">
+                            <Group align="flex-start" wrap="nowrap"> {/* Use wrap="nowrap" */}
                                 <Stack gap="xs" style={{ flexGrow: 1 }}>
+                                    {/* Apply outline style to TextInput */}
                                     <TextInput
                                         placeholder="Milestone Title (e.g., Phase 1 Complete)"
                                         value={milestone.title}
                                         onChange={(e) => handleMilestoneChange(index, 'title', e.currentTarget.value)}
-                                        // error={validationErrors[`milestone_${index}_title`]} // More granular error handling if needed
                                         size="xs"
+                                        classNames={{ input: styles.textInputOutline }} // Apply style
                                     />
+                                    {/* Apply outline style to DateInput */}
                                     <DateInput
                                         placeholder="Select date"
-                                        value={milestone.date ? new Date(milestone.date) : null} // Convert string back to Date for picker
+                                        value={milestone.date ? new Date(milestone.date) : null}
                                         onChange={(dateValue) => handleMilestoneChange(index, 'date', dateValue)}
-                                        // error={validationErrors[`milestone_${index}_date`]}
-                                        valueFormat="YYYY-MM-DD" // Format displayed in input
+                                        valueFormat="YYYY-MM-DD"
                                         size="xs"
+                                        classNames={{ input: styles.textInputOutline }} // Apply style
                                     />
                                 </Stack>
-                                <ActionIcon
-                                    color="red"
-                                    variant="subtle"
-                                    onClick={() => removeMilestone(index)}
-                                    disabled={milestones.length <= 1} // Disable removing the last row
-                                    title="Remove Milestone"
-                                >
-                                    <IconTrash size={18} />
-                                </ActionIcon>
+                                <Box pt={5}> {/* Add padding top to align icon */}
+                                    <ActionIcon
+                                        color="red"
+                                        variant="subtle"
+                                        onClick={() => removeMilestone(index)}
+                                        disabled={milestones.length <= 1 && !milestone.title && !milestone.date} // Allow removing the last row only if it's empty
+                                        title="Remove Milestone"
+                                    >
+                                        <IconTrash size={18} />
+                                    </ActionIcon>
+                                </Box>
                             </Group>
                         </Paper>
                     ))}
