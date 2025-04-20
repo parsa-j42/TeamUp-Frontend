@@ -15,7 +15,7 @@ import { apiClient } from '@utils/apiClient';
 import { useAuth } from '@contexts/AuthContext';
 import {
     ProjectDto, ApplicationDto, FindApplicationsQueryDto, UpdateApplicationStatusPayload,
-    ProjectMemberDto, SimpleUserDto, AddMemberDto,
+    ProjectMemberDto, SimpleUserDto, InviteUserDto, ApplicationStatus,
 } from '../../../types/api';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -111,7 +111,6 @@ export default function DashboardPage() {
         console.log(`[Dashboard] Searching users for: ${debouncedInviteSearchQuery}`);
         setIsSearchingUsers(true); setInviteError(null);
         try {
-            // Assuming GET /users returns SimpleUserDto[] with required name fields
             const users = await apiClient<SimpleUserDto[]>(`/users?search=${encodeURIComponent(debouncedInviteSearchQuery)}`);
             const currentMemberIds = new Set(selectedProjectData?.members.map(m => m.userId) || []);
             const filteredUsers = users.filter(u => !currentMemberIds.has(u.id));
@@ -155,8 +154,8 @@ export default function DashboardPage() {
         try {
             const payload: UpdateApplicationStatusPayload = { status };
             await apiClient<ApplicationDto>(`/applications/${applicationId}/status`, { method: 'PATCH', body: payload });
-            fetchApplications();
-            if (status === 'Accepted') { fetchSelectedProjectDetails(); }
+            fetchApplications(); // Refresh the application list
+            if (status === 'Accepted') { fetchSelectedProjectDetails(); } // Refresh members if accepted
         } catch (err: any) { setError(err.data?.message || err.message || `Failed to ${status.toLowerCase()} application.`); }
         finally { setIsProcessingAction(null); }
     };
@@ -165,25 +164,31 @@ export default function DashboardPage() {
         setIsProcessingAction(memberUserId); setError(null);
         try {
             await apiClient<void>(`/projects/${projectId}/members/${memberUserId}`, { method: 'DELETE' });
-            fetchSelectedProjectDetails();
+            fetchSelectedProjectDetails(); // Refresh members
         } catch (err: any) { setError(err.data?.message || err.message || 'Failed to remove team member.'); }
         finally { setIsProcessingAction(null); }
     };
 
+    // --- UPDATED: Invite Member Handler ---
     const handleInviteMember = async () => {
         if (!inviteUserId || !selectedProjectId) {
             setInviteError("Please select a user to invite."); return;
         }
         setIsInvitingUser(true); setInviteError(null);
         try {
-            const payload: AddMemberDto = { userId: inviteUserId, role: 'Member' };
-            await apiClient<ProjectMemberDto>(`/projects/${selectedProjectId}/members`, { method: 'POST', body: payload });
+            const payload: InviteUserDto = { userId: inviteUserId }; // Role is optional, defaults to Member on backend
+            // Call the new invite endpoint
+            await apiClient<ApplicationDto>(`/projects/${selectedProjectId}/invite`, { method: 'POST', body: payload });
             closeInviteModal();
-            fetchSelectedProjectDetails();
+            // No need to refresh project details, just show success
+            setError(null); // Clear previous errors
+            // Optionally show a success notification here
+            console.log("Invitation sent successfully!");
+            // Reset modal state
             setInviteSearchQuery(''); setInviteUserId(null); setInviteSearchResults([]);
         } catch (err: any) {
             console.error('[Dashboard] Error inviting member:', err);
-            setInviteError(err.data?.message || err.message || 'Failed to invite member.');
+            setInviteError(err.data?.message || err.message || 'Failed to send invitation.');
         } finally { setIsInvitingUser(false); }
     };
 
@@ -254,7 +259,6 @@ export default function DashboardPage() {
                                 {displayProject.members.map((member: ProjectMemberDto) => (
                                     <Stack key={member.id} gap="xs" align="left" ta="left">
                                         <Avatar src={undefined} radius="50%" size={80} color="gray.3"> <IconPhoto size="2rem" color={theme.colors.mainPurple[1]} /> </Avatar>
-                                        {/* Use preferredUsername + lastName */}
                                         <Text fw={500} size="md">{`${member.user.preferredUsername} ${member.user.lastName}`}</Text>
                                         <Text size="sm" c="gray.4">{member.role}</Text>
                                         <Group gap="sm" mt="xs" justify="flex-start">
@@ -304,15 +308,15 @@ export default function DashboardPage() {
             {/* Applications Section */}
             <Box bg="white" p="xl" style={{ borderRadius: theme.radius.lg, border: `1px solid ${theme.colors.mainPurple[6]}` }} m="xl">
                 <Stack gap="lg">
-                    <Stack gap="xs"> <Title order={2} fw={500}>Applications</Title> <Text size="sm"> Manage applications for your projects or track your own submissions. </Text> </Stack>
+                    <Stack gap="xs"> <Title order={2} fw={500}>Applications & Invitations</Title> <Text size="sm"> Manage incoming/outgoing requests and invitations. </Text> </Stack>
                     <Stack gap="md">
                         <SegmentedControl value={applicationFilter} onChange={(value) => setApplicationFilter(value as 'received' | 'sent')} data={[ { label: 'Received', value: 'received' }, { label: 'Sent', value: 'sent' } ]} color="mainPurple.6" radius="md" styles={(theme) => ({ root: { backgroundColor: 'transparent', padding: 0, width: 'fit-content' }, label: { paddingTop: theme.spacing.xs, paddingBottom: theme.spacing.xs, paddingLeft: theme.spacing.md, paddingRight: theme.spacing.md }, control: { border: 'none' }, indicator: { borderRadius: theme.radius.md, backgroundColor: theme.colors.mainPurple[6], boxShadow: 'none' } })} />
-                        <Select placeholder={applicationFilter === 'received' ? "Filter received by project you own" : "Filter sent by project applied to"} data={projectOptionsForFilter} value={selectedProjectId} onChange={handleProjectSelection} clearable searchable nothingFoundMessage="No relevant projects found"
+                        <Select placeholder={applicationFilter === 'received' ? "Filter received by project" : "Filter sent by project"} data={projectOptionsForFilter} value={selectedProjectId} onChange={handleProjectSelection} clearable searchable nothingFoundMessage="No relevant projects found"
                                 rightSection={<IconChevronDown size={16} color={theme.colors.mainPurple[6]} />} radius="md" styles={(theme) => ({ input: { borderColor: theme.colors.mainPurple[2], color: theme.colors.mainPurple[6], '::placeholder': { color: theme.colors.mainPurple[6] } }, dropdown: { borderColor: theme.colors.mainPurple[2] }, option: { '&[data-selected]': { backgroundColor: theme.colors.mainPurple[1], color: theme.colors.mainPurple[8] }, '&[data-hovered]': { backgroundColor: theme.colors.mainPurple[0] } } })} />
                     </Stack>
                     {isLoadingApplications && <Center><Loader my="lg" /></Center>}
-                    {!isLoadingApplications && error && <Alert color="red" title="Error Loading Applications" icon={<IconAlertCircle />}>{error}</Alert>}
-                    {!isLoadingApplications && applications.length === 0 && !error && ( <Text c="dimmed" ta="center" my="lg">No {applicationFilter} applications {selectedProjectId ? 'for this project' : ''} found.</Text> )}
+                    {!isLoadingApplications && error && <Alert color="red" title="Error Loading Data" icon={<IconAlertCircle />}>{error}</Alert>}
+                    {!isLoadingApplications && applications.length === 0 && !error && ( <Text c="dimmed" ta="center" my="lg">No {applicationFilter} applications or invitations {selectedProjectId ? 'for this project' : ''} found.</Text> )}
                     {!isLoadingApplications && applications.length > 0 && (
                         <Stack gap="lg">
                             {applications.map((app, index) => (
@@ -320,29 +324,26 @@ export default function DashboardPage() {
                                     <Group justify="space-between" align="flex-start">
                                         <Stack gap="sm">
                                             <Group gap="xs"> <IconClock size={16} color='black' /> <Text size="xs" c="black" title={dayjs(app.createdAt).format('YYYY-MM-DD HH:mm')}>{dayjs(app.createdAt).fromNow()}</Text> </Group>
-                                            {/* Make Project Title Clickable */}
                                             <Anchor onClick={() => navigate(`/project/${app.projectId}`)} underline="hover" c="black">
                                                 <Title order={4} fw={500}>
                                                     {app.roleAppliedFor ? `${app.roleAppliedFor} @ ${app.project.title}` : `Application for ${app.project.title}`}
+                                                    {app.status === ApplicationStatus.INVITED && applicationFilter === 'received' && ' (Invitation)'}
                                                 </Title>
                                             </Anchor>
                                             {applicationFilter === 'received' ? (
                                                 <Group gap="xs" style={{ cursor: 'pointer' }} onClick={() => navigate(`/profile/${app.applicantId}`)} >
                                                     <Avatar color="gray" radius="xl" size="sm"> <IconPhoto size="0.8rem" /> </Avatar>
-                                                    {/* Use preferredUsername + lastName */}
                                                     <Text size="sm" c="dimmed">{`${app.applicant.preferredUsername} ${app.applicant.lastName}`}</Text>
                                                 </Group>
-                                            ) : (
-                                                // Display project owner for sent applications
+                                            ) : ( // Sent applications
                                                 <Group gap="xs">
-                                                    {/* Use preferredUsername + lastName */}
                                                     <Text size="sm" c="dimmed">Owner: {`${app.project.owner.preferredUsername} ${app.project.owner.lastName}`}</Text>
                                                 </Group>
                                             )}
-                                            <Badge color={app.status === 'Accepted' ? 'green' : app.status === 'Declined' ? 'red' : 'yellow'}>{app.status}</Badge>
+                                            <Badge color={app.status === ApplicationStatus.ACCEPTED ? 'green' : app.status === ApplicationStatus.DECLINED ? 'red' : app.status === ApplicationStatus.INVITED ? 'blue' : 'yellow'}>{app.status}</Badge>
                                         </Stack>
-                                        {/* Actions for Received Applications */}
-                                        {applicationFilter === 'received' && app.status === 'Pending' && (
+                                        {/* Actions: Show for Received Pending Apps (Owner) OR Received Invites (Applicant) */}
+                                        {applicationFilter === 'received' && (app.status === ApplicationStatus.PENDING || app.status === ApplicationStatus.INVITED) && (
                                             <Group gap="sm" mt={25}>
                                                 <Button variant="filled" color="mainPurple.6" radius="md" size="sm" fw={400} onClick={() => handleApplicationStatusUpdate(app.id, 'Accepted')} loading={isProcessingAction === app.id} disabled={!!isProcessingAction}> Accept </Button>
                                                 <Button variant="outline" radius="md" size="sm" fw={400} onClick={() => handleApplicationStatusUpdate(app.id, 'Declined')} loading={isProcessingAction === app.id} disabled={!!isProcessingAction} styles={(theme) => ({ root: { borderColor: "black", color: theme.colors.gray[7], '&:hover': { backgroundColor: theme.colors.gray[0] } } })} > Decline </Button>
@@ -365,16 +366,14 @@ export default function DashboardPage() {
                         ref={autocompleteRef}
                         label="Search User by Name"
                         placeholder="Start typing a name..."
-                        data={autocompleteData} // Use formatted data (preferredUsername + lastName)
+                        data={autocompleteData}
                         value={inviteSearchQuery}
                         onChange={setInviteSearchQuery}
                         onOptionSubmit={(value) => {
                             console.log("User selected ID:", value);
-                            setInviteUserId(value); // Store the ID
-                            // Update input field to show the selected user's name
+                            setInviteUserId(value);
                             const selectedUser = inviteSearchResults.find(u => u.id === value);
                             if (selectedUser) {
-                                // Use preferredUsername + lastName for display
                                 setInviteSearchQuery(`${selectedUser.preferredUsername} ${selectedUser.lastName}`);
                             }
                         }}
@@ -386,11 +385,11 @@ export default function DashboardPage() {
                         <Button variant="default" onClick={closeInviteModal} disabled={isInvitingUser}>Cancel</Button>
                         <Button
                             color="mainPurple.6"
-                            onClick={handleInviteMember}
+                            onClick={handleInviteMember} // Calls the updated handler
                             loading={isInvitingUser}
                             disabled={!inviteUserId || isInvitingUser}
                         >
-                            Add Member
+                            Send Invitation {/* Changed button text */}
                         </Button>
                     </Group>
                 </Stack>
