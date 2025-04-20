@@ -15,7 +15,7 @@ import { apiClient } from '@utils/apiClient';
 import { useAuth } from '@contexts/AuthContext';
 import {
     ProjectDto, ApplicationDto, FindApplicationsQueryDto, UpdateApplicationStatusPayload,
-    ProjectMemberDto, SimpleUserDto, InviteUserDto, ApplicationStatus,
+    ProjectMemberDto, SimpleUserDto, InviteUserDto, ApplicationStatus, MilestoneDto
 } from '../../../types/api';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -39,7 +39,7 @@ export default function DashboardPage() {
     const [isLoadingSelectedProject, setIsLoadingSelectedProject] = useState(false);
     const [isLoadingApplications, setIsLoadingApplications] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null);
+    const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null); // For app accept/decline/remove member
     const [projectOptionsForFilter, setProjectOptionsForFilter] = useState<{ value: string; label: string }[]>([]);
 
     // --- Invite Member State ---
@@ -52,6 +52,10 @@ export default function DashboardPage() {
     const [isInvitingUser, setIsInvitingUser] = useState(false);
     const [inviteError, setInviteError] = useState<string | null>(null);
     const autocompleteRef = useRef<HTMLInputElement>(null);
+
+    // --- Milestone/Task State ---
+    const [activeMilestoneId, setActiveMilestoneId] = useState<string | null>(null);
+    const [isActivatingMilestone, setIsActivatingMilestone] = useState<string | null>(null); // Store ID being activated
 
     // --- Navigation State Handling ---
     useLayoutEffect(() => {
@@ -67,23 +71,33 @@ export default function DashboardPage() {
 
     // --- Data Fetching ---
     const fetchSelectedProjectDetails = useCallback(async () => {
-        if (!selectedProjectId) { setSelectedProjectData(null); return; }
+        if (!selectedProjectId) {
+            setSelectedProjectData(null);
+            setActiveMilestoneId(null); // Clear active milestone when project changes
+            return;
+        }
         console.log(`[Dashboard] Fetching details for project ID: ${selectedProjectId}`);
         setIsLoadingSelectedProject(true); setError(null);
         try {
             const data = await apiClient<ProjectDto>(`/projects/${selectedProjectId}`);
             setSelectedProjectData(data);
+            // Find and set the initially active milestone ID
+            const initiallyActive = data.milestones?.find(m => m.active);
+            setActiveMilestoneId(initiallyActive ? initiallyActive.id : null);
+            console.log("[Dashboard] Fetched project data, initially active milestone:", initiallyActive?.id);
         } catch (err: any) {
             console.error(`[Dashboard] Error fetching project ${selectedProjectId} details:`, err);
             setError(err.data?.message || err.message || 'Failed to load selected project details.');
             setSelectedProjectData(null);
+            setActiveMilestoneId(null);
         } finally { setIsLoadingSelectedProject(false); }
     }, [selectedProjectId]);
 
     const fetchApplications = useCallback(async () => {
         if (!initialCheckComplete || !userDetails) return;
         console.log(`[Dashboard] Fetching applications with filter: ${applicationFilter}, project: ${selectedProjectId || 'All'}`);
-        setIsLoadingApplications(true); setError(null);
+        setIsLoadingApplications(true); // Keep separate loading state for applications
+        // Don't clear main error here, maybe set a specific appError state if needed
         try {
             const queryParams: FindApplicationsQueryDto = {
                 filter: applicationFilter,
@@ -96,19 +110,19 @@ export default function DashboardPage() {
             setApplications(data.applications);
         } catch (err: any) {
             console.error('[Dashboard] Error fetching applications:', err);
+            // Use main error state for now, or create separate appError state
             setError(err.data?.message || err.message || 'Failed to load applications.');
             setApplications([]);
         } finally { setIsLoadingApplications(false); }
     }, [applicationFilter, selectedProjectId, initialCheckComplete, userDetails]);
 
-    // --- Fetch User Search Results (Debounced) ---
     const searchUsers = useCallback(async () => {
+        // ... (user search logic remains the same)
         if (!debouncedInviteSearchQuery || debouncedInviteSearchQuery.length < 2) {
             setInviteSearchResults([]);
             setIsSearchingUsers(false);
             return;
         }
-        console.log(`[Dashboard] Searching users for: ${debouncedInviteSearchQuery}`);
         setIsSearchingUsers(true); setInviteError(null);
         try {
             const users = await apiClient<SimpleUserDto[]>(`/users?search=${encodeURIComponent(debouncedInviteSearchQuery)}`);
@@ -119,9 +133,7 @@ export default function DashboardPage() {
             console.error('[Dashboard] Error searching users:', err);
             setInviteError(err.data?.message || err.message || 'Failed to search users.');
             setInviteSearchResults([]);
-        } finally {
-            setIsSearchingUsers(false);
-        }
+        } finally { setIsSearchingUsers(false); }
     }, [debouncedInviteSearchQuery, selectedProjectData?.members]);
 
     useEffect(() => { searchUsers(); }, [searchUsers]);
@@ -131,18 +143,17 @@ export default function DashboardPage() {
     const handleProjectSelection = useCallback((projectId: string | null) => {
         console.log("[Dashboard] Project selected:", projectId);
         setSelectedProjectId(projectId);
+        // Active milestone will be reset by fetchSelectedProjectDetails effect
     }, []);
 
     useEffect(() => {
+        // ... (fetchFilterOptions logic remains the same)
         const fetchFilterOptions = async () => {
             if (initialCheckComplete && userDetails) {
                 try {
                     const projects = await apiClient<ProjectDto[]>('/projects/me');
                     setProjectOptionsForFilter(projects.map(p => ({ value: p.id, label: p.title })));
-                } catch (err) {
-                    console.error("Failed to fetch projects for filter dropdown:", err);
-                    setProjectOptionsForFilter([]);
-                }
+                } catch (err) { console.error("Failed to fetch projects for filter dropdown:", err); setProjectOptionsForFilter([]); }
             }
         };
         fetchFilterOptions();
@@ -150,50 +161,75 @@ export default function DashboardPage() {
 
     // --- Action Handlers ---
     const handleApplicationStatusUpdate = async (applicationId: string, status: 'Accepted' | 'Declined') => {
+        // ... (logic remains the same)
         setIsProcessingAction(applicationId); setError(null);
         try {
             const payload: UpdateApplicationStatusPayload = { status };
             await apiClient<ApplicationDto>(`/applications/${applicationId}/status`, { method: 'PATCH', body: payload });
-            fetchApplications(); // Refresh the application list
-            if (status === 'Accepted') { fetchSelectedProjectDetails(); } // Refresh members if accepted
+            fetchApplications();
+            if (status === 'Accepted') { fetchSelectedProjectDetails(); }
         } catch (err: any) { setError(err.data?.message || err.message || `Failed to ${status.toLowerCase()} application.`); }
         finally { setIsProcessingAction(null); }
     };
 
     const handleRemoveMember = async (projectId: string, memberUserId: string) => {
+        // ... (logic remains the same)
         setIsProcessingAction(memberUserId); setError(null);
         try {
             await apiClient<void>(`/projects/${projectId}/members/${memberUserId}`, { method: 'DELETE' });
-            fetchSelectedProjectDetails(); // Refresh members
+            fetchSelectedProjectDetails();
         } catch (err: any) { setError(err.data?.message || err.message || 'Failed to remove team member.'); }
         finally { setIsProcessingAction(null); }
     };
 
-    // --- UPDATED: Invite Member Handler ---
     const handleInviteMember = async () => {
-        if (!inviteUserId || !selectedProjectId) {
-            setInviteError("Please select a user to invite."); return;
-        }
+        // ... (logic remains the same - calls invite endpoint)
+        if (!inviteUserId || !selectedProjectId) { setInviteError("Please select a user to invite."); return; }
         setIsInvitingUser(true); setInviteError(null);
         try {
-            const payload: InviteUserDto = { userId: inviteUserId }; // Role is optional, defaults to Member on backend
-            // Call the new invite endpoint
+            const payload: InviteUserDto = { userId: inviteUserId };
             await apiClient<ApplicationDto>(`/projects/${selectedProjectId}/invite`, { method: 'POST', body: payload });
             closeInviteModal();
-            // No need to refresh project details, just show success
-            setError(null); // Clear previous errors
-            // Optionally show a success notification here
+            setError(null);
             console.log("Invitation sent successfully!");
-            // Reset modal state
             setInviteSearchQuery(''); setInviteUserId(null); setInviteSearchResults([]);
-        } catch (err: any) {
-            console.error('[Dashboard] Error inviting member:', err);
-            setInviteError(err.data?.message || err.message || 'Failed to send invitation.');
-        } finally { setIsInvitingUser(false); }
+        } catch (err: any) { console.error('[Dashboard] Error inviting member:', err); setInviteError(err.data?.message || err.message || 'Failed to send invitation.'); }
+        finally { setIsInvitingUser(false); }
     };
+
+    // --- NEW: Activate Milestone Handler ---
+    const handleActivateMilestone = async (milestoneId: string) => {
+        if (!selectedProjectId || isActivatingMilestone === milestoneId) return; // Prevent activating if already activating this one
+        console.log(`[Dashboard] Activating milestone ${milestoneId} for project ${selectedProjectId}`);
+        setIsActivatingMilestone(milestoneId); // Set which one is being activated
+        setError(null);
+        try {
+            await apiClient<MilestoneDto>(`/projects/${selectedProjectId}/milestones/${milestoneId}/activate`, { method: 'PATCH' });
+            // Update local state instead of full refetch for better UX
+            setActiveMilestoneId(milestoneId);
+            setSelectedProjectData(prevData => {
+                if (!prevData) return null;
+                return {
+                    ...prevData,
+                    milestones: prevData.milestones?.map(m => ({
+                        ...m,
+                        active: m.id === milestoneId, // Set active flag locally
+                    }))
+                };
+            });
+            console.log(`[Dashboard] Milestone ${milestoneId} activated locally.`);
+        } catch (err: any) {
+            console.error(`[Dashboard] Error activating milestone ${milestoneId}:`, err);
+            setError(err.data?.message || err.message || 'Failed to activate milestone.');
+        } finally {
+            setIsActivatingMilestone(null); // Clear activating state
+        }
+    };
+    // --- END NEW ---
 
     // --- Helper Functions ---
     const formatProjectDateRange = (start?: string, end?: string): string => {
+        // ... (logic remains the same)
         if (!start) return 'Date not set';
         const startDate = dayjs(start).format('MMM YYYY');
         const endDate = end ? dayjs(end).format('MMM YYYY') : 'Present';
@@ -209,11 +245,14 @@ export default function DashboardPage() {
     const currentUserId = userDetails.id;
     const isOwner = !!displayProject && currentUserId === displayProject.owner.id;
 
-    // Format search results for Autocomplete using preferredUsername + lastName
     const autocompleteData = inviteSearchResults.map(user => ({
         value: user.id,
-        label: `${user.preferredUsername} ${user.lastName}` // Use preferredUsername + lastName
+        label: `${user.preferredUsername} ${user.lastName}`
     }));
+
+    // Find the currently active milestone's tasks
+    const activeMilestone = displayProject?.milestones?.find(m => m.id === activeMilestoneId);
+    const tasksToShow = activeMilestone?.tasks ?? [];
 
     // --- Wave Background Setup ---
     const topWaveHeight = 500;
@@ -279,25 +318,61 @@ export default function DashboardPage() {
                                 {/* Timeline */}
                                 <Box>
                                     {(displayProject.milestones?.length ?? 0) > 0 ? (
-                                        <Timeline active={displayProject.milestones?.findIndex(m => m.active) ?? -1} bulletSize={24} lineWidth={2} color="white">
+                                        <Timeline
+                                            active={displayProject.milestones?.findIndex(m => m.id === activeMilestoneId) ?? -1} // Use activeMilestoneId for active index
+                                            bulletSize={24}
+                                            lineWidth={2}
+                                            color="white"
+                                        >
                                             {displayProject.milestones!.map((item, index) => (
                                                 <Timeline.Item
                                                     key={item.id}
                                                     title={<Text size="sm" c="white">{dayjs(item.date).format('DD MMM YYYY')}</Text>}
-                                                    bullet={ item.active ? ( <ThemeIcon size={24} radius="xl" color="mainOrange.6"> <IconPointFilled size={16} color="yellow" /> </ThemeIcon> ) : ( <ThemeIcon size={24} radius="xl" variant='outline' color="white"> <IconCircleDashed size={16} /> </ThemeIcon> )}
+                                                    bullet={ item.id === activeMilestoneId ? ( <ThemeIcon size={24} radius="xl" color="mainOrange.6"> <IconPointFilled size={16} color="yellow" /> </ThemeIcon> ) : ( <ThemeIcon size={24} radius="xl" variant='outline' color="white"> <IconCircleDashed size={16} /> </ThemeIcon> )}
                                                     lineVariant={index === 0 ? 'solid' : 'dashed'}
+                                                    // Add onClick to activate milestone
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => handleActivateMilestone(item.id)}
                                                 >
-                                                    {item.active ? ( <Paper radius="md" p="xs" bg={theme.colors.mainOrange[6]} c="black" shadow="xs"> <Text size="sm" fw={500}>{item.title}</Text> </Paper> ) : ( <Text size="sm" c="white" ml={5}>{item.title}</Text> )}
+                                                    {item.id === activeMilestoneId ? (
+                                                        <Paper radius="md" p="xs" bg={theme.colors.mainOrange[6]} c="black" shadow="xs">
+                                                            <Text size="sm" fw={500}>{item.title}</Text>
+                                                        </Paper>
+                                                    ) : (
+                                                        <Text size="sm" c="white" ml={5}>{item.title}</Text>
+                                                    )}
+                                                    {/* Show loader if this item is being activated */}
+                                                    {isActivatingMilestone === item.id && <Loader size="xs" color="white" ml="sm" />}
                                                 </Timeline.Item>
                                             ))}
                                         </Timeline>
                                     ) : ( <Text c="gray.5">No milestones defined for this project yet.</Text> )}
                                 </Box>
-                                {/* Task Details Placeholder */}
-                                <Stack gap="xs">
-                                    <Text size="sm" c="gray.3">Selected Task Status</Text>
-                                    <Title order={2} fw={500}>Selected Task Name</Title>
-                                    <Text size="sm" c="gray.3">Selected Task Description...</Text>
+                                {/* Task Details Section */}
+                                <Stack gap="md">
+                                    <Title order={4} fw={500} c="white">
+                                        Tasks for: {activeMilestone?.title || 'No Milestone Selected'}
+                                    </Title>
+                                    {tasksToShow.length === 0 && <Text size="sm" c="gray.3">No tasks found for this milestone.</Text>}
+                                    {tasksToShow.map(task => (
+                                        <Paper key={task.id} p="sm" radius="sm" bg="rgba(255,255,255,0.1)">
+                                            <Stack gap="xs">
+                                                <Group justify="space-between">
+                                                    <Text fw={500} size="sm">{task.name}</Text>
+                                                    <Badge size="xs" color={task.status === 'Done' ? 'green' : task.status === 'In Progress' ? 'blue' : 'gray'}>
+                                                        {task.status}
+                                                    </Badge>
+                                                </Group>
+                                                <Text size="xs" c="gray.3">{task.description}</Text>
+                                                {task.assignee && (
+                                                    <Group gap="xs">
+                                                        <Avatar size="xs" radius="xl" color="teal" />
+                                                        <Text size="xs" c="gray.2">{`${task.assignee.preferredUsername} ${task.assignee.lastName}`}</Text>
+                                                    </Group>
+                                                )}
+                                            </Stack>
+                                        </Paper>
+                                    ))}
                                 </Stack>
                             </SimpleGrid>
                         </Stack>
