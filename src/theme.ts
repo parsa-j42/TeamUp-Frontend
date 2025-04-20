@@ -2,9 +2,9 @@ import { createTheme } from "@mantine/core";
 import '@fonts/Altivo/Altivo.css';
 
 export const theme = createTheme({
-    fontFamily: 'Altivo, sans-serif',
+    fontFamily: 'Roboto, sans-serif',
     headings: {
-        fontFamily: 'Altivo, sans-serif',
+        fontFamily: 'Roboto, sans-serif',
     },
     colors: {
         mainPurple: [
