@@ -1,21 +1,25 @@
-import { useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import {
     Box, Stack, useMantineTheme, Title, Text, Group, Avatar, SimpleGrid, ActionIcon,
-    Timeline, Paper, ThemeIcon, Divider, Button, Select, SegmentedControl, // Keep Select for app filtering
-    Loader, Alert, Center, Container, Badge,
+    Timeline, Paper, ThemeIcon, Divider, Button, Select, SegmentedControl,
+    Loader, Alert, Center, Container, Badge, Modal, Autocomplete, Anchor,
 } from '@mantine/core';
 import {
     IconClock, IconArrowRight, IconTrash, IconPhoto, IconPointFilled,
-    IconCircleDashed, IconChevronDown, IconAlertCircle
+    IconCircleDashed, IconChevronDown, IconAlertCircle, IconUserPlus,
 } from '@tabler/icons-react';
 import WavyBackground from '@components/shared/WavyBackground/WavyBackground.tsx';
-import MyProjectList from "@components/shared/MyProjectsList.tsx"; // Use MyProjectList again
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import MyProjectList from "@components/shared/MyProjectsList.tsx";
+import { useNavigate, useLocation } from "react-router-dom";
 import { apiClient } from '@utils/apiClient';
 import { useAuth } from '@contexts/AuthContext';
-import { ProjectDto, ApplicationDto, FindApplicationsQueryDto, UpdateApplicationStatusPayload, ProjectMemberDto } from '../../../types/api'; // Import SimpleUserDto
+import {
+    ProjectDto, ApplicationDto, FindApplicationsQueryDto, UpdateApplicationStatusPayload,
+    ProjectMemberDto, SimpleUserDto, AddMemberDto,
+} from '../../../types/api';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 
 dayjs.extend(relativeTime);
 
@@ -24,39 +28,44 @@ const TOP_WAVE_PATH = "M 0,60 Q 15,100 40,81 C 60,70 80,0 130,20 L 100,0 L 0,0 Z
 export default function DashboardPage() {
     const theme = useMantineTheme();
     const navigate = useNavigate();
-    const location = useLocation(); // Get location to check state
+    const location = useLocation();
     const { userDetails, isLoading: isAuthLoading, initialCheckComplete } = useAuth();
 
     // --- State ---
-    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // Managed by MyProjectList callback
+    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
     const [selectedProjectData, setSelectedProjectData] = useState<ProjectDto | null>(null);
     const [applications, setApplications] = useState<ApplicationDto[]>([]);
     const [applicationFilter, setApplicationFilter] = useState<'received' | 'sent'>('received');
-    // Removed isLoadingMyProjects - MyProjectList handles its own loading
     const [isLoadingSelectedProject, setIsLoadingSelectedProject] = useState(false);
     const [isLoadingApplications, setIsLoadingApplications] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null);
-    // State to store project options for the application filter dropdown
     const [projectOptionsForFilter, setProjectOptionsForFilter] = useState<{ value: string; label: string }[]>([]);
 
-    // Use useLayoutEffect to ensure this runs BEFORE render and other effects
+    // --- Invite Member State ---
+    const [inviteModalOpened, { open: openInviteModal, close: closeInviteModal }] = useDisclosure(false);
+    const [inviteSearchQuery, setInviteSearchQuery] = useState('');
+    const [debouncedInviteSearchQuery] = useDebouncedValue(inviteSearchQuery, 300);
+    const [inviteSearchResults, setInviteSearchResults] = useState<SimpleUserDto[]>([]);
+    const [inviteUserId, setInviteUserId] = useState<string | null>(null);
+    const [isSearchingUsers, setIsSearchingUsers] = useState(false);
+    const [isInvitingUser, setIsInvitingUser] = useState(false);
+    const [inviteError, setInviteError] = useState<string | null>(null);
+    const autocompleteRef = useRef<HTMLInputElement>(null);
+
+    // --- Navigation State Handling ---
     useLayoutEffect(() => {
         const navState = location.state as { selectedProjectId?: string } | null;
         if (navState?.selectedProjectId) {
             console.log(`[Dashboard] Received selectedProjectId from navigation: ${navState.selectedProjectId}`);
-            // Set the selected project ID from navigation state
             setSelectedProjectId(navState.selectedProjectId);
-            // Clear the state to avoid reapplying on refresh
             setTimeout(() => {
                 navigate(location.pathname, { replace: true, state: {} });
             }, 0);
         }
-    }, [location, navigate]); // Include full location object
+    }, [location, navigate]);
 
     // --- Data Fetching ---
-    // Fetching MyProjects list is now handled inside MyProjectList component
-
     const fetchSelectedProjectDetails = useCallback(async () => {
         if (!selectedProjectId) { setSelectedProjectData(null); return; }
         console.log(`[Dashboard] Fetching details for project ID: ${selectedProjectId}`);
@@ -92,28 +101,39 @@ export default function DashboardPage() {
         } finally { setIsLoadingApplications(false); }
     }, [applicationFilter, selectedProjectId, initialCheckComplete, userDetails]);
 
-    // --- Fetch Details when Selection Changes ---
-    useEffect(() => {
-        if (initialCheckComplete && userDetails) {
-            fetchSelectedProjectDetails();
+    // --- Fetch User Search Results (Debounced) ---
+    const searchUsers = useCallback(async () => {
+        if (!debouncedInviteSearchQuery || debouncedInviteSearchQuery.length < 2) {
+            setInviteSearchResults([]);
+            setIsSearchingUsers(false);
+            return;
         }
-    }, [fetchSelectedProjectDetails, initialCheckComplete, userDetails]);
+        console.log(`[Dashboard] Searching users for: ${debouncedInviteSearchQuery}`);
+        setIsSearchingUsers(true); setInviteError(null);
+        try {
+            // Assuming GET /users returns SimpleUserDto[] with required name fields
+            const users = await apiClient<SimpleUserDto[]>(`/users?search=${encodeURIComponent(debouncedInviteSearchQuery)}`);
+            const currentMemberIds = new Set(selectedProjectData?.members.map(m => m.userId) || []);
+            const filteredUsers = users.filter(u => !currentMemberIds.has(u.id));
+            setInviteSearchResults(filteredUsers);
+        } catch (err: any) {
+            console.error('[Dashboard] Error searching users:', err);
+            setInviteError(err.data?.message || err.message || 'Failed to search users.');
+            setInviteSearchResults([]);
+        } finally {
+            setIsSearchingUsers(false);
+        }
+    }, [debouncedInviteSearchQuery, selectedProjectData?.members]);
 
-    // --- Fetch Applications when Filter or Selected Project Changes ---
-    useEffect(() => {
-        fetchApplications();
-    }, [fetchApplications]);
+    useEffect(() => { searchUsers(); }, [searchUsers]);
+    useEffect(() => { if (initialCheckComplete && userDetails) { fetchSelectedProjectDetails(); } }, [fetchSelectedProjectDetails, initialCheckComplete, userDetails]);
+    useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
-    // --- Handle Project Selection from MyProjectList OR Navigation State ---
     const handleProjectSelection = useCallback((projectId: string | null) => {
         console.log("[Dashboard] Project selected:", projectId);
         setSelectedProjectId(projectId);
-        // Note: fetchSelectedProjectDetails runs via useEffect dependency
-    }, []); // Empty dependency array, function itself doesn't change
+    }, []);
 
-    // --- Populate Project Filter Dropdown ---
-    // Fetch projects specifically for the filter dropdown when needed
-    // This could be optimized if MyProjectList could share its fetched data
     useEffect(() => {
         const fetchFilterOptions = async () => {
             if (initialCheckComplete && userDetails) {
@@ -128,7 +148,6 @@ export default function DashboardPage() {
         };
         fetchFilterOptions();
     }, [initialCheckComplete, userDetails]);
-
 
     // --- Action Handlers ---
     const handleApplicationStatusUpdate = async (applicationId: string, status: 'Accepted' | 'Declined') => {
@@ -151,6 +170,23 @@ export default function DashboardPage() {
         finally { setIsProcessingAction(null); }
     };
 
+    const handleInviteMember = async () => {
+        if (!inviteUserId || !selectedProjectId) {
+            setInviteError("Please select a user to invite."); return;
+        }
+        setIsInvitingUser(true); setInviteError(null);
+        try {
+            const payload: AddMemberDto = { userId: inviteUserId, role: 'Member' };
+            await apiClient<ProjectMemberDto>(`/projects/${selectedProjectId}/members`, { method: 'POST', body: payload });
+            closeInviteModal();
+            fetchSelectedProjectDetails();
+            setInviteSearchQuery(''); setInviteUserId(null); setInviteSearchResults([]);
+        } catch (err: any) {
+            console.error('[Dashboard] Error inviting member:', err);
+            setInviteError(err.data?.message || err.message || 'Failed to invite member.');
+        } finally { setIsInvitingUser(false); }
+    };
+
     // --- Helper Functions ---
     const formatProjectDateRange = (start?: string, end?: string): string => {
         if (!start) return 'Date not set';
@@ -166,6 +202,13 @@ export default function DashboardPage() {
     // --- Prepare data for rendering ---
     const displayProject = selectedProjectData;
     const currentUserId = userDetails.id;
+    const isOwner = !!displayProject && currentUserId === displayProject.owner.id;
+
+    // Format search results for Autocomplete using preferredUsername + lastName
+    const autocompleteData = inviteSearchResults.map(user => ({
+        value: user.id,
+        label: `${user.preferredUsername} ${user.lastName}` // Use preferredUsername + lastName
+    }));
 
     // --- Wave Background Setup ---
     const topWaveHeight = 500;
@@ -177,7 +220,6 @@ export default function DashboardPage() {
         <Stack gap={0} mb="xl">
             {/* Top Section */}
             <WavyBackground wavePath={TOP_WAVE_PATH} waveHeight={topWaveHeight} backgroundColor={theme.colors.mainPurple[6]} contentPaddingTop={topSectionPadding} extraBottomPadding="0px" >
-                {/* Use MyProjectList component again */}
                 <Box pt="0px" pb="50px" px="xl">
                     <MyProjectList
                         onSelectProject={handleProjectSelection}
@@ -202,18 +244,23 @@ export default function DashboardPage() {
 
                         {/* Team Members */}
                         <Stack gap="md">
-                            <Title order={3} fw={500}>Team Members</Title>
+                            <Group justify="space-between">
+                                <Title order={3} fw={500}>Team Members</Title>
+                                {isOwner && (
+                                    <Button size="xs" variant="light" color="white" onClick={openInviteModal} leftSection={<IconUserPlus size={16} />} > Invite Member </Button>
+                                )}
+                            </Group>
                             <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="xl">
                                 {displayProject.members.map((member: ProjectMemberDto) => (
                                     <Stack key={member.id} gap="xs" align="left" ta="left">
                                         <Avatar src={undefined} radius="50%" size={80} color="gray.3"> <IconPhoto size="2rem" color={theme.colors.mainPurple[1]} /> </Avatar>
-                                        <Text fw={500} size="md">{`${member.user.firstName} ${member.user.lastName}`}</Text>
+                                        {/* Use preferredUsername + lastName */}
+                                        <Text fw={500} size="md">{`${member.user.preferredUsername} ${member.user.lastName}`}</Text>
                                         <Text size="sm" c="gray.4">{member.role}</Text>
                                         <Group gap="sm" mt="xs" justify="flex-start">
-                                            {/* Removed mailto link */}
-                                            <ActionIcon variant="transparent" color="white" title={`View ${member.user.firstName}'s Profile`} onClick={() => navigate(`/profile/${member.userId}`)} > <IconArrowRight size={18} /> </ActionIcon>
-                                            {currentUserId === displayProject.owner.id && member.userId !== displayProject.owner.id && (
-                                                <ActionIcon variant="transparent" color="red" title={`Remove ${member.user.firstName}`} onClick={() => handleRemoveMember(displayProject.id, member.userId)} loading={isProcessingAction === member.userId} disabled={!!isProcessingAction}> <IconTrash size={18} /> </ActionIcon>
+                                            <ActionIcon variant="transparent" color="white" title={`View ${member.user.preferredUsername}'s Profile`} onClick={() => navigate(`/profile/${member.userId}`)} > <IconArrowRight size={18} /> </ActionIcon>
+                                            {isOwner && member.userId !== displayProject.owner.id && (
+                                                <ActionIcon variant="transparent" color="red" title={`Remove ${member.user.preferredUsername}`} onClick={() => handleRemoveMember(displayProject.id, member.userId)} loading={isProcessingAction === member.userId} disabled={!!isProcessingAction}> <IconTrash size={18} /> </ActionIcon>
                                             )}
                                         </Group>
                                     </Stack>
@@ -260,10 +307,7 @@ export default function DashboardPage() {
                     <Stack gap="xs"> <Title order={2} fw={500}>Applications</Title> <Text size="sm"> Manage applications for your projects or track your own submissions. </Text> </Stack>
                     <Stack gap="md">
                         <SegmentedControl value={applicationFilter} onChange={(value) => setApplicationFilter(value as 'received' | 'sent')} data={[ { label: 'Received', value: 'received' }, { label: 'Sent', value: 'sent' } ]} color="mainPurple.6" radius="md" styles={(theme) => ({ root: { backgroundColor: 'transparent', padding: 0, width: 'fit-content' }, label: { paddingTop: theme.spacing.xs, paddingBottom: theme.spacing.xs, paddingLeft: theme.spacing.md, paddingRight: theme.spacing.md }, control: { border: 'none' }, indicator: { borderRadius: theme.radius.md, backgroundColor: theme.colors.mainPurple[6], boxShadow: 'none' } })} />
-                        {/* Use projectOptionsForFilter state */}
                         <Select placeholder={applicationFilter === 'received' ? "Filter received by project you own" : "Filter sent by project applied to"} data={projectOptionsForFilter} value={selectedProjectId} onChange={handleProjectSelection} clearable searchable nothingFoundMessage="No relevant projects found"
-                            // Disable if the base project list is loading (used to populate options)
-                            // disabled={isLoadingMyProjects} // This state is no longer here, consider adding a loading state for the options fetch
                                 rightSection={<IconChevronDown size={16} color={theme.colors.mainPurple[6]} />} radius="md" styles={(theme) => ({ input: { borderColor: theme.colors.mainPurple[2], color: theme.colors.mainPurple[6], '::placeholder': { color: theme.colors.mainPurple[6] } }, dropdown: { borderColor: theme.colors.mainPurple[2] }, option: { '&[data-selected]': { backgroundColor: theme.colors.mainPurple[1], color: theme.colors.mainPurple[8] }, '&[data-hovered]': { backgroundColor: theme.colors.mainPurple[0] } } })} />
                     </Stack>
                     {isLoadingApplications && <Center><Loader my="lg" /></Center>}
@@ -276,15 +320,28 @@ export default function DashboardPage() {
                                     <Group justify="space-between" align="flex-start">
                                         <Stack gap="sm">
                                             <Group gap="xs"> <IconClock size={16} color='black' /> <Text size="xs" c="black" title={dayjs(app.createdAt).format('YYYY-MM-DD HH:mm')}>{dayjs(app.createdAt).fromNow()}</Text> </Group>
-                                            <Title order={4} fw={500}>{app.roleAppliedFor || `Application for ${app.project.title}`}</Title>
+                                            {/* Make Project Title Clickable */}
+                                            <Anchor onClick={() => navigate(`/project/${app.projectId}`)} underline="hover" c="black">
+                                                <Title order={4} fw={500}>
+                                                    {app.roleAppliedFor ? `${app.roleAppliedFor} @ ${app.project.title}` : `Application for ${app.project.title}`}
+                                                </Title>
+                                            </Anchor>
                                             {applicationFilter === 'received' ? (
                                                 <Group gap="xs" style={{ cursor: 'pointer' }} onClick={() => navigate(`/profile/${app.applicantId}`)} >
                                                     <Avatar color="gray" radius="xl" size="sm"> <IconPhoto size="0.8rem" /> </Avatar>
-                                                    <Text size="sm" c="dimmed">{`${app.applicant.firstName} ${app.applicant.lastName}`}</Text>
+                                                    {/* Use preferredUsername + lastName */}
+                                                    <Text size="sm" c="dimmed">{`${app.applicant.preferredUsername} ${app.applicant.lastName}`}</Text>
                                                 </Group>
-                                            ) : ( <Group gap="xs" style={{ cursor: 'pointer' }} onClick={() => navigate(`/projects/${app.projectId}`)} > <Text size="sm" c="dimmed">{app.project.title}</Text> </Group> )}
+                                            ) : (
+                                                // Display project owner for sent applications
+                                                <Group gap="xs">
+                                                    {/* Use preferredUsername + lastName */}
+                                                    <Text size="sm" c="dimmed">Owner: {`${app.project.owner.preferredUsername} ${app.project.owner.lastName}`}</Text>
+                                                </Group>
+                                            )}
                                             <Badge color={app.status === 'Accepted' ? 'green' : app.status === 'Declined' ? 'red' : 'yellow'}>{app.status}</Badge>
                                         </Stack>
+                                        {/* Actions for Received Applications */}
                                         {applicationFilter === 'received' && app.status === 'Pending' && (
                                             <Group gap="sm" mt={25}>
                                                 <Button variant="filled" color="mainPurple.6" radius="md" size="sm" fw={400} onClick={() => handleApplicationStatusUpdate(app.id, 'Accepted')} loading={isProcessingAction === app.id} disabled={!!isProcessingAction}> Accept </Button>
@@ -299,7 +356,45 @@ export default function DashboardPage() {
                     )}
                 </Stack>
             </Box>
+
+            {/* Invite Member Modal */}
+            <Modal opened={inviteModalOpened} onClose={closeInviteModal} title="Invite Member" centered>
+                <Stack>
+                    {inviteError && <Alert color="red" title="Invite Error" icon={<IconAlertCircle />} withCloseButton onClose={() => setInviteError(null)}>{inviteError}</Alert>}
+                    <Autocomplete
+                        ref={autocompleteRef}
+                        label="Search User by Name"
+                        placeholder="Start typing a name..."
+                        data={autocompleteData} // Use formatted data (preferredUsername + lastName)
+                        value={inviteSearchQuery}
+                        onChange={setInviteSearchQuery}
+                        onOptionSubmit={(value) => {
+                            console.log("User selected ID:", value);
+                            setInviteUserId(value); // Store the ID
+                            // Update input field to show the selected user's name
+                            const selectedUser = inviteSearchResults.find(u => u.id === value);
+                            if (selectedUser) {
+                                // Use preferredUsername + lastName for display
+                                setInviteSearchQuery(`${selectedUser.preferredUsername} ${selectedUser.lastName}`);
+                            }
+                        }}
+                        limit={5}
+                        rightSection={isSearchingUsers ? <Loader size="xs" /> : null}
+                        comboboxProps={{ withinPortal: true }}
+                    />
+                    <Group justify="flex-end" mt="md">
+                        <Button variant="default" onClick={closeInviteModal} disabled={isInvitingUser}>Cancel</Button>
+                        <Button
+                            color="mainPurple.6"
+                            onClick={handleInviteMember}
+                            loading={isInvitingUser}
+                            disabled={!inviteUserId || isInvitingUser}
+                        >
+                            Add Member
+                        </Button>
+                    </Group>
+                </Stack>
+            </Modal>
         </Stack>
     );
 }
-
