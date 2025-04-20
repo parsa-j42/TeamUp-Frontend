@@ -14,6 +14,7 @@ import PrivacyAndTermsPage from "@components/static/PrivacyAndTerms/PrivacyAndTe
 import CapConPage from "@components/static/CapConPage/CapConPage.tsx";
 import SignUpPage from "@components/pages/auth/SignUpPage/SignUpPage.tsx";
 import ConfirmSignUpPage from "@components/pages/auth/ConfirmSignUpPage/ConfirmSignUpPage.tsx";
+import DiscoverPage from '@components/pages/DiscoverPage/DiscoverPage';
 
 export const AppRouter: React.FC = () => {
     // Temporary for CapCon
@@ -37,22 +38,21 @@ export const AppRouter: React.FC = () => {
             <Route path="/SignUp" element={<SignUpPage />} />
             <Route path="/confirm-signup" element={<ConfirmSignUpPage />} />
             <Route path="/LogIn" element={<LogInPage />} />
+            <Route path="/discover" element={<DiscoverPage />} />
+
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
-                {/* --- MODIFIED: Add :projectId parameter --- */}
                 <Route path="/project/:projectId" element={<ProjectPage />} />
-                {/* --- END MODIFIED --- */}
                 <Route path="/submitted" element={<SuccessPage />} />
                 <Route path="/create-project" element={<CreateProjectPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                {/* Add route for viewing other user profiles */}
                 <Route path="/profile/:userId" element={<ProfilePage />} />
 
             </Route>
 
-            {/* Redirect root to dashboard if authenticated, otherwise to login */}
+            {/* Redirect root to landing */}
             <Route path="/" element={<Navigate to="/landing" replace />} />
 
             {/* 404 route */}

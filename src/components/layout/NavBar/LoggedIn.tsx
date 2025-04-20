@@ -29,11 +29,11 @@ export function LoggedIn() {
     return (
         <Group h="100%" p="0" justify="flex-end" gap="xl" wrap="nowrap">
             <Button variant="white" color="black" fw={400} size="md"
-                    onClick={() => navigate("/#")}>Discover</Button>
+                    onClick={() => navigate("/Discover")}>Discover</Button>
             <Button variant="white" color="black" fw={400} size="md"
                     onClick={() => navigate("/Dashboard")}>Dashboard</Button>
             <Button variant="white" color="black" fw={400} size="md"
-                    onClick={() => navigate("/#")}>Messages</Button>
+                    onClick={() => navigate("/AboutUs")}>Messages</Button>
             <Menu position="bottom" withinPortal width="250px" radius="md" trigger="click-hover"
                   styles={{
                       dropdown: { border: 'none', boxShadow: '0 0 25px rgba(0, 0, 0, 0.2)' }
