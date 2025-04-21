@@ -24,27 +24,20 @@ export function LoggedOut() {
     return (
         <Stack gap={0}>
             {/* Top Section  */}
-            <WavyBackground
-                wavePath={WAVE_PATH}
-                waveHeight={waveHeight}
-                backgroundColor={theme.colors.mainPurple[6]}
-                contentPaddingTop={waveTopSectionPadding}
-                extraBottomPadding="0px"
-            >
-
                 <Box pt="50px" pb="150px">
-                    <Group justify="center" align="top" gap="60px">
+                    <Group justify="center" align="top" gap="100px">
                         <Stack align="flex-start" gap="lg">
                             <Title order={1} ta="left" size="48px" fw={400} lh={1.2}>
-                                Turn your ideas <br/>into reality. <br/>Build. Collaborate. <br/>Launch.
+                                Turn your ideas <br/>into reality. <br/>
+                                <Text span c="mainBlue.6" inherit>Build. Collaborate. <br/>Launch.</Text>
                             </Title>
-                            <Text size="xl" ta="left" c="dimmed" lh={1.4}>
+                            <Text size="lg" ta="left" lh={1.4}>
                                 Post your project ideas and find the <br/> best‑fit team members.
                             </Text>
                             <Group>
-                                <Button variant="filled" color="mainBlue.6"
+                                <Button variant="filled" color="mainBlue.6" radius="lg" size="lg"
                                         onClick={() => navigate("/SignUp")}>Create Project</Button>
-                                <Button variant="filled" color="mainBlue.6"
+                                <Button variant="filled" color="mainBlue.6" radius="lg" size="lg"
                                         onClick={() => navigate("/Discover")}>Find a Project</Button>
                             </Group>
                         </Stack>
@@ -122,7 +115,6 @@ export function LoggedOut() {
                         </Box>
                     </Flex>
                 </Box>
-            </WavyBackground>
 
             {/* New Projects Section */}
             <Box mb="50px" mt="md">
