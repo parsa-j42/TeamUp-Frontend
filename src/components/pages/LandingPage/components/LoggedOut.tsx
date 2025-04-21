@@ -1,25 +1,11 @@
-import {Box, Button, Divider, Flex, Group, Image, Stack, Text, Title, useMantineTheme} from '@mantine/core';
-import WavyBackground from '@components/shared/WavyBackground/WavyBackground.tsx';
+import {Box, Button, Divider, Flex, Group, Image, Stack, Text, Title} from '@mantine/core';
 import ProjectListContainer from "@components/shared/ProjectList/ProjectList.tsx";
 import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import {useNavigate} from "react-router-dom";
 
-// SVG paths for wave effects
-const WAVE_PATH = "M 0 43 C 50 52 50 52 100 43 L 100 -30 L 0 -30 Z";
 
 export function LoggedOut() {
-    const theme = useMantineTheme();
     const navigate = useNavigate();
-
-    // Wave dimension configurations
-    const waveHeight = 1300;
-
-    // Calculate edge positions
-    const waveEdgeRatio = -10 / 100;
-
-    const waveOffset = waveHeight * waveEdgeRatio;
-
-    const waveTopSectionPadding = `calc(${waveOffset}px + ${theme.spacing.xl})`;
 
     return (
         <Stack gap={0}>
