@@ -1,13 +1,13 @@
-import { Card, Text, Title, Pill, Group, Badge, Stack } from '@mantine/core';
+import { Card, Text, Title, Group, Badge, Stack } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
-import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 // props interface for type safety
 export interface ProjectCardProps {
     id?: string; // Add optional id prop
     title?: string;
     description?: string;
+    skills: string[];
     tags: string[];
     showFeedbackBadge?: boolean;
 }
@@ -27,44 +27,53 @@ export interface ProjectCardProps {
  * @param showFeedbackBadge - (Optional) If true, displays the "Looking for Feedback" badge. Defaults to false.
  * @param otherProps
  */
-export function ProjectCard({ id, title, description, tags, showFeedbackBadge = false, ...otherProps }: ProjectCardProps) {
-    const navigate = useNavigate();
+export function ProjectCard({ id, title, description, skills, tags, showFeedbackBadge = false, ...otherProps }: ProjectCardProps) {
+    // const navigate = useNavigate();
 
-    const handleApplyClick = () => {
-        if (id) {
-            navigate(`/project/${id}`); // Navigate to specific project page
-        } else {
-            console.warn('ProjectCard: Missing project ID, cannot navigate.');
-            // Optionally navigate to a generic discover page or do nothing
-            // navigate('/discover');
-        }
-    };
+    // const handleApplyClick = () => {
+    //     if (id) {
+    //         navigate(`/project/${id}`); // Navigate to specific project page
+    //     } else {
+    //         console.warn('ProjectCard: Missing project ID, cannot navigate.');
+    //         // Optionally navigate to a generic discover page or do nothing
+    //         // navigate('/discover');
+    //     }
+    // };
 
     return (
         // Use Mantine Card as the main container
-        <Card shadow="sm" padding="lg" radius="lg" bg="lightPurple.6" withBorder h="400" w="400"
-              style={{ maxWidth: 400, maxHeight: 400 }} {...otherProps}>
+        <Card shadow="xl" padding="lg" radius="lg" bg="white" withBorder h="300" w="430" pt="xl"
+              style={{ maxWidth: 430, maxHeight: 300 }} {...otherProps}>
             {/* Stack component arranges elements vertically with spacing */}
             <Stack gap="md">
+                <Text c="dimmed">TEAMMI</Text>
                 {/* Project Title */}
-                <Title order={2} size={30} fw={400}>
+                <Title order={2} size={27} fw={600} c="#1696b6">
                     {title}
                 </Title>
 
+                <Group gap="xs">
+                    <Text fw={600}>Primary Skills:</Text>
+                    {skills.map((skill) => (
+                    <Text key={skill} size="md" fw={600}>
+                        {skill},
+                    </Text>
+                ))}
+                </Group>
                 {/* Tags Section */}
                 <Group gap="xs"> {/* Group component arranges elements horizontally */}
                     {/* Map over the tags array to render each tag as a Pill */}
                     {tags.map((tag) => (
-                        <Pill key={tag} size="md" variant="filled" c="white" bg="mainRed.6">
-                            {tag}
-                        </Pill>
+                        <Text key={tag} size="md" >
+                            #{tag}
+                        </Text>
                     ))}
                 </Group>
 
-                {/* Project Description */}
-                <Text size="sm" c="dimmed" lineClamp={4}> {/* Use Mantine Text for the description, limit lines */}
-                    {description}
-                </Text>
+                {/*/!* Project Description *!/*/}
+                {/*<Text size="sm" c="dimmed" lineClamp={4}> /!* Use Mantine Text for the description, limit lines *!/*/}
+                {/*    {description}*/}
+                {/*</Text>*/}
 
             </Stack>
 
@@ -80,23 +89,22 @@ export function ProjectCard({ id, title, description, tags, showFeedbackBadge = 
                         radius="xl"
                         fw={400}
                         leftSection={<IconCheck size={16} />}
-                        styles={{ label: { fontSize: '12px' } }}
-                    >
-                        Looking for Feedback
+                        styles={{
+                            root: {
+                                background: '#fffdf7',
+                                border: `2px solid #ffb701`,
+                                color: 'var(--mantine-color-white)',
+                                '&:hover': {
+                                    background: 'var(--mantine-color-red-8)',
+                                }
+                            },
+                            label: {
+                                fontSize: '12px'
+                            }
+                        }}                    >
+                        Want Feedback
                     </Badge>
                 )}
-                {/* Spacer to push button right when badge is hidden */}
-                {!showFeedbackBadge && <div style={{ flexGrow: 1 }}></div>}
-                {/* Apply Button */}
-                <RoundedButton
-                    color="mainPurple.6"
-                    variant="filled"
-                    size="md"
-                    fw="400"
-                    onClick={handleApplyClick} // Use the new handler
-                >
-                    Apply
-                </RoundedButton>
             </Group>
         </Card>
     );

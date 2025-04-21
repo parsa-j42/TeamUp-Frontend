@@ -1,25 +1,32 @@
 .scrollbar {
     background-color: transparent;
     border-radius: 10px;
+
     @mixin hover {
-        background-color: var(--mantine-color-mainGreen-6) !important;
+        background-color: var(--mantine-color-mainBlue-6) !important;
         & .scrollbarThumb {
-            background-color: var(--mantine-color-mainOrange-6) !important;
+            background-color: var(--mantine-color-lightBlue-6) !important;
             margin: 1px 8px 1px 8px;
         }
     }
 }
 
 .scrollbarThumb {
-    background-color: var(--mantine-color-mainGreen-6);
+    background-color: var(--mantine-color-mainBlue-6);
     margin: 0px 8px 0px 8px;
 
+
     @mixin hover {
-        background-color: var(--mantine-color-mainOrange-6) !important;
+        background-color: var(--mantine-color-lightBlue-6) !important;
         margin: 1px 8px 1px 8px;
+
     }
 }
 
 .scrollbarViewport {
     padding-bottom: 20px !important;
+}
+
+.scrollbarRoot {
+    width: 98% !important;
 }

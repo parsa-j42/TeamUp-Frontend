@@ -1,5 +1,4 @@
 import {Button, Group} from "@mantine/core";
-import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import {useNavigate} from "react-router-dom";
 
 export function LoggedOut() {
@@ -10,8 +9,10 @@ export function LoggedOut() {
                         onClick={() => navigate("/Discover")}>Discover</Button>
                 <Button variant="white" color="black" fw={400} size="md"
                         onClick={() => navigate("/AboutUs")}>About</Button>
-                <RoundedButton color="mainPurple.6" variant="filled" size="sm" fw="500" onClick={() => navigate("/SignUp")}>Sign Up</RoundedButton>
-                <RoundedButton color="mainPurple.6" variant="filled" size="sm" fw="500" onClick={() => navigate("/LogIn")}>Sign In</RoundedButton>
+                <Button color="mainBlue.6" variant="subtle" size="sm" fw="600" radius="md"
+                        onClick={() => navigate("/SignUp")}>Sign In</Button>
+                <Button color="mainBlue.6" variant="filled" size="sm" fw="600" radius="md"
+                        onClick={() => navigate("/LogIn")}>Sign Up</Button>
             </Group>
     );
 }

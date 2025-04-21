@@ -22,6 +22,7 @@ const MOCK_PROJECT_DATA: Omit<ProjectCardProps, 'key' | 'id'> = { // Remove id f
     title: "Recommended Project",
     description: "Brief Introduction of project. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vestibulum leo a nisi faucibus.",
     tags: ['Figma', 'Design'],
+    skills: ['Figma', 'Design'],
     showFeedbackBadge: true,
 };
 
@@ -100,6 +101,7 @@ export function LoggedIn() {
         title: p.title,
         description: p.description,
         tags: p.tags || [],
+        skills: p.requiredSkills || [],
         // Determine showFeedbackBadge based on your logic, e.g., mentorRequest field
         showFeedbackBadge: p.mentorRequest === 'looking',
     }));
