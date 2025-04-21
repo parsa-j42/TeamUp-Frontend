@@ -33,7 +33,7 @@ export function LoggedIn() {
             <Button variant="white" color="black" fw={400} size="md"
                     onClick={() => navigate("/Dashboard")}>Dashboard</Button>
             <Button variant="white" color="black" fw={400} size="md"
-                    onClick={() => navigate("/AboutUs")}>Messages</Button>
+                    onClick={() => navigate("/Messages")}>Messages</Button>
             <Menu position="bottom" withinPortal width="250px" radius="md" trigger="click-hover"
                   styles={{
                       dropdown: { border: 'none', boxShadow: '0 0 25px rgba(0, 0, 0, 0.2)' }

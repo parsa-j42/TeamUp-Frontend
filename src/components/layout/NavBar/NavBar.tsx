@@ -43,21 +43,22 @@ export function NavBar() {
                         radius="md"
                         value={searchValue} // Controlled input
                         onChange={(event) => setSearchValue(event.currentTarget.value)} // Update state
-                        onKeyDown={handleSearchKeyDown} // Handle Enter key
+                        onKeyDown={handleSearchKeyDown}
                         rightSection={
                             <IconSearch
-                                style={{ width: rem(19), height: rem(19), cursor: 'pointer' }} // Make icon clickable
+                                style={{ width: rem(19), height: rem(19), cursor: 'pointer' }}
+                                color="mainBlue.6"
                                 stroke={3}
-                                onClick={handleSearchIconClick} // Handle click
+                                onClick={handleSearchIconClick}
                             />
                         }
                         styles={(theme) => ({
                             input: {
-                                borderColor: theme.colors.mainPurple[6],
+                                borderColor: theme.colors.mainBlue[6],
                                 borderWidth: 2,
                             },
                             section: {
-                                backgroundColor: theme.colors.mainPurple[6],
+                                backgroundColor: "white",
                                 color: "white",
                                 cursor: 'pointer', // Indicate clickable section
                             },
