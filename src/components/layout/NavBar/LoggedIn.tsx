@@ -20,7 +20,7 @@ export function LoggedIn() {
 
     // Get avatar URL from profile within userDetails
     // const avatarUrl = userDetails?.profile?.avatarUrl;
-    const avatarUrl='/avatar.svg';
+    const avatarUrl='/avatar-blue.svg';
     // --- END MODIFIED ---
 
     // Determine if we should show loading skeletons
