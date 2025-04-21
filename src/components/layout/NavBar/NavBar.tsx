@@ -33,7 +33,7 @@ export function NavBar() {
         <AppShell.Header>
             <Group h="100%" px="13%" justify="space-between" wrap="nowrap">
                 <Image fit="contain" h={60}
-                       src="/TeamUpLogo.png" alt="TeamUp Logo"
+                       src="/TeamUpLogo.svg" alt="TeamUp Logo"
                        style={{ cursor: 'pointer' }}
                        onClick={handleLogoClick}/>
                 <Group h="100%" p="0" justify="space-between" gap="xs" wrap="nowrap" pl="60px" flex="1">
