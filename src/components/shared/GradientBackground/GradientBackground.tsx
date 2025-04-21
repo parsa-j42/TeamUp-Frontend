@@ -24,13 +24,16 @@ const GradientBackground = ({
                 marginLeft: '-50vw',
                 marginRight: '-50vw',
                 width: '100vw',
-                overflow: 'hidden',
+                overflow: 'hidden', // Prevent content overflow issues
                 paddingBottom,
                 background: gradient,
             }}
             {...otherProps}
         >
-            {children}
+            {/* Inner container to constrain content width */}
+            <Box style={{ width: '100%', maxWidth: '100vw', margin: '0 auto' }}>
+                {children}
+            </Box>
         </Box>
     );
 };
