@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text, Button } from '@mantine/core';
+import { Box, Text, Button, Image } from '@mantine/core';
 import classes from './CapConPage.module.css';
 import { IconBrandLinkedinFilled, IconBrandFigma, IconWorld } from '@tabler/icons-react';
 
@@ -104,8 +104,27 @@ const CapConPage: React.FC = () => {
                     <Box className={classes.teamGrid}>
                         {teamMembers.map((member, index) => (
                             <Box key={index} className={classes.memberCard}>
-                                <Box className={classes.profileCircle}>
-                                    {member.initial}
+                                <Box className={classes.profileCircle} style={{ overflow: 'hidden', position: 'relative' }}>
+                                    <div style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        borderRadius: '50%',
+                                        overflow: 'hidden',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <Image
+                                            src={`/${member.name}.png`}
+                                            alt={member.name}
+                                            style={{
+                                                width: '140%',
+                                                height: '140%',
+                                                objectFit: 'cover',
+                                                transform: member.name.toLowerCase() === 'yeonseo hong' ? 'translateY(15px)' : 'none'
+                                            }}
+                                        />
+                                    </div>
                                 </Box>
 
                                 <Text className={classes.memberName}>{member.name}</Text>
@@ -140,3 +159,4 @@ const CapConPage: React.FC = () => {
 };
 
 export default CapConPage;
+

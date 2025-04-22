@@ -86,7 +86,7 @@ export default function LogInPage() {
                     });
                 } else {
                     // Default redirect (e.g., to dashboard or original intended page)
-                    const from = locationState?.from?.pathname || '/dashboard';
+                    const from = locationState?.from?.pathname || '/my-projects';
                     console.log(`[LoginPage] Redirecting to default location: ${from}`);
                     navigate(from, { replace: true });
                 }
