@@ -9,7 +9,7 @@
 .textInputOutline:focus-within {
     border-color: transparent;
     outline: none;
-    box-shadow: 0 0 12px var(--mantine-color-mainPurple-6);
+    box-shadow: 0 0 12px var(--mantine-color-mainBlue-6);
     border-radius: 12px;
 }
 
@@ -30,11 +30,11 @@
     bottom: -2px;
     background: linear-gradient(
             135deg,
-            var(--mantine-color-mainPurple-8) 0%,
-            var(--mantine-color-mainPurple-6) 25%,
-            var(--mantine-color-mainPurple-4) 50%,
-            var(--mantine-color-mainPurple-6) 75%,
-            var(--mantine-color-mainPurple-8) 100%
+            var(--mantine-color-mainBlue-8) 0%,
+            var(--mantine-color-mainBlue-6) 25%,
+            var(--mantine-color-mainBlue-4) 50%,
+            var(--mantine-color-mainBlue-6) 75%,
+            var(--mantine-color-mainBlue-8) 100%
     );
     background-size: 400% 400%;
     animation: gradient-shift 8s ease infinite,
@@ -66,9 +66,9 @@
 }
 
 @keyframes glow {
-    0% { box-shadow: 0 0 8px var(--mantine-color-mainPurple-6); }
-    50% { box-shadow: 0 0 16px var(--mantine-color-mainPurple-6), 0 0 20px var(--mantine-color-mainPurple-4); }
-    100% { box-shadow: 0 0 8px var(--mantine-color-mainPurple-6); }
+    0% { box-shadow: 0 0 8px var(--mantine-color-mainBlue-6); }
+    50% { box-shadow: 0 0 16px var(--mantine-color-mainBlue-6), 0 0 20px var(--mantine-color-mainBlue-4); }
+    100% { box-shadow: 0 0 8px var(--mantine-color-mainBlue-6); }
 }
 
 @keyframes breathe {
@@ -84,7 +84,7 @@
 
 .textInputAsterisk {
     font-family: "Noto Sans", sans-serif;
-    color: var(--mantine-color-mainPurple-6);
+    color: var(--mantine-color-mainBlue-6);
 }
 
 
