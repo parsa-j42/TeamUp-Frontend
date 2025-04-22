@@ -215,7 +215,7 @@ export default function SignUpPage() {
                 });
                 console.log('[SignUpPage] Profile data saved successfully via backend.');
                 // Navigate to dashboard or profile page after successful completion
-                navigate('/dashboard', { state: { message: 'Profile setup complete!' } });
+                navigate('/my-projects', { state: { message: 'Profile setup complete!' } });
                 // Keep isSubmitting true as we navigate away
             } catch (error: any) {
                 console.error('[SignUpPage] Failed to save profile data via backend:', error);

@@ -101,7 +101,7 @@ function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProp
         try {
             const data = await apiClient<ProjectDto[]>('/projects/me');
             setProjects(data);
-            
+
             // Only auto-select if we're in Dashboard context and no project is already selected
             if (onSelectProject && data.length > 0 && !hasAutoSelectedRef.current) {
                 if (selectedProjectId) {
@@ -145,7 +145,7 @@ function MyProjectList({ onSelectProject, selectedProjectId }: MyProjectListProp
         } else {
             // If used elsewhere (like Landing Page), navigate to Dashboard with state
             console.log(`[MyProjectList] Navigating to Dashboard for project: ${projectId}`);
-            navigate('/dashboard', { state: { selectedProjectId: projectId } });
+            navigate('/my-projects', { state: { selectedProjectId: projectId } });
         }
     };
 

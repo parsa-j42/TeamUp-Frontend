@@ -206,7 +206,7 @@ export default function LandingPage() {
                             </Group>
                         </Stack>
                         <Group justify="flex-end">
-                            <Anchor onClick={() => navigate('/dashboard')} c="dimmed" size="sm">
+                            <Anchor onClick={() => navigate('/my-projects')} c="dimmed" size="sm">
                                 FULL PAGE <IconArrowRight size={14} style={{ verticalAlign: 'middle' }}/>
                             </Anchor></Group>
                     </Container>

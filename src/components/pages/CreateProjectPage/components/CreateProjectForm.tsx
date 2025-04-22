@@ -82,7 +82,7 @@ export function CreateProjectForm() {
 
     // --- Event Handlers ---
     const handleCancel = () => {
-        navigate('/Dashboard');
+        navigate('/my-projects');
     };
 
     const handleCreate = async () => {
@@ -113,7 +113,7 @@ export function CreateProjectForm() {
         try {
             const newProject = await apiClient<ProjectDto>('/projects', { method: 'POST', body: payload });
             console.log('Project created successfully:', newProject);
-            navigate('/Dashboard', {
+            navigate('/my-projects', {
                 replace: true,
                 state: {
                     selectedProjectId: newProject.id,
