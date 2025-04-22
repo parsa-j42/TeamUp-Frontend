@@ -25,7 +25,7 @@ import {
     useMantineTheme
 } from '@mantine/core';
 import {IconAlertCircle, IconArrowRight, IconClock, IconPencil, IconPhoto, IconPlus, IconX} from '@tabler/icons-react';
-import WavyBackground from "@components/shared/WavyBackground/WavyBackground.tsx";
+import GradientBackground from '@components/shared/GradientBackground/GradientBackground';
 import {useDisclosure} from '@mantine/hooks';
 import {apiClient} from '@utils/apiClient';
 import {useAuth} from '@contexts/AuthContext';
@@ -39,8 +39,6 @@ import {
     UserDto,
     WorkExperienceDto
 } from '../../../types/api';
-
-const TOP_WAVE_PATH = "M 0,6 Q 15,8 40,7 C 60,5 80,5 130,7 L 100,0 L 0,0 Z";
 
 // --- Reusable Section Card Component ---
 interface SectionCardProps {
@@ -421,11 +419,6 @@ export default function ProfilePage() {
         setProfileEditData(prev => ({...prev, [name]: value}));
     };
 
-    // --- Wave Background Setup ---
-    const topWaveHeight = 25000;
-    const topWaveEdgeRatio = -10 / 100;
-    const topWaveOffset = topWaveHeight * topWaveEdgeRatio;
-    const topSectionPadding = `calc(${topWaveOffset}px + ${theme.spacing.xl})`;
     const initialItemsToShow = 2;
 
     // --- Render Loading/Error States ---
@@ -465,8 +458,7 @@ export default function ProfilePage() {
 
     // --- Render Main Content ---
     return (
-        <WavyBackground wavePath={TOP_WAVE_PATH} waveHeight={topWaveHeight} backgroundColor={theme.colors.mainPurple[6]}
-                        contentPaddingTop={topSectionPadding} extraBottomPadding="0px">
+        <GradientBackground gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Container size="100%" style={{borderRadius: theme.radius.md}} p="xl">
                 {/* General Page Error */}
                 {error && !profileEditOpened && !skillsEditOpened && !interestsEditOpened && !experienceEditOpened && !portfolioProjectAddOpened && !portfolioProjectEditOpened && (
@@ -817,6 +809,7 @@ export default function ProfilePage() {
                                 loading={isSavingNewPortfolioProject}>Add Project</Button> </Group> </Stack>
             </Modal>
 
-        </WavyBackground>
+        </GradientBackground>
     );
 }
+
