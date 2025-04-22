@@ -14,21 +14,23 @@ import React from 'react';
 
 // Mock data for team members
 const teamMembers = [
-    { id: 1, name: 'Full name', role: 'Role title', avatarUrl: '' },
-    { id: 2, name: 'Full name', role: 'Role title', avatarUrl: '' },
-    { id: 3, name: 'Full name', role: 'Role title', avatarUrl: '' },
-    { id: 4, name: 'Full name', role: 'Role title', avatarUrl: '' },
-    { id: 5, name: 'Full name', role: 'Role title', avatarUrl: '' },
+    { name: 'Shubo Zhang', role: 'Graphic Designer', avatarUrl: '/Shubo Zhang.png' },
+    { name: 'Yunna Jeon', role: 'UX/UI Designer', avatarUrl: '/Yunna Jeon.png' },
+    { name: 'Danika Lieu', role: 'Interactive Designer', avatarUrl: '/Danika Lieu.png' },
+    { name: 'Yeonseo Hong', role: 'User Experience/Interface Designer', avatarUrl: '/Yeonseo Hong.png' },
+    { name: 'Parsa Jafari', role: 'Software Developer', avatarUrl: '/Parsa Jafari.png' },
 ];
 
 // Gradient Background Component
-function GradientBackground({ gradient, children }: { gradient: string; children?: React.ReactNode }) {
-  return (
-    <Box 
-      style={{ 
+function GradientBackground({ gradient, children }: { gradient: string; children?: React.ReactNode }) {return (
+    <Box
+      style={{
         background: gradient,
         position: 'relative',
         minHeight: '100%',
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        left: 0,
         overflow: 'hidden',
       }}
     >
@@ -66,7 +68,7 @@ export default function AboutUsPage() {
                         <Title order={3} fw={400} fz={28}>TeamUp Team</Title> {/* Adjusted fw, increased size */}
                         <SimpleGrid cols={{ base: 3, xs: 5 }} spacing="xl" mt="lg">
                             {teamMembers.map((member) => (
-                                <Stack key={member.id} align="center" gap={10}>
+                                <Stack key={member.name} align="center" gap={10}>
                                     <Avatar
                                         src={member.avatarUrl || undefined}
                                         size={100}
@@ -126,3 +128,4 @@ export default function AboutUsPage() {
         </GradientBackground>
     );
 }
+
