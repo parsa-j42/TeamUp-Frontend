@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     Container, Stack, Title, Text, Group, Avatar, Button, Divider,
-    Select, Loader, Alert, Center, Box, Tabs,
+    Select, Loader, Alert, Center, Box, Tabs
 } from '@mantine/core';
-import { IconClock, IconAlertCircle, IconPhoto, IconChevronDown } from '@tabler/icons-react';
+import { IconClock, IconAlertCircle, IconChevronDown } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
 import { apiClient } from '@utils/apiClient';
 import { useAuth } from '@contexts/AuthContext';
@@ -25,28 +25,29 @@ export default function MyApplicationsPage() {
     const [applications, setApplications] = useState<ApplicationDto[]>([]);
     const [isLoadingApplications, setIsLoadingApplications] = useState(true);
     const [applicationsError, setApplicationsError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'received' | 'sent'>('received');
-    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'all' | 'sent' | 'received'>('received');
+    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // Use null for "All"
     const [projectOptions, setProjectOptions] = useState<{ value: string; label: string }[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(false);
-    const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null); // Tracks application ID being processed
+    const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null);
 
     // --- Data Fetching ---
     const fetchApplications = useCallback(async () => {
         if (!initialCheckComplete || !userDetails) {
             setIsLoadingApplications(false);
-            return; // Don't fetch if auth isn't ready
+            return;
         }
         setIsLoadingApplications(true);
         setApplicationsError(null);
         console.log(`Fetching applications: filter=${activeTab}, projectId=${selectedProjectId}`);
         try {
             const queryParams: FindApplicationsQueryDto = {
-                filter: activeTab,
-                // Only include projectId if it's selected
+                ...(activeTab !== 'all' && { filter: activeTab }),
                 ...(selectedProjectId && { projectId: selectedProjectId }),
-                take: 50 // Fetch a reasonable number
+                take: 50
             };
+            Object.keys(queryParams).forEach(key => queryParams[key as keyof FindApplicationsQueryDto] === undefined && delete queryParams[key as keyof FindApplicationsQueryDto]);
+
             const params = new URLSearchParams(queryParams as any).toString();
             const data = await apiClient<{ applications: ApplicationDto[], total: number }>(`/applications?${params}`);
             setApplications(data.applications);
@@ -60,15 +61,18 @@ export default function MyApplicationsPage() {
     }, [activeTab, selectedProjectId, initialCheckComplete, userDetails]);
 
     const fetchProjectOptions = useCallback(async () => {
-        if (!initialCheckComplete || !userDetails) return; // Only fetch if logged in
+        if (!initialCheckComplete || !userDetails) return;
         setIsLoadingProjects(true);
         try {
-            // Fetch projects the user is associated with (owned or member)
             const projects = await apiClient<ProjectDto[]>('/projects/me');
-            setProjectOptions(projects.map(p => ({ value: p.id, label: p.title })));
+            // Set "All projects" as the first option with empty value
+            setProjectOptions([
+                { value: '', label: 'All projects' },
+                ...projects.map(p => ({ value: p.id, label: p.title }))
+            ]);
         } catch (err) {
             console.error("Failed to fetch projects for filter dropdown:", err);
-            setProjectOptions([]); // Set empty on error
+            setProjectOptions([{ value: '', label: 'All projects' }]);
         } finally {
             setIsLoadingProjects(false);
         }
@@ -80,28 +84,25 @@ export default function MyApplicationsPage() {
             fetchApplications();
             fetchProjectOptions();
         }
-    }, [fetchApplications, fetchProjectOptions, initialCheckComplete]); // Fetch on initial load and when filters change via fetchApplications dependency
+    }, [fetchApplications, fetchProjectOptions, initialCheckComplete]);
 
     // --- Action Handlers ---
     const handleTabChange = (value: string | null) => {
-        if (value === 'sent' || value === 'received') {
+        if (value === 'all' || value === 'sent' || value === 'received') {
             setActiveTab(value);
-            // Fetching is triggered by useEffect dependency on activeTab
         }
     };
 
     const handleProjectFilterChange = (value: string | null) => {
-        setSelectedProjectId(value);
-        // Fetching is triggered by useEffect dependency on selectedProjectId
+        setSelectedProjectId(value === '' ? null : value); // Map empty string back to null
     };
 
     const handleApplicationStatusUpdate = async (applicationId: string, status: 'Accepted' | 'Declined') => {
         setIsProcessingAction(applicationId);
-        setApplicationsError(null); // Clear previous errors
+        setApplicationsError(null);
         try {
             const payload: UpdateApplicationStatusPayload = { status };
             await apiClient<ApplicationDto>(`/applications/${applicationId}/status`, { method: 'PATCH', body: payload });
-            // Refetch applications to show the updated status
             fetchApplications();
         } catch (err: any) {
             console.error(`[MyApplicationsPage] Error ${status.toLowerCase()}ing application ${applicationId}:`, err);
@@ -130,12 +131,12 @@ export default function MyApplicationsPage() {
 
         return (
             <Box key={app.id}>
-                <Group justify="space-between" align="flex-start" wrap="nowrap" className={classes.applicationItem}>
-                    {/* Left Side: Time, Title, Applicant Info */}
-                    <Stack gap="xs" style={{ flexGrow: 1, overflow: 'hidden' }}>
+                <Group justify="space-between" align="center" wrap="nowrap" className={classes.applicationItem}>
+                    {/* Left Side */}
+                    <Stack gap="xs" style={{ flexGrow: 1, overflow: 'hidden', marginRight: 'var(--mantine-spacing-md)' }}>
                         <Group gap="xs" className={classes.itemHeader}>
-                            <IconClock size={16} color='gray' />
-                            <Text size="xs" c="dimmed" title={dayjs(app.createdAt).format('YYYY-MM-DD HH:mm')}>
+                            <IconClock size={16} color='black' stroke={1.5}/> {/* Icon color black */}
+                            <Text size="xs" c="black" title={dayjs(app.createdAt).format('YYYY-MM-DD HH:mm')}> {/* Time text black */}
                                 {formatRelativeTime(app.createdAt)}
                             </Text>
                         </Group>
@@ -143,32 +144,34 @@ export default function MyApplicationsPage() {
                             {titleText}
                             {app.status === ApplicationStatus.INVITED && activeTab === 'received' && ' (Invitation)'}
                         </Title>
-                        {/* Show Applicant for received, Project Owner for sent */}
-                        {activeTab === 'received' ? (
+                        {(activeTab === 'received') ? (
                             <Group
                                 gap="xs"
                                 className={classes.applicantInfo}
                                 onClick={() => handleProfileClick(app.applicantId)}
+                                wrap="nowrap"
                             >
-                                <Avatar color="gray" radius="xl" size="sm">
-                                    <IconPhoto size="0.8rem" /> {/* Placeholder */}
+                                <Avatar radius="xl" size="sm" className={classes.applicantAvatar}>
+                                    {/* Placeholder initials or icon */}
+                                    {app.applicant.firstName?.[0] || '?'}
+                                    {app.applicant.lastName?.[0] || ''}
                                 </Avatar>
-                                <Text size="sm" c="dimmed" lineClamp={1}>
-                                    {`${app.applicant.preferredUsername} ${app.applicant.lastName}`}
+                                <Text size="sm" className={classes.applicantNameText} lineClamp={1}>
+                                    {`${app.applicant.preferredUsername} ${app.applicant.lastName}`} - Go to profile page if clicked
                                 </Text>
                             </Group>
                         ) : (
                             <Group gap="xs">
-                                <Text size="sm" c="dimmed">
-                                    Project: {app.project.title} (Owner: {`${app.project.owner.preferredUsername} ${app.project.owner.lastName}`})
+                                <Text size="sm" c="dimmed" lineClamp={1}>
+                                    Project: {app.project.title} (Status: {app.status})
                                 </Text>
                             </Group>
                         )}
                     </Stack>
 
-                    {/* Right Side: Action Buttons (Conditional) */}
+                    {/* Right Side: Action Buttons */}
                     {showActions && (
-                        <Group gap="sm" style={{ alignSelf: 'center' }}>
+                        <Group gap="sm" wrap="nowrap" style={{ flexShrink: 0 }}>
                             <Button
                                 variant="filled"
                                 radius="xl"
@@ -194,7 +197,7 @@ export default function MyApplicationsPage() {
                         </Group>
                     )}
                 </Group>
-                <Divider my="sm" className={classes.divider} />
+                <Divider className={classes.divider} />
             </Box>
         );
     };
@@ -211,25 +214,12 @@ export default function MyApplicationsPage() {
                     <Tabs
                         value={activeTab}
                         onChange={handleTabChange}
-                        variant="pills" // Use pills variant for background on active
-                        radius="md"
+                        variant="unstyled"
                         classNames={{ list: classes.tabsList, tab: classes.tab }}
-                        mb="lg" // Add margin below tabs
-                        styles={(theme) => ({ // Style active tab background
-                            tab: {
-                                '&[data-active]': {
-                                    backgroundColor: theme.colors.blue[5], // Use screenshot blue
-                                    color: theme.white,
-                                },
-                                '&:not([data-active]):hover': {
-                                    backgroundColor: theme.colors.gray[1],
-                                }
-                            }
-                        })}
+                        mb="lg"
                     >
-                        <Tabs.List grow>
-                            {/* <Tabs.Tab value="all">View all</Tabs.Tab> */}
-                            {/* "View All" needs specific logic, implementing Sent/Received first */}
+                        <Tabs.List>
+                            <Tabs.Tab value="all">View all</Tabs.Tab>
                             <Tabs.Tab value="sent">Sent</Tabs.Tab>
                             <Tabs.Tab value="received">Received</Tabs.Tab>
                         </Tabs.List>
@@ -238,30 +228,32 @@ export default function MyApplicationsPage() {
                     <Select
                         placeholder="Select one of the projects"
                         data={projectOptions}
-                        value={selectedProjectId}
+                        // Use empty string for "All projects" option value
+                        value={selectedProjectId ?? ''}
                         onChange={handleProjectFilterChange}
                         disabled={isLoadingProjects}
-                        clearable
+                        clearable={false} // Don't allow clearing beyond "All projects"
                         searchable
                         nothingFoundMessage="No projects found"
-                        rightSection={isLoadingProjects ? <Loader size="xs" /> : <IconChevronDown size={16} />}
+                        rightSection={isLoadingProjects ? <Loader size={16} /> : <IconChevronDown size={16} />}
                         className={classes.projectSelect}
+                        comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
                     />
 
                     {/* Application List */}
                     {isLoadingApplications && <Center><Loader my="xl" /></Center>}
                     {!isLoadingApplications && applicationsError && (
-                        <Alert color="red" title="Error Loading Applications" icon={<IconAlertCircle />}>
+                        <Alert color="red" title="Error Loading Applications" icon={<IconAlertCircle />} mt="md">
                             {applicationsError}
                         </Alert>
                     )}
                     {!isLoadingApplications && !applicationsError && applications.length === 0 && (
                         <Center mih={150}>
-                            <Text c="dimmed">No {activeTab} applications {selectedProjectId ? 'for this project' : ''} found.</Text>
+                            <Text c="dimmed">No {activeTab !== 'all' ? activeTab : ''} applications {selectedProjectId ? 'for this project' : ''} found.</Text>
                         </Center>
                     )}
                     {!isLoadingApplications && !applicationsError && applications.length > 0 && (
-                        <Stack gap={0}> {/* Use gap={0} and let divider handle spacing */}
+                        <Stack gap={0}>
                             {applications.map(renderApplicationItem)}
                         </Stack>
                     )}

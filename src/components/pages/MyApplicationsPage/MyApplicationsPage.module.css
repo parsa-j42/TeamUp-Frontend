@@ -1,3 +1,6 @@
+/* src/components/pages/MyApplicationsPage/MyApplicationsPage.module.css */
+/* UPDATED STYLES V3 - Exact Match */
+
 .pageWrapper {
     padding: var(--mantine-spacing-xl);
     background-color: #f8f9fa; /* Light background for the page */
@@ -22,92 +25,153 @@
 
 .contentBox {
     background-color: white;
-    border: 1px solid #cce7ff; /* Light blue border */
+    /* Use mainBlue.6 for border */
+    border: 1px solid var(--mantine-color-mainBlue-6);
     border-radius: var(--mantine-radius-lg);
     padding: var(--mantine-spacing-xl);
-    box-shadow: var(--mantine-shadow-sm);
+    box-shadow: none; /* Explicitly remove shadow */
 }
 
+/* --- Tab Styles --- */
 .tabsList {
     border-bottom: 1px solid var(--mantine-color-gray-3);
     margin-bottom: var(--mantine-spacing-lg);
+    gap: var(--mantine-spacing-xl);
+    padding-left: var(--mantine-spacing-sm);
 }
 
 .tab {
-    padding-top: var(--mantine-spacing-sm);
-    padding-bottom: var(--mantine-spacing-sm);
-    padding-left: var(--mantine-spacing-lg);
-    padding-right: var(--mantine-spacing-lg);
+    padding: var(--mantine-spacing-sm) 0;
+    margin-bottom: -1px; /* Overlap the bottom border */
     font-weight: 500;
-    color: var(--mantine-color-gray-6);
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-gray-7); /* Default text color */
+    background-color: transparent;
+    border: none;
     border-bottom: 2px solid transparent;
-    margin-bottom: -1px; /* Overlap border */
-
-    &[data-active] {
-        color: var(--mantine-color-blue-6);
-        border-bottom-color: var(--mantine-color-blue-6);
-        background-color: transparent;
-    }
+    transition: color 0.2s, border-color 0.2s;
 
     &:hover {
-        background-color: var(--mantine-color-gray-0);
+        background-color: transparent;
+        color: var(--mantine-color-mainBlue-6); /* Blue text on hover */
+    }
+    &:focus, &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* Active state */
+    &[data-active] {
+        color: var(--mantine-color-mainBlue-6); /* Blue text */
+        border-bottom-color: var(--mantine-color-mainBlue-6); /* Blue border bottom */
+        background-color: transparent;
     }
 }
+/* --- End Tab Styles --- */
+
 
 .projectSelect {
     margin-bottom: var(--mantine-spacing-xl);
     & .mantine-Select-input {
-        border-color: #a3daff; /* Light blue border for select */
+        border-color: var(--mantine-color-mainBlue-6); /* Blue border */
+        color: var(--mantine-color-mainBlue-6); /* Blue text */
         border-radius: var(--mantine-radius-md);
+        &::placeholder { /* Style placeholder */
+            color: var(--mantine-color-mainBlue-6);
+            opacity: 0.8; /* Slightly lighter placeholder */
+        }
+        &:focus-within {
+            border-color: var(--mantine-color-mainBlue-7); /* Slightly darker blue on focus */
+            box-shadow: none;
+        }
+    }
+    & .mantine-Select-dropdown {
+        border-radius: var(--mantine-radius-md);
+        border-color: var(--mantine-color-mainBlue-6); /* Blue border */
+    }
+    & .mantine-Select-option {
+        &[data-selected] {
+            background-color: var(--mantine-color-blue-0); /* Very light blue background */
+            color: var(--mantine-color-mainBlue-7);
+        }
+        &[data-hovered] {
+            background-color: var(--mantine-color-blue-0);
+        }
     }
 }
 
 .applicationItem {
-    /* Container for each application row */
-    padding-top: var(--mantine-spacing-md);
-    padding-bottom: var(--mantine-spacing-md);
+    padding-top: var(--mantine-spacing-lg);
+    padding-bottom: var(--mantine-spacing-lg);
 }
 
 .itemHeader {
     margin-bottom: var(--mantine-spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-xs);
+    /* Ensure time text is black */
+    & .mantine-Text-root {
+        color: var(--mantine-color-black);
+    }
 }
 
 .itemTitle {
     font-weight: 600;
     font-size: var(--mantine-font-size-lg);
-    color: var(--mantine-color-black);
+    color: var(--mantine-color-black); /* Black title */
     line-height: 1.3;
+    margin-bottom: var(--mantine-spacing-xs);
 }
 
 .applicantInfo {
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-xs);
     &:hover {
-        text-decoration: underline;
+        opacity: 0.8;
     }
 }
+
+.applicantAvatar {
+    background-color: var(--mantine-color-gray-2);
+    color: var(--mantine-color-gray-6);
+}
+
+.applicantNameText {
+    color: var(--mantine-color-gray-7);
+}
+
 
 .actionButton {
     border-radius: var(--mantine-radius-xl);
     font-weight: 500;
     min-width: 90px;
+    height: 36px;
+    padding-left: var(--mantine-spacing-md);
+    padding-right: var(--mantine-spacing-md);
+    font-size: var(--mantine-font-size-sm);
 }
 
 .acceptButton {
-    background-color: #33a1ff; /* Blue accept button */
+    background-color: var(--mantine-color-mainBlue-6); /* Blue background */
+    color: white;
+    border: none;
     &:hover {
-        background-color: #1f8eeb;
+        background-color: var(--mantine-color-mainBlue-7); /* Darker blue */
     }
 }
 
 .declineButton {
     background-color: white;
-    color: #33a1ff; /* Blue text */
+    color: var(--mantine-color-mainBlue-6); /* Blue text */
     border: 1px solid var(--mantine-color-mainBlue-6); /* Blue border */
     &:hover {
-        background-color: #e7f5ff; /* Lighter blue background on hover */
+        background-color: var(--mantine-color-blue-0); /* Very light blue */
     }
 }
 
 .divider {
-    border-top-color: var(--mantine-color-gray-3);
+    border-top-color: var(--mantine-color-black); /* Black divider */
 }
