@@ -64,7 +64,7 @@ export default function SuccessPage() {
             {/* Decorative Circles - positioned absolutely relative to the next Box */}
             <DecorativeCircle
                 size="400px"
-                color="bgPurple"
+                color="mainBlue"
                 opacity={0.7}
                 top="55%"
                 left={0}
@@ -72,7 +72,7 @@ export default function SuccessPage() {
             />
             <DecorativeCircle
                 size="200px"
-                color="mainPurple"
+                color="mainBlue"
                 opacity={0.55}
                 top="37%"
                 left={0}
@@ -80,7 +80,7 @@ export default function SuccessPage() {
             />
             <DecorativeCircle
                 size="330px"
-                color="bgPurple"
+                color="mainBlue"
                 opacity={0.7}
                 top="52%"
                 right={0}
@@ -103,7 +103,7 @@ export default function SuccessPage() {
 
                     {/* Homepage Button */}
                     <Button
-                        color="mainPurple.6"
+                        color="mainBlue.6"
                         variant="filled"
                         radius="xl"
                         fw={500}
