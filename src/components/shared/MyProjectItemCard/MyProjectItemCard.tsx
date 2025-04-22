@@ -17,7 +17,7 @@ export function MyProjectItemCard({ id, title, date, category, isOngoing, member
     const navigate = useNavigate();
 
     const handleNavigate = () => {
-        navigate(`/project/${id}`);
+        navigate(`/my-project-details/${id}`);
     };
 
     // Determine category icon (can be expanded later)
