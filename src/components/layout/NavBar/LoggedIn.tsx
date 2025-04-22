@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Group, Menu, Title, Skeleton } from "@mantine/core"; // Added Skeleton
+import { Avatar, Box, Button, Group, Menu, Title, Skeleton } from "@mantine/core";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@contexts/AuthContext";
 import {
@@ -6,6 +6,7 @@ import {
     IconLogout,
     IconSettings,
     IconUser,
+    IconInbox
 } from "@tabler/icons-react";
 
 export function LoggedIn() {
@@ -31,7 +32,7 @@ export function LoggedIn() {
             <Button variant="white" color="black" fw={400} size="md"
                     onClick={() => navigate("/Discover")}>Discover</Button>
             <Button variant="white" color="black" fw={400} size="md"
-                    onClick={() => navigate("/Dashboard")}>Dashboard</Button>
+                    onClick={() => navigate("/my-projects")}>My Projects</Button>
             <Button variant="white" color="black" fw={400} size="md"
                     onClick={() => navigate("/Messages")}>Messages</Button>
             <Menu position="bottom" withinPortal width="250px" radius="md" trigger="click-hover"
@@ -60,7 +61,10 @@ export function LoggedIn() {
                     </Menu.Label>
                     <Menu.Divider pb="xs" w="90%" m="0 auto"/>
                     <Menu.Item pb="xs" pl="lg" leftSection={<IconLayoutDashboardFilled color="#6A4CF2" size={21} style={{marginBottom: "2px"}}/>}
-                               onClick={() => navigate("/dashboard")}>Dashboard</Menu.Item>
+                               onClick={() => navigate("/my-projects")}>My Projects</Menu.Item>
+                    <Menu.Item pb="xs" pl="lg" leftSection={<IconInbox color="#37c5e7" size={21} style={{marginBottom: "2px"}}/>}
+                               onClick={() => navigate("/my-applications")}>My Applications</Menu.Item>
+
                     <Menu.Item pb="xs" pl="lg" leftSection={<IconUser size={22} style={{marginBottom: "2px"}}/>}
                                onClick={() => navigate("/profile")}>My Profile</Menu.Item>
                     <Menu.Divider pb="xs"  w="90%" m="0 auto"/>

@@ -184,30 +184,33 @@ export default function LandingPage() {
             {/* --- My Current Projects Section (Conditional) --- */}
             {/* Render only if authenticated, check complete, not loading, and projects exist */}
             {isAuthenticated && initialCheckComplete && !isLoadingMyProjects && myProjects && myProjects.length > 0 && (
-                <Container size="lg" py="xl" mt="xl" mb="xl">
-                    <Stack gap="lg">
-                        <Group justify="space-between">
-                            <Title order={2} size="31px" fw={400}>My Current Project</Title>
+                <GradientBackground gradient="">
+                    <Container size="lg" py="xl" mt="xl" mb="xl">
+                        <Stack gap="lg">
+                            <Group justify="space-between" mb="xl">
+                                <Title order={2} size="31px" fw={400}>My Current Project</Title>
+                            </Group>
+                            {/* No needT for separate loading/error here as it depends on the outer condition */}
+                            <Group justify="center" gap="lg">
+                                {myProjects.slice(0, 2).map((project) => (
+                                    <MyProjectItemCard
+                                        key={project.id}
+                                        id={project.id}
+                                        title={project.title}
+                                        date={dayjs(project.createdAt).format('DD MMM YYYY')}
+                                        category={project.tags?.[0] || project.projectType || 'General'}
+                                        isOngoing={!project.endDate}
+                                        members={project.members || []}
+                                    />
+                                ))}
+                            </Group>
+                        </Stack>
+                        <Group justify="flex-end">
                             <Anchor onClick={() => navigate('/dashboard')} c="dimmed" size="sm">
                                 FULL PAGE <IconArrowRight size={14} style={{ verticalAlign: 'middle' }}/>
-                            </Anchor>
-                        </Group>
-                        {/* No need for separate loading/error here as it depends on the outer condition */}
-                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-                            {myProjects.slice(0, 2).map((project) => (
-                                <MyProjectItemCard
-                                    key={project.id}
-                                    id={project.id}
-                                    title={project.title}
-                                    date={dayjs(project.createdAt).format('DD MMM YYYY')}
-                                    category={project.tags?.[0] || project.projectType || 'General'}
-                                    isOngoing={!project.endDate}
-                                    members={project.members || []}
-                                />
-                            ))}
-                        </SimpleGrid>
-                    </Stack>
-                </Container>
+                            </Anchor></Group>
+                    </Container>
+                </GradientBackground>
             )}
             {/* Render error for My Projects if applicable and user is logged in */}
             {isAuthenticated && initialCheckComplete && myProjectsError && (

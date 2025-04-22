@@ -15,6 +15,8 @@ import CapConPage from "@components/static/CapConPage/CapConPage.tsx";
 import SignUpPage from "@components/pages/auth/SignUpPage/SignUpPage.tsx";
 import ConfirmSignUpPage from "@components/pages/auth/ConfirmSignUpPage/ConfirmSignUpPage.tsx";
 import DiscoverPage from '@components/pages/DiscoverPage/DiscoverPage';
+import MyProjectsPage from "@components/pages/MyProjectsPage/MyProjectsPage.tsx";
+import MyApplicationsPage from "@components/pages/MyApplicationsPage/MyApplicationsPage.tsx";
 
 export const AppRouter: React.FC = () => {
     // Temporary for CapCon
@@ -48,6 +50,8 @@ export const AppRouter: React.FC = () => {
                 <Route path="/submitted" element={<SuccessPage />} />
                 <Route path="/create-project" element={<CreateProjectPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/my-projects" element={<MyProjectsPage/>} />
+                <Route path="/my-applications" element={<MyApplicationsPage/>} />
             </Route>
 
             {/* Redirect root to landing */}
