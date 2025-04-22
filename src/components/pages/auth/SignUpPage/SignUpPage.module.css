@@ -36,16 +36,38 @@
 }
 
 .pill {
-    background-color: var(--mantine-color-mainBlue-1);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 1) 0%, rgba(55, 197, 231, 0.3) 50%, rgba(255, 255, 255, 1) 100%);
     color: black;
 }
 
 .dropdown {
-    background-color: var(--mantine-color-mainBlue-1);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.7) 0%, rgba(55, 197, 231, 0.2) 50%, rgba(255, 255, 255, 0.1) 100%);
     color: black;
     border: none;
+    box-shadow: #37c5e7 0px 0px 0px 1px, #37c5e7 0px 4px 16px;
+    border-radius: 15px;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.asterisk {
+    color: var(--mantine-color-mainBlue-6);
+}
+
+.dropdown::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(270deg, rgba(255, 255, 255, 1) 0%, rgba(55, 197, 231, 0.2) 50%, rgba(255, 255, 255, 1) 100%);
+    filter: blur(5px);
+    z-index: -1;
+    border-radius: inherit;
 }
 
 .inputInner {
     border: none;
 }
+

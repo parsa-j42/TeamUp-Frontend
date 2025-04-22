@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box, Paper, Stack, Stepper, Title, Text, TextInput, Group,
-    MultiSelect, Textarea, PasswordInput, Loader // Added Loader
+    Textarea, PasswordInput, Loader, TagsInput
 } from '@mantine/core';
-import styles from './SignUpPage.module.css'; // Ensure this path is correct
-import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx"; // Ensure this path is correct
+import styles from './SignUpPage.module.css';
+import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import { useNavigate, useLocation } from "react-router-dom";
-import UserTypeToggle from "@components/shared/UserTypeToggle/UserTypeToggle.tsx"; // Ensure this path is correct
+import UserTypeToggle from "@components/shared/UserTypeToggle/UserTypeToggle.tsx";
 import { signUp } from 'aws-amplify/auth';
-import { apiClient } from '@utils/apiClient'; // Ensure path is correct
+import { apiClient } from '@utils/apiClient';
 import { useAuth } from '@contexts/AuthContext';
-import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx"; // Ensure path is correct
+import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx";
 
 // --- Frontend DTOs/Payloads (Mirroring Backend) ---
 interface CompleteSignupProfilePayload {
@@ -297,12 +297,12 @@ export default function SignUpPage() {
                     {/* --- Step 0 Fields --- */}
                     {active === 0 && (
                         <>
-                            <TextInput required variant="unstyled" label="First Name" name="firstName" value={formData.firstName || ''} onChange={handleInputChange} error={errors.firstName} classNames={{ wrapper: styles.inputWrapper }} />
-                            <TextInput required variant="unstyled" label="Last Name" name="lastName" value={formData.lastName || ''} onChange={handleInputChange} error={errors.lastName} classNames={{ wrapper: styles.inputWrapper }} />
-                            <TextInput required variant="unstyled" label="Preferred Name" name="preferredUsername" value={formData.preferredUsername || ''} onChange={handleInputChange} error={errors.preferredUsername} classNames={{ wrapper: styles.inputWrapper }} />
-                            <TextInput required variant="unstyled" label="Email" name="email" type="email" value={formData.email || ''} onChange={handleInputChange} error={errors.email} classNames={{ wrapper: styles.inputWrapper }} />
-                            <PasswordInput required variant="unstyled" label="Password" name="password" value={formData.password || ''} onChange={handleInputChange} error={errors.password} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput }} />
-                            <PasswordInput required variant="unstyled" label="Confirm Password" name="confirmPassword" value={formData.confirmPassword || ''} onChange={handleInputChange} error={errors.confirmPassword} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput }} />
+                            <TextInput required variant="unstyled" label="First Name" name="firstName" value={formData.firstName || ''} onChange={handleInputChange} error={errors.firstName} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
+                            <TextInput required variant="unstyled" label="Last Name" name="lastName" value={formData.lastName || ''} onChange={handleInputChange} error={errors.lastName} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
+                            <TextInput required variant="unstyled" label="Preferred Name" name="preferredUsername" value={formData.preferredUsername || ''} onChange={handleInputChange} error={errors.preferredUsername} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
+                            <TextInput required variant="unstyled" label="Email" name="email" type="email" value={formData.email || ''} onChange={handleInputChange} error={errors.email} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
+                            <PasswordInput required variant="unstyled" label="Password" name="password" value={formData.password || ''} onChange={handleInputChange} error={errors.password} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput, required: styles.asterisk }} />
+                            <PasswordInput required variant="unstyled" label="Confirm Password" name="confirmPassword" value={formData.confirmPassword || ''} onChange={handleInputChange} error={errors.confirmPassword} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput, required: styles.asterisk }} />
                         </>
                     )}
 
@@ -311,16 +311,46 @@ export default function SignUpPage() {
                         <>
                             <UserTypeToggle value={formData.userType} onChange={handleUserTypeChange} />
                             {errors.userType && <Text c="red" size="xs">{errors.userType}</Text>}
-                            <MultiSelect required label="Interests" placeholder="Select multiple" data={['Photoshop', 'React', 'Python', 'Economics', 'Marketing', 'Design']} value={formData.interests || []} onChange={handleMultiSelectChange('interests')} error={errors.interests} searchable clearable classNames={{ wrapper: styles.inputWrapper, dropdown: styles.dropdown, input: styles.inputInner }} />
-                            <TextInput required variant="unstyled" label="Program" name="program" value={formData.program || ''} onChange={handleInputChange} error={errors.program} classNames={{ wrapper: styles.inputWrapper }} />
-                        </>
+                            <TextInput required variant="unstyled" label="Program" name="program" value={formData.program || ''} onChange={handleInputChange} error={errors.program} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk}} />
+                            <TagsInput
+                                required
+                                label="Interests"
+                                placeholder="Type and press Enter"
+                                value={formData.interests || []}
+                                onChange={handleMultiSelectChange('interests')}
+                                error={errors.interests}
+                                clearable
+                                classNames={{
+                                    wrapper: styles.inputWrapper,
+                                    dropdown: styles.dropdown,
+                                    input: styles.inputInner,
+                                    pill: styles.pill,
+                                    required: styles.asterisk
+                                }}
+                                />
+                            </>
                     )}
 
                     {/* --- Step 2 Fields (conditional on user being logged in) --- */}
                     {active === 2 && user && (
                         <>
-                            <MultiSelect required label="Skills" placeholder="Select Multiple" data={['Photoshop', 'React', 'Python', 'Economics', 'Project Management', 'Communication']} value={formData.skills || []} onChange={handleMultiSelectChange('skills')} error={errors.skills} searchable clearable classNames={{ wrapper: styles.inputWrapper, dropdown: styles.dropdown, input: styles.inputInner, pill: styles.pill }} />
-                            <Textarea required variant="unstyled" label="Experience" placeholder="Tell us about your relevant experience, projects, or goals, in around two sentences." name="experience" value={formData.experience || ''} onChange={handleInputChange} error={errors.experience} autosize minRows={3} classNames={{ wrapper: styles.inputWrapper }} />
+                            <TagsInput
+                                required
+                                label="Skills"
+                                placeholder="Type and press Enter"
+                                value={formData.skills || []}
+                                onChange={handleMultiSelectChange('skills')}
+                                error={errors.skills}
+                                clearable
+                                classNames={{
+                                    wrapper: styles.inputWrapper,
+                                    dropdown: styles.dropdown,
+                                    input: styles.inputInner,
+                                    pill: styles.pill,
+                                    required: styles.asterisk
+                                }}
+                            />
+                            <Textarea required variant="unstyled" label="Experience" placeholder="Tell us about your relevant experience, projects, or goals, in around two sentences." name="experience" value={formData.experience || ''} onChange={handleInputChange} error={errors.experience} autosize minRows={3} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
                         </>
                     )}
 
@@ -355,3 +385,4 @@ export default function SignUpPage() {
         </GradientBackground>
     );
 }
+

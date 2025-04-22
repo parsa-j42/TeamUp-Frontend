@@ -8,7 +8,7 @@ interface UserTypeToggleProps {
 }
 
 export function UserTypeToggle({ value, onChange }: UserTypeToggleProps) {
-    const [internalValue, setInternalValue] = useState<string>(value || 'undergraduate');
+    const [internalValue, setInternalValue] = useState<string>(value || '');
 
     const handleChange = (newValue: string) => {
         setInternalValue(newValue);
