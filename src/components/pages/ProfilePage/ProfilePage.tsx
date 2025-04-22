@@ -459,7 +459,7 @@ export default function ProfilePage() {
     // --- Render Main Content ---
     return (
         <GradientBackground gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
-            <Container size="100%" style={{borderRadius: theme.radius.md}} p="xl">
+            <Container ml="12%" size="100%" style={{borderRadius: theme.radius.md}} p="xl">
                 {/* General Page Error */}
                 {error && !profileEditOpened && !skillsEditOpened && !interestsEditOpened && !experienceEditOpened && !portfolioProjectAddOpened && !portfolioProjectEditOpened && (
                     <Alert icon={<IconAlertCircle size="1rem"/>} title="Operation Error" color="red" radius="md"
