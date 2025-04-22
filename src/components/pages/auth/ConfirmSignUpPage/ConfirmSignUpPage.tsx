@@ -8,6 +8,7 @@ import styles from './ConfirmSignUpPage.module.css';
 import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
+import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx";
 
 type ConfirmErrors = {
     code?: string | null;
@@ -111,7 +112,7 @@ export default function ConfirmSignUpPage() {
 
     const emailIconContainerStyle: React.CSSProperties = {
         width: 145, height: 145, borderRadius: '50%',
-        backgroundColor: theme.colors.mainPurple?.[6] || theme.primaryColor,
+        backgroundColor: theme.colors.mainBlue?.[6] || theme.primaryColor,
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         border: `10px solid ${theme.colors.gray?.[3] || '#d9d9d9'}`,
         marginBottom: theme.spacing.xl,
@@ -119,7 +120,8 @@ export default function ConfirmSignUpPage() {
     const emailIconStyle = { size: 80, color: theme.colors.gray?.[3] || "#d9d9d9", strokeWidth: 2.5 };
 
     return (
-        <Box className={styles.container} bg="bgPurple.6">
+        <GradientBackground className={styles.container} gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%,
+                rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Stack align="center" justify="center" style={{ minHeight: '100vh', padding: '20px' }}>
                 <Box style={emailIconContainerStyle}> <IconMail {...emailIconStyle} /> </Box>
                 <Title order={2} size="32px" fw={400} c="mainPurple.6" ta="center"> Verify Email Address </Title>
@@ -138,6 +140,6 @@ export default function ConfirmSignUpPage() {
                     <RoundedButton color="mainPurple.6" textColor="white" variant="filled" size="md" fw="500" w="175px" borderWidth="2" onClick={handleConfirm} loading={isSubmitting} disabled={isSubmitting || isResending || code.length !== 6} > Confirm Account </RoundedButton>
                 </Group>
             </Stack>
-        </Box>
+        </GradientBackground>
     );
 }
