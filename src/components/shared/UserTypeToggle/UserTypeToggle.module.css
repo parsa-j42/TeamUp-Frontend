@@ -10,23 +10,23 @@
 
 /* In case you need additional label styling */
 .label {
-    color: #ff8383;
+    color: #37c5e7;
     font-weight: 500;
 }
 
 /* Additional styling for control elements if needed */
 .control {
-    border: 2px solid #ff8383;
+    border: 2px solid #37c5e7;
     border-right: 0;
 }
 
 .control:last-of-type {
-    border-right: 2px solid #ff8383;
+    border-right: 2px solid #37c5e7;
 }
 
 /* For the active indicator */
 .indicator {
-    background-color: #ff8383;
+    background-color: #37c5e7;
     border-radius:0;
     border: none;
 }

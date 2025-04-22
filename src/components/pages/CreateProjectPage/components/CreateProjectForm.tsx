@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Stack, TextInput, Textarea, Button, Group, Title, Text, TagsInput, Alert,
-    Paper, ActionIcon, Box, // Added Box
+    Paper, ActionIcon, Box, MultiSelect
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { IconAlertCircle, IconPlus, IconTrash } from '@tabler/icons-react';
@@ -139,8 +139,11 @@ export function CreateProjectForm() {
             <TextInput withAsterisk label="Project Title" value={title} onChange={(e) => { setTitle(e.currentTarget.value); setValidationErrors(p => ({ ...p, title: null })); }} error={validationErrors.title} classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, required: styles.textInputAsterisk }} />
             <Textarea withAsterisk autosize minRows={2} label="Project Description" value={description} onChange={(e) => { setDescription(e.currentTarget.value); setValidationErrors(p => ({ ...p, description: null })); }} error={validationErrors.description} classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, required: styles.textInputAsterisk }} />
             <ChipGroupField label="How many members are you working with?" options={numOfMembersFormOptions} value={numOfMembersValue} onChange={(newValue) => { setNumOfMembersValue(newValue as string); setValidationErrors(p => ({ ...p, numOfMembers: null })); }} required error={validationErrors.numOfMembers} />
-            <TagsInput withAsterisk label="Which skills do you need?" placeholder="Enter skills and press Enter" value={requiredSkills} onChange={(value) => { setRequiredSkills(value); setValidationErrors(p => ({ ...p, requiredSkills: null })); }} error={validationErrors.requiredSkills} clearable classNames={{ label: styles.textInputLabel, required: styles.textInputAsterisk }} />
-            <TagsInput label="Project Tags (Optional)" placeholder="Enter tags and press Enter" value={tags} onChange={setTags} clearable classNames={{ label: styles.textInputLabel }} />
+            <TagsInput withAsterisk label="Which skills do you need?" placeholder="Enter skills and press Enter" value={requiredSkills} onChange={(value) => { setRequiredSkills(value); setValidationErrors(p => ({ ...p, requiredSkills: null })); }} error={validationErrors.requiredSkills} clearable classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, required: styles.textInputAsterisk }} />
+            <MultiSelect required label="Project Tags (Optional)" placeholder="Select multiple" value={tags}
+                         onChange={setTags} clearable data={['Design', 'Development', 'Business', 'Community', 'Content & Media', 'Science']}
+                         classNames={{ wrapper: styles.inputWrapper, dropdown: styles.dropdown, input: styles.textInputOutline, pill: styles.pill, required: styles.textInputAsterisk }} />
+
             <Textarea withAsterisk autosize minRows={2} label="Required Roles and Descriptions" value={requiredRoles} onChange={(e) => { setRequiredRoles(e.currentTarget.value); setValidationErrors(p => ({ ...p, requiredRoles: null })); }} error={validationErrors.requiredRoles} classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, required: styles.textInputAsterisk }} />
             <ChipGroupField label="Project Type" options={projectTypeFormOptions} value={projectTypeValue} onChange={(newValue) => { setProjectTypeValue(newValue as string); setValidationErrors(p => ({ ...p, projectType: null })); }} required error={validationErrors.projectType} />
             <ChipGroupField labelComponent={MentorFeedbackLabel} options={mentorRequestFormOptions} value={mentorRequestValue} onChange={(newValue) => setMentorRequestValue(newValue as string)} />
@@ -151,7 +154,7 @@ export function CreateProjectForm() {
                 <Stack gap="sm">
                     <Group justify="space-between">
                         <Title order={4} size="16px" fw={500}>Project Milestones (Optional)</Title>
-                        <Button color="mainPurple.6" size="xs" variant="light" onClick={addMilestone} leftSection={<IconPlus size={14} />}> Add Milestone </Button>
+                        <Button color="mainBlue.6" size="xs" variant="light" onClick={addMilestone} leftSection={<IconPlus size={14} />}> Add Milestone </Button>
                     </Group>
                     <Text size="xs" c="dimmed">Define key dates and deliverables for your project.</Text>
                     {validationErrors.milestones && <Text c="red" size="xs">{validationErrors.milestones}</Text>}
@@ -197,8 +200,8 @@ export function CreateProjectForm() {
 
 
             <Group justify="flex-end" mt="md">
-                <Button variant="outline" radius="xl" color="mainPurple.6" fw={400} onClick={handleCancel} disabled={isSubmitting} > Cancel </Button>
-                <Button color="mainPurple.6" variant="filled" radius="xl" fw={400} onClick={handleCreate} loading={isSubmitting} > Create </Button>
+                <Button variant="outline" radius="xl" color="mainBlue.6" fw={400} onClick={handleCancel} disabled={isSubmitting} > Cancel </Button>
+                <Button color="mainBlue.6" variant="filled" radius="xl" fw={400} onClick={handleCreate} loading={isSubmitting} > Create </Button>
             </Group>
         </Stack>
     );

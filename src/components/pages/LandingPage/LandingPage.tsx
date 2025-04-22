@@ -188,10 +188,10 @@ export default function LandingPage() {
                     <Container size="lg" py="xl" mt="xl" mb="xl">
                         <Stack gap="lg">
                             <Group justify="space-between" mb="xl">
-                                <Title order={2} size="31px" fw={400}>My Current Project</Title>
+                                <Title order={2} size="31px" fw={400}>My Current Projects</Title>
                             </Group>
                             {/* No needT for separate loading/error here as it depends on the outer condition */}
-                            <Group justify="center" gap="lg">
+                            <Group justify="center" gap="80px">
                                 {myProjects.slice(0, 2).map((project) => (
                                     <MyProjectItemCard
                                         key={project.id}

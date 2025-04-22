@@ -95,16 +95,17 @@ export const theme = createTheme({
             '#B27F00'
         ],
         mainBlue: [
-            '#000000',
-            '#000000',
-            '#000000',
-            '#0e313a',
-            '#1c6274',
-            '#2994ad',
-            '#37c5e7', // Original mainBlue
-            '#69d4ed',
+            '#cff4fe',
+            '#cdf0f9',
             '#9be2f3',
-            '#cdf0f9'
+            '#69d4ed',
+            '#69d4ed',
+            '#69d4ed',
+            '#37c5e7',
+            '#2994ad',
+            '#1c6274',
+            '#0e313a',
+
         ],
         lightBlue: [
             '#000000',
