@@ -4,15 +4,13 @@ import {
     useMantineTheme, Loader, Alert, Center
 } from '@mantine/core';
 import { IconAlertCircle, IconBookmark, IconBookmarkFilled } from '@tabler/icons-react';
-import WavyBackground from '@components/shared/WavyBackground/WavyBackground';
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ProjectSectionCard } from './components/ProjectSectionCard';
 import { apiClient } from '@utils/apiClient';
 import { ProjectDto, ApplicationDto, BookmarkDto } from '../../../types/api'; // Ensure correct path
-import { useAuth } from '@contexts/AuthContext'; // Ensure correct path
+import { useAuth } from '@contexts/AuthContext';
+import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx"; // Ensure correct path
 
-// Define the SVG path for the wave shape
-const WAVE_PATH = "M 0 39 Q 24 58 52 35 C 59 28 88 23 100 39 L 100 0 L 0 0 Z";
 
 export default function ProjectPage() {
     const theme = useMantineTheme();
@@ -161,7 +159,8 @@ export default function ProjectPage() {
 
     // --- Render Logic ---
     return (
-        <WavyBackground wavePath={WAVE_PATH} waveHeight={1425} contentPaddingTop={0} extraBottomPadding={0} flipWave={true} >
+        <GradientBackground gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%,
+                rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Box p="xl">
                 <Container size="md" py="xl" px="xl" bg="rgba(217, 217, 217, 0.40)" style={{ borderRadius: theme.radius.md }} >
                     {/* Display API error for actions (e.g., apply/bookmark failure) */}
@@ -169,9 +168,9 @@ export default function ProjectPage() {
 
                     {/* Project Header */}
                     <Group justify="flex-start" gap="xl" align="center" mb="xl">
-                        <Title order={1} c="white" fw={500}> {title} </Title>
+                        <Title order={1} c="black" fw={500}> {title} </Title>
                         <Group gap="lg">
-                            {tags.map((tag) => ( <Badge key={tag} color="mainOrange.6" c="black" fw={500} variant="filled" size="lg" radius="sm"> {tag} </Badge> ))}
+                            {tags.map((tag) => ( <Badge key={tag} color="mainBlue.6" c="black" fw={500} variant="filled" size="lg" radius="sm"> {tag} </Badge> ))}
                         </Group>
                     </Group>
 
@@ -254,6 +253,6 @@ export default function ProjectPage() {
                     </Stack>
                 </Container>
             </Box>
-        </WavyBackground>
+        </GradientBackground>
     );
 }
