@@ -4,7 +4,6 @@ import {
     Stack,
     Text,
     Title,
-    useMantineTheme,
     Anchor,
 } from '@mantine/core';
 import React from 'react';
@@ -12,8 +11,8 @@ import React from 'react';
 // Gradient Background Component
 function GradientBackground({ gradient, children }: { gradient: string; children?: React.ReactNode }) {
   return (
-    <Box 
-      style={{ 
+    <Box
+      style={{
         background: gradient,
         position: 'relative',
         minHeight: '100%',
@@ -27,8 +26,6 @@ function GradientBackground({ gradient, children }: { gradient: string; children
 
 // Main Privacy and Terms Page Component
 export default function PrivacyAndTermsPage() {
-    const theme = useMantineTheme();
-
     // Helper component for rendering policy/term items
     const PolicyItem = ({ number, title, children }: { number: number; title: string; children: React.ReactNode }) => (
         <Stack gap="xs">
