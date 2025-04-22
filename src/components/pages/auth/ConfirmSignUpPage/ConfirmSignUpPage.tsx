@@ -124,7 +124,7 @@ export default function ConfirmSignUpPage() {
                 rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Stack align="center" justify="center" style={{ minHeight: '100vh', padding: '20px' }}>
                 <Box style={emailIconContainerStyle}> <IconMail {...emailIconStyle} /> </Box>
-                <Title order={2} size="32px" fw={400} c="mainPurple.6" ta="center"> Verify Email Address </Title>
+                <Title order={2} size="32px" fw={400} c="mainBlue.6" ta="center"> Verify Email Address </Title>
                 <Text size="15px" lh={1.5} ta="center" maw={450} mb="lg">
                     We sent a verification code to{' '} <Text span fw={500}>{username || 'your email'}</Text>.{' '}
                     Please enter the 6-digit code below. <br />
@@ -136,8 +136,8 @@ export default function ConfirmSignUpPage() {
                 {errors.apiError && <Text c="red" size="sm" ta="center" mt="xs">{errors.apiError}</Text>}
                 {resendMessage && <Text c={resendMessage.startsWith('Failed') ? 'red' : 'green'} size="sm" ta="center" mt="xs">{resendMessage}</Text>}
                 <Group mt="xl" gap="xl">
-                    <RoundedButton color="mainPurple.6" textColor="black" variant="outline" size="md" fw="400" w="175px" borderWidth="2" onClick={handleResend} loading={isResending} disabled={isResending || isSubmitting} > Resend Code </RoundedButton>
-                    <RoundedButton color="mainPurple.6" textColor="white" variant="filled" size="md" fw="500" w="175px" borderWidth="2" onClick={handleConfirm} loading={isSubmitting} disabled={isSubmitting || isResending || code.length !== 6} > Confirm Account </RoundedButton>
+                    <RoundedButton color="mainBlue.6" textColor="black" variant="outline" size="md" fw="400" w="175px" borderWidth="2" onClick={handleResend} loading={isResending} disabled={isResending || isSubmitting} > Resend Code </RoundedButton>
+                    <RoundedButton color="mainBlue.6" textColor="white" variant="filled" size="md" fw="500" w="175px" borderWidth="2" onClick={handleConfirm} loading={isSubmitting} disabled={isSubmitting || isResending || code.length !== 6} > Confirm Account </RoundedButton>
                 </Group>
             </Stack>
         </GradientBackground>
