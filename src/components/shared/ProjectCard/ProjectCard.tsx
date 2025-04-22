@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Card, Text, Title, Group, Badge, Stack, Button, Box } from '@mantine/core';
 import { IconCheck, IconUsers } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +18,7 @@ export interface ProjectCardProps {
  * ProjectCard Component (Flippable)
  *
  * Displays project information on the front (title, skills, tags, members, badge).
- * Flips on click to show description and an Apply button on the back.
+ * Flips on hover to show description and an Apply button on the back.
  * Uses Mantine UI components and custom CSS for the flip effect.
  *
  * @param id - The unique identifier of the project.
@@ -42,15 +41,10 @@ export function ProjectCard({
                                 ...otherProps
                             }: ProjectCardProps) {
     const navigate = useNavigate();
-    const [isFlipped, setIsFlipped] = useState(false);
-
-    const handleFlip = () => {
-        setIsFlipped(!isFlipped);
-    };
 
     // Navigate when the Apply button on the back is clicked
     const handleApplyClick = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent the card flip when clicking the button
+        e.stopPropagation(); // Prevent any potential event bubbling
         if (id) {
             navigate(`/project/${id}`); // Navigate to specific project page
         } else {
@@ -59,8 +53,8 @@ export function ProjectCard({
     };
 
     return (
-        <Box className={classes.cardContainer} onClick={handleFlip} {...otherProps}>
-            <Box className={`${classes.cardInner} ${isFlipped ? classes.cardInnerFlipped : ''}`}>
+        <Box className={classes.cardContainer} {...otherProps}>
+            <Box className={classes.cardInner}>
                 {/* --- Front Face --- */}
                 <Box className={`${classes.cardFace} ${classes.cardFront}`}>
                     {/* Use Mantine Card for consistent padding and styling inside the face */}
