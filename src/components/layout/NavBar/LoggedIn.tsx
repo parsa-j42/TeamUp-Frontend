@@ -60,9 +60,9 @@ export function LoggedIn() {
                         )}
                     </Menu.Label>
                     <Menu.Divider pb="xs" w="90%" m="0 auto"/>
-                    <Menu.Item pb="xs" pl="lg" leftSection={<IconLayoutDashboardFilled color="#6A4CF2" size={21} style={{marginBottom: "2px"}}/>}
+                    <Menu.Item pb="xs" pl="lg" leftSection={<IconLayoutDashboardFilled color="#37c5e7" size={21} style={{marginBottom: "2px"}}/>}
                                onClick={() => navigate("/my-projects")}>My Projects</Menu.Item>
-                    <Menu.Item pb="xs" pl="lg" leftSection={<IconInbox color="#37c5e7" size={21} style={{marginBottom: "2px"}}/>}
+                    <Menu.Item pb="xs" pl="lg" leftSection={<IconInbox size={21} style={{marginBottom: "2px"}}/>}
                                onClick={() => navigate("/my-applications")}>My Applications</Menu.Item>
 
                     <Menu.Item pb="xs" pl="lg" leftSection={<IconUser size={22} style={{marginBottom: "2px"}}/>}
