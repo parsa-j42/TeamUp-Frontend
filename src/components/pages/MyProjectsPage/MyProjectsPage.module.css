@@ -1,8 +1,5 @@
-/* src/components/pages/MyProjectsPage/MyProjectsPage.module.css */
-
 .pageWrapper {
     /* Light blue gradient background */
-    background: linear-gradient(180deg, #e0f7fa 0%, #ffffff 70%);
     min-height: calc(100vh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px)); /* Fill viewport height */
     padding-top: var(--mantine-spacing-xl);
     padding-bottom: var(--mantine-spacing-xl);

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-    Box, Container, Stack, Title, Text, Group, Button, ActionIcon,
-    SimpleGrid, Loader, Alert, Center, Menu
+    Container, Stack, Title, Text, Group, Button,
+    SimpleGrid, Loader, Alert, Center
 } from '@mantine/core';
-import { IconDots, IconAlertCircle } from '@tabler/icons-react';
+import { IconAlertCircle } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
 import { apiClient } from '@utils/apiClient';
 import { ProjectDto } from '../../../types/api';
@@ -11,6 +11,7 @@ import { useAuth } from '@contexts/AuthContext';
 import { MyProjectItemCard } from '@components/shared/MyProjectItemCard/MyProjectItemCard'; // Adjust path if needed
 import dayjs from 'dayjs';
 import classes from './MyProjectsPage.module.css';
+import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx";
 
 export default function MyProjectsPage() {
     const navigate = useNavigate();
@@ -51,14 +52,15 @@ export default function MyProjectsPage() {
     }, [fetchMyProjects, initialCheckComplete]); // Add initialCheckComplete dependency
 
     return (
-        <Box className={classes.pageWrapper}>
+        <GradientBackground className={classes.pageWrapper} gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%,
+                rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Container size="lg">
                 <Stack gap="xl">
                     {/* Header Section */}
                     <Group justify="space-between" className={classes.headerGroup}>
                         <Stack gap={0}>
                             <Title order={1} className={classes.title}>My Projects</Title>
-                            <Text size="sm" className={classes.subtitle}>
+                            <Text size="sm">
                                 Here are the projects you're currently working on.
                             </Text>
                         </Stack>
@@ -75,18 +77,18 @@ export default function MyProjectsPage() {
                                 Create New Project
                             </Button>
                             {/* Placeholder Menu for future actions */}
-                            <Menu shadow="md" width={200}>
-                                <Menu.Target>
-                                    <ActionIcon variant="outline" size="lg" radius="md" className={classes.menuButton}>
-                                        <IconDots size={18} />
-                                    </ActionIcon>
-                                </Menu.Target>
-                                <Menu.Dropdown>
-                                    <Menu.Label>Options</Menu.Label>
-                                    <Menu.Item>Option 1</Menu.Item>
-                                    <Menu.Item>Option 2</Menu.Item>
-                                </Menu.Dropdown>
-                            </Menu>
+                            {/*<Menu shadow="md" width={200}>*/}
+                            {/*    <Menu.Target>*/}
+                            {/*        <ActionIcon variant="outline" size="lg" radius="md" className={classes.menuButton}>*/}
+                            {/*            <IconDots size={18} />*/}
+                            {/*        </ActionIcon>*/}
+                            {/*    </Menu.Target>*/}
+                            {/*    /!*<Menu.Dropdown>*!/*/}
+                            {/*        /!*<Menu.Label>Options</Menu.Label>*!/*/}
+                            {/*        /!*<Menu.Item>Option 1</Menu.Item>*!/*/}
+                            {/*        /!*<Menu.Item>Option 2</Menu.Item>*!/*/}
+                            {/*    /!*</Menu.Dropdown>*!/*/}
+                            {/*</Menu>*/}
                         </Group>
                     </Group>
 
@@ -126,6 +128,6 @@ export default function MyProjectsPage() {
                     )}
                 </Stack>
             </Container>
-        </Box>
+        </GradientBackground>
     );
 }
