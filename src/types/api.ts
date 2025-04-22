@@ -161,6 +161,13 @@ export interface MilestoneDto {
   tasks?: TaskDto[];
 }
 
+export interface UpdateMilestoneDto {
+  title?: string;
+  date?: string; // Expect ISO string format
+  active?: boolean; // Although activating is a separate endpoint, include for completeness
+}
+
+
 export interface ProjectDto {
   id: string;
   title: string;

@@ -7,16 +7,40 @@
 .pageTitle {
     font-size: 32px;
     font-weight: 600;
+    margin-top: var(--mantine-spacing-xl);
     margin-bottom: var(--mantine-spacing-xl);
-    padding-left: var(--mantine-spacing-md); /* Align with content */
 }
 
-.sectionCard {
-    background-color: white;
+.sectionCardGlass {
+    /*background-color: white;*/
     border-radius: var(--mantine-radius-md);
     padding: var(--mantine-spacing-xl);
     margin-bottom: var(--mantine-spacing-xl);
     box-shadow: var(--mantine-shadow-xs);
+}
+
+.sectionCard {
+    /*background-color: white;*/
+    border-radius: var(--mantine-radius-md);
+    padding: var(--mantine-spacing-xl);
+    margin-bottom: var(--mantine-spacing-xl);
+}
+
+.greySection {
+    background-color: #f6f6f6;
+    padding: var(--mantine-spacing-xl);
+    margin-bottom: var(--mantine-spacing-xl);
+    box-shadow: var(--mantine-shadow-xs);
+}
+
+.fullWidth {
+    width: 100vw; /* Full viewport width */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    border-radius: 0; /* No border radius for edge-to-edge effect */
 }
 
 .projectHeaderTitle {
@@ -43,8 +67,9 @@
 }
 
 .memberAvatar {
-    margin-bottom: var(--mantine-spacing-sm);
+    margin: 0 auto var(--mantine-spacing-sm); /* Center horizontally with auto margins */
     background-color: var(--mantine-color-gray-2); /* Placeholder background */
+    display: block; /* Ensure it can be centered */
 }
 
 .memberName {
@@ -120,6 +145,17 @@
     line-height: 1.3;
 }
 
+.milestoneActions {
+    flex-shrink: 0; /* Prevent icons shrinking */
+    /* Hide actions by default, show on hover of the item for owner */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.milestoneItem:hover .milestoneActions {
+    opacity: 1;
+}
+
 /* Task Details Styles */
 .taskDetailsContainer {
     /* Container for the task details on the right */
@@ -170,3 +206,4 @@
 .taskActions {
     flex-shrink: 0; /* Prevent action icons from shrinking */
 }
+
