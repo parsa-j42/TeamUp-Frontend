@@ -105,19 +105,19 @@
 }
 .chipLabel[data-checked] {
     /* Styles for the selected chip's label */
-    background-color: var(--mantine-color-lightPurple-7);
+    background-color: var(--mantine-color-mainBlue-7);
     border-color: transparent; /* Remove border when selected */
     color: var(--mantine-color-black); /* Ensure text is readable */
 }
 
 .chipLabel[data-checked]:hover {
     /* Hover state for the selected chip's label */
-    background-color: var(--mantine-color-lightPurple-8); /* Slightly darker on hover */
+    background-color: var(--mantine-color-mainBlue-8); /* Slightly darker on hover */
 }
 
 .chipLabel:not([data-checked]):hover {
     /* Hover state for non-selected chips */
-    background-color: var(--mantine-color-lightPurple-3); /* Light hover effect */
+    background-color: var(--mantine-color-mainBlue-3); /* Light hover effect */
 }
 
 .chipLabel:not([data-checked]) {

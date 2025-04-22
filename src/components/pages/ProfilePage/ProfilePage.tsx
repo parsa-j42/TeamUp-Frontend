@@ -423,11 +423,11 @@ export default function ProfilePage() {
 
     // --- Render Loading/Error States ---
     if (isAuthLoading || !initialCheckComplete) {
-        return (<Center style={{height: '80vh'}}> <Loader color="mainPurple.6"/> </Center>);
+        return (<Center style={{height: '80vh'}}> <Loader color="mainBlue.6"/> </Center>);
     }
     // Don't check isAuthenticated here, allow viewing public profiles
     if (isLoading) {
-        return (<Center style={{height: '80vh'}}> <Loader color="mainPurple.6"/> </Center>);
+        return (<Center style={{height: '80vh'}}> <Loader color="mainBlue.6"/> </Center>);
     }
     if (error && !profileUserData) {
         return (<Container style={{paddingTop: '5vh'}}> <Alert icon={<IconAlertCircle size="1rem"/>}
@@ -500,14 +500,14 @@ export default function ProfilePage() {
                                             size={18}/></ActionIcon>}
                                     </Group>
                                     <Group gap="sm">
-                                        {status && <Badge color="mainPurple.6" variant="filled" radius="xl"
+                                        {status && <Badge color="mainBlue.6" variant="filled" radius="xl"
                                                           size="sm">{status}</Badge>}
                                         {institution && <Text size="sm" c="dimmed">{institution}</Text>}
                                     </Group>
                                     {bio && <Text size="sm" c="dimmed" mt="xs" maw={500}>{bio}</Text>}
                                 </Stack>
                                 {/* Only show message button if NOT own profile */}
-                                {!isOwnProfile && <Button color="mainPurple.6" radius="xl" mt={5} fw={400}
+                                {!isOwnProfile && <Button color="mainBlue.6" radius="xl" mt={5} fw={400}
                                                           style={{flexShrink: 0}}> Message </Button>}
                             </Group>
                         </Box>
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                                     <Stack gap="md" style={{flex: 1}}>
                                         <Title order={4} fw={500}>{project.title}</Title>
                                         <Group gap="xs"> {project.tags?.map(tag => (
-                                            <Badge key={tag} color="mainPurple.6" variant="light" radius="sm"
+                                            <Badge key={tag} color="mainBlue.6" variant="light" radius="sm"
                                                    size="sm">{tag}</Badge>))} </Group>
                                         <Text size="sm" c="black" lineClamp={3}>{project.description}</Text>
                                     </Stack>
@@ -632,7 +632,7 @@ export default function ProfilePage() {
                         ))}
                         {/* Only show add button if own profile */}
                         {isOwnProfile &&
-                            <Button variant='outline' color='mainPurple.6' onClick={handleOpenPortfolioProjectAdd}
+                            <Button variant='outline' color='mainBlue.6' onClick={handleOpenPortfolioProjectAdd}
                                     leftSection={<IconPlus size={16}/>} radius="md"> Add Portfolio Project </Button>}
                     </Stack>
                 </Paper>
@@ -657,7 +657,7 @@ export default function ProfilePage() {
                     minRows={3}/> <Group justify="flex-end" mt="md"> <Button variant="default"
                                                                              onClick={closeProfileEdit}
                                                                              disabled={isSavingProfile}>Cancel</Button>
-                    <Button color="mainPurple.6" onClick={handleProfileInfoSave} loading={isSavingProfile}>Save
+                    <Button color="mainBlue.6" onClick={handleProfileInfoSave} loading={isSavingProfile}>Save
                         Changes</Button> </Group> </Stack>
             </Modal>
             {/* Skills Edit Modal */}
@@ -669,7 +669,7 @@ export default function ProfilePage() {
                     description="Add relevant skills one by one." data={[]} value={skillsEditData}
                     onChange={setSkillsEditData} clearable/> <Group justify="flex-end" mt="md"> <Button
                     variant="default" onClick={closeSkillsEdit} disabled={isSavingSkills}>Cancel</Button> <Button
-                    color="mainPurple.6" onClick={handleSkillsSave} loading={isSavingSkills}>Save Skills</Button>
+                    color="mainBlue.6" onClick={handleSkillsSave} loading={isSavingSkills}>Save Skills</Button>
                 </Group> </Stack>
             </Modal>
             {/* Skills Show All Modal */}
@@ -690,7 +690,7 @@ export default function ProfilePage() {
                     description="Add relevant interests one by one." data={[]} value={interestsEditData}
                     onChange={setInterestsEditData} clearable/> <Group justify="flex-end" mt="md"> <Button
                     variant="default" onClick={closeInterestsEdit} disabled={isSavingInterests}>Cancel</Button> <Button
-                    color="mainPurple.6" onClick={handleInterestsSave} loading={isSavingInterests}>Save
+                    color="mainBlue.6" onClick={handleInterestsSave} loading={isSavingInterests}>Save
                     Interests</Button> </Group> </Stack>
             </Modal>
             {/* Interests Show All Modal */}
@@ -724,7 +724,7 @@ export default function ProfilePage() {
                                                                                                                 minRows={3}/>
                     <Group justify="flex-end" mt="md"> <Button variant="default" onClick={closeExperienceEdit}
                                                                disabled={isSavingExperience}>Cancel</Button> <Button
-                        color="mainPurple.6" onClick={handleExperienceSave} loading={isSavingExperience}>Save
+                        color="mainBlue.6" onClick={handleExperienceSave} loading={isSavingExperience}>Save
                         Experience</Button> </Group> </Stack>
             </Modal>
             {/* Experience Show All Modal */}
@@ -772,7 +772,7 @@ export default function ProfilePage() {
                         <Text size="sm" c="dimmed" mt="xs">Image Upload Not Implemented</Text> </Paper> </Box> <Group
                         justify="flex-end" mt="md"> <Button variant="default" onClick={closePortfolioProjectEdit}
                                                             disabled={isSavingEditedPortfolioProject}>Cancel</Button>
-                        <Button color="mainPurple.6" onClick={handlePortfolioProjectEditSave}
+                        <Button color="mainBlue.6" onClick={handlePortfolioProjectEditSave}
                                 loading={isSavingEditedPortfolioProject}>Save Changes</Button> </Group> </Stack>)}
             </Modal>
             <Modal opened={portfolioProjectAddOpened} onClose={closePortfolioProjectAdd} title="Add Portfolio Project"
@@ -805,7 +805,7 @@ export default function ProfilePage() {
                         <Text size="sm" c="dimmed" mt="xs">Image Upload Not Implemented</Text> </Paper> </Box> <Group
                         justify="flex-end" mt="md"> <Button variant="default" onClick={closePortfolioProjectAdd}
                                                             disabled={isSavingNewPortfolioProject}>Cancel</Button>
-                        <Button color="mainPurple.6" onClick={handlePortfolioProjectAddSave}
+                        <Button color="mainBlue.6" onClick={handlePortfolioProjectAddSave}
                                 loading={isSavingNewPortfolioProject}>Add Project</Button> </Group> </Stack>
             </Modal>
 
