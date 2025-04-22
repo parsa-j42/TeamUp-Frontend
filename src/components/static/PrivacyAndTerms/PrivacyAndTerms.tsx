@@ -4,48 +4,28 @@ import {
     Stack,
     Text,
     Title,
-    useMantineTheme,
     Anchor,
 } from '@mantine/core';
 import React from 'react';
 
-// Reusing the wave logic from AboutUsPage
-
-// Wave path from the previous example (ProfilePage)
-const BOTTOM_WAVE_PATH = "M 0,6 Q 15,8 40,7 C 60,5 80,5 130,7 L 100,0 L 0,0 Z";
-
-// Component for the bottom wave effect
-function BottomWave() {
-    const theme = useMantineTheme();
-    // Assuming bgPurple exists in the theme as requested
-    const waveColor = theme.colors.bgPurple ? theme.colors.bgPurple[6] : theme.colors.violet[1]; // Fallback color
-    const waveHeight = 150; // Adjust height as needed
-
-    return (
-        <Box style={{ height: waveHeight, overflow: 'hidden', marginTop: '-1px' /* Prevent potential gap */ }}>
-            <svg
-                viewBox="0 0 100 10" // ViewBox needs to roughly match the coordinate system of the path
-                preserveAspectRatio="none"
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'block', // Ensure SVG behaves like a block element
-                    transform: 'scaleY(-1)', // Flip vertically so the curve goes upwards from the bottom
-                }}
-            >
-                <path d={BOTTOM_WAVE_PATH} fill={waveColor} />
-            </svg>
-        </Box>
-    );
+// Gradient Background Component
+function GradientBackground({ gradient, children }: { gradient: string; children?: React.ReactNode }) {
+  return (
+    <Box
+      style={{
+        background: gradient,
+        position: 'relative',
+        minHeight: '100%',
+        overflow: 'hidden',
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
 
 // Main Privacy and Terms Page Component
 export default function PrivacyAndTermsPage() {
-    const theme = useMantineTheme();
-    // Assuming bgPurple exists in the theme as requested
-    const waveColor = theme.colors.bgPurple ? theme.colors.bgPurple[6] : theme.colors.violet[1]; // Fallback color
-    const topWaveHeight = 500; // Adjust height for the top curve
-
     // Helper component for rendering policy/term items
     const PolicyItem = ({ number, title, children }: { number: number; title: string; children: React.ReactNode }) => (
         <Stack gap="xs">
@@ -59,49 +39,9 @@ export default function PrivacyAndTermsPage() {
     );
 
     return (
-        // Main container Box:
-        // - Uses flex column layout.
-        // - minHeight ensures it tries to fill vertical space.
-        // - overflow: hidden prevents scrollbars.
-        // - position: relative for the absolutely positioned top wave.
-        <Box style={{
-            backgroundColor: theme.white,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100%', // Fill AppShell.Main height
-        }}>
-            {/* Top Wave Element - Absolutely positioned */}
-            <Box
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: topWaveHeight,
-                    overflow: 'hidden',
-                    zIndex: 0, // Behind content
-                }}
-            >
-                {/* Inner Box creates the actual curve shape */}
-                <Box
-                    style={{
-                        width: '150%', // Wider than viewport
-                        height: '100%',
-                        position: 'absolute',
-                        left: '-25%', // Center the wide box
-                        bottom: 0,
-                        backgroundColor: waveColor,
-                        borderTopLeftRadius: '50%', // Creates the curve
-                        borderTopRightRadius: '50%',
-                        transform: 'scaleY(-1)', // Flips curve downwards
-                    }}
-                />
-            </Box>
-
+        <GradientBackground gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%,
+                rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             {/* Content Area Container */}
-            {/* - flexGrow: 1 makes this container take up available vertical space. */}
-            {/* - Using 'lg' size for better readability of text. */}
             <Container size="lg" py={100} style={{ position: 'relative', zIndex: 1, flexGrow: 1 }}>
                 {/* Main stack for content sections */}
                 <Stack gap={50}> {/* Increased gap between main sections */}
@@ -160,11 +100,6 @@ export default function PrivacyAndTermsPage() {
                     </Stack>
                 </Stack>
             </Container>
-
-            {/* Bottom Wave Component - Placed after the content container */}
-            <Box style={{ zIndex: 0, marginTop: 'auto' }}>
-                <BottomWave />
-            </Box>
-        </Box>
+        </GradientBackground>
     );
 }
