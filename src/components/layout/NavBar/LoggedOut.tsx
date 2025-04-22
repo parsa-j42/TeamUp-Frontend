@@ -10,9 +10,9 @@ export function LoggedOut() {
                 <Button variant="white" color="black" fw={400} size="md"
                         onClick={() => navigate("/AboutUs")}>About</Button>
                 <Button color="mainBlue.6" variant="subtle" size="sm" fw="600" radius="md"
-                        onClick={() => navigate("/SignUp")}>Sign In</Button>
+                        onClick={() => navigate("/LogIn")}>Sign In</Button>
                 <Button color="mainBlue.6" variant="filled" size="sm" fw="600" radius="md"
-                        onClick={() => navigate("/LogIn")}>Sign Up</Button>
+                        onClick={() => navigate("/SignUp")}>Sign Up</Button>
             </Group>
     );
 }

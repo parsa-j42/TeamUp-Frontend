@@ -31,7 +31,7 @@ const GradientBackground = ({
             {...otherProps}
         >
             {/* Inner container to constrain content width */}
-            <Box style={{ width: '100%', maxWidth: '100vw', margin: '0 auto' }}>
+            <Box style={{ maxWidth: '100vw', margin: '0 auto' }}>
                 {children}
             </Box>
         </Box>

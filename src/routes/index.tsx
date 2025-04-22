@@ -39,17 +39,15 @@ export const AppRouter: React.FC = () => {
             <Route path="/confirm-signup" element={<ConfirmSignUpPage />} />
             <Route path="/LogIn" element={<LogInPage />} />
             <Route path="/discover" element={<DiscoverPage />} />
-
+            <Route path="/project/:projectId" element={<ProjectPage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/project/:projectId" element={<ProjectPage />} />
                 <Route path="/submitted" element={<SuccessPage />} />
                 <Route path="/create-project" element={<CreateProjectPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/profile/:userId" element={<ProfilePage />} />
-
             </Route>
 
             {/* Redirect root to landing */}

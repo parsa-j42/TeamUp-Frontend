@@ -14,5 +14,5 @@
 
 /* --- Input Styling (Identical to SignUp) --- */
 .inputWrapper {
-    border-bottom: 2px solid var(--mantine-color-mainRed-6);
+    border-bottom: 2px solid #0e2e58;
 }
