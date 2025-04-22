@@ -16,6 +16,9 @@ function GradientBackground({ gradient, children }: { gradient: string; children
         background: gradient,
         position: 'relative',
         minHeight: '100%',
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        left: 0,
         overflow: 'hidden',
       }}
     >
@@ -50,7 +53,7 @@ export default function PrivacyAndTermsPage() {
 
                     {/* Effective Date */}
                     <Text size="sm" fw={500} mt={-30}> {/* Adjusted margin */}
-                        Effective Date: [Insert Date]
+                        Effective Date: April, 2025
                     </Text>
 
                     {/* Privacy Policy Section */}
@@ -103,3 +106,4 @@ export default function PrivacyAndTermsPage() {
         </GradientBackground>
     );
 }
+
