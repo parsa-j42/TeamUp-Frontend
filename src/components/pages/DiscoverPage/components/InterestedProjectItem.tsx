@@ -7,7 +7,6 @@ export interface InterestedProjectItemProps {
     title: string;
     skills: string[];
     tags: string[];
-    // Add props for the badges shown in the screenshot
     category?: string; // e.g., "UI/UX"
     status?: string; // e.g., "Open to application"
 }
@@ -17,8 +16,8 @@ export function InterestedProjectItem({
                                           title,
                                           skills = [],
                                           tags = [],
-                                          category = "N/A", // Default category
-                                          status = "N/A" // Default status
+                                          category = "UI/UX", // Default category from screenshot
+                                          status = "Open to application" // Default status from screenshot
                                       }: InterestedProjectItemProps) {
     const theme = useMantineTheme();
     const navigate = useNavigate();
@@ -32,11 +31,11 @@ export function InterestedProjectItem({
             component="button" // Make it clickable
             onClick={handleNavigate}
             p="lg"
-            radius="md"
+            radius="lg" // Use larger radius as per screenshot
             className={classes.interestedItemPaper} // Apply specific styles
-            withBorder
+            withBorder={false} // No border shown in screenshot
         >
-            <Group justify="space-between" wrap="nowrap">
+            <Group justify="space-between" wrap="nowrap" align="flex-start"> {/* Align badges top */}
                 {/* Left Side: Title, Skills, Tags */}
                 <Stack gap="xs" style={{ flexGrow: 1, overflow: 'hidden' }}>
                     <Text size="sm" c="dimmed" lineClamp={1}>team name</Text> {/* Placeholder */}
@@ -67,12 +66,11 @@ export function InterestedProjectItem({
                 </Stack>
 
                 {/* Right Side: Badges */}
-                <Group gap="sm" style={{ alignSelf: 'flex-start' }}>
-                    {/* Example Badges - customize colors/variants as needed */}
-                    <Badge variant="outline" color="yellow" radius="sm" className={classes.interestedItemBadge}>
+                <Group gap="sm" style={{ flexShrink: 0 }}> {/* Prevent shrinking */}
+                    <Badge variant="outline" radius="sm" className={classes.interestedItemBadge}>
                         {category}
                     </Badge>
-                    <Badge variant="outline" color="yellow" radius="sm" className={classes.interestedItemBadge}>
+                    <Badge variant="outline" radius="sm" className={classes.interestedItemBadge}>
                         {status}
                     </Badge>
                 </Group>

@@ -1,11 +1,7 @@
-/* src/components/pages/DiscoverPage/DiscoverPage.module.css */
-/* UPDATED FILE */
-
 .pageWrapper {
     padding-top: var(--mantine-spacing-xl);
     padding-bottom: var(--mantine-spacing-xl);
-    /* Background is likely white or very light based on screenshot */
-    background-color: white;
+    background-color: white; /* White background */
     min-height: calc(100vh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px));
 }
 
@@ -14,26 +10,53 @@
 }
 
 .filterButton {
-    /* Styles for the main Filters button */
     background-color: white;
-    color: var(--mantine-color-black);
+    color: var(--mantine-color-gray-7); /* Grey text */
     border-color: var(--mantine-color-gray-4);
+    font-weight: 500;
     &:hover {
         background-color: var(--mantine-color-gray-1);
     }
 }
 
-.filterControlsGroup {
-    /* Styles for the group containing filter inputs */
-    gap: var(--mantine-spacing-md);
+/* --- Filter Controls --- */
+.filterControlsContainer {
     margin-bottom: var(--mantine-spacing-xl);
+    /* Use Grid for precise layout */
 }
 
-.filterInputWrapper {
-    /* Wrapper for each filter input/select + clear button */
-    position: relative;
-    flex: 1; /* Allow inputs to grow */
-    min-width: 200px; /* Prevent inputs from becoming too small */
+.filterControlWrapper {
+    /* Wrapper for Label + Input + Clear */
+    display: flex;
+    flex-direction: column;
+}
+
+.filterLabelGroup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--mantine-spacing-xs); /* Space between label and input */
+}
+
+.filterLabel {
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 500;
+    color: var(--mantine-color-black);
+}
+
+.filterClearButton {
+    color: var(--mantine-color-gray-5);
+    font-size: var(--mantine-font-size-xs);
+    background: none;
+    border: none;
+    padding: 0; /* Remove padding */
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover {
+        color: var(--mantine-color-gray-7);
+        text-decoration: underline;
+    }
 }
 
 .filterInput {
@@ -41,29 +64,51 @@
     border: 1px solid var(--mantine-color-gray-4);
     border-radius: var(--mantine-radius-md);
     background-color: white;
-    /* Ensure icon is styled correctly */
-    & .mantine-TextInput-icon {
+
+    & .mantine-TextInput-icon,
+    & .mantine-Select-dropdown {
         color: var(--mantine-color-gray-5);
     }
-}
-
-.filterClearButton {
-    position: absolute;
-    top: 0;
-    right: 0;
-    color: var(--mantine-color-gray-5);
-    font-size: var(--mantine-font-size-xs);
-    background: none;
-    border: none;
-    padding: 5px; /* Adjust padding */
-    cursor: pointer;
-    line-height: 1; /* Ensure vertical alignment */
-
-    &:hover {
-        color: var(--mantine-color-gray-7);
+    & .mantine-Select-input {
+        border-radius: var(--mantine-radius-md); /* Ensure select input matches */
+        border: none; /* Remove inner border of select */
+        padding-left: 36px; /* Adjust if using left section */
+    }
+    /* Remove focus ring if desired */
+    &:focus-within {
+        outline: none;
+        box-shadow: none;
+        border-color: var(--mantine-color-blue-5); /* Example focus border */
     }
 }
 
+.filterPillsContainer {
+    margin-top: var(--mantine-spacing-md);
+    margin-bottom: var(--mantine-spacing-lg);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--mantine-spacing-xs);
+}
+
+.filterPill {
+    background-color: #fff0b3; /* Light yellow */
+    border: 1px solid #ffe066; /* Darker yellow border */
+    color: #e67700; /* Dark yellow text */
+    font-weight: 500;
+    border-radius: var(--mantine-radius-xl);
+    padding: 3px var(--mantine-spacing-xs); /* Adjust padding */
+    font-size: var(--mantine-font-size-xs);
+
+    & .mantine-Pill-remove {
+        color: #e67700;
+        &:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+    }
+}
+
+
+/* --- Results Sections --- */
 .resultsSection {
     margin-top: var(--mantine-spacing-xl);
 }
@@ -71,16 +116,17 @@
 .sectionTitle {
     margin-bottom: var(--mantine-spacing-lg);
     font-weight: 600;
-    font-size: 28px; /* Adjusted size */
+    font-size: 28px;
     color: var(--mantine-color-black);
 }
 
-/* Styles for the new InterestedProjectItem */
+/* Styles for the InterestedProjectItem */
 .interestedItemPaper {
     background-color: #e7f5ff; /* Light blue background */
-    border-color: #a5d8ff; /* Slightly darker blue border */
+    border: none; /* No border */
     transition: box-shadow 0.2s ease;
     cursor: pointer;
+    border-radius: var(--mantine-radius-lg); /* Match screenshot radius */
 
     &:hover {
         box-shadow: var(--mantine-shadow-sm);
@@ -89,8 +135,12 @@
 
 .interestedItemBadge {
     background-color: white;
-    border: 1px solid #fcc419; /* Example yellow border */
-    color: #e67700; /* Example dark yellow text */
+    border: 1px solid #fcc419; /* Yellow border */
+    color: #e67700; /* Dark yellow text */
     font-weight: 500;
-    text-transform: none; /* Prevent uppercase */
+    text-transform: none;
+    border-radius: var(--mantine-radius-sm); /* Match screenshot radius */
+    font-size: var(--mantine-font-size-xs); /* Match screenshot size */
+    height: auto; /* Adjust height automatically */
+    padding: 4px 8px; /* Adjust padding */
 }
