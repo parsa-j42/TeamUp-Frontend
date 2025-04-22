@@ -9,7 +9,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import UserTypeToggle from "@components/shared/UserTypeToggle/UserTypeToggle.tsx"; // Ensure this path is correct
 import { signUp } from 'aws-amplify/auth';
 import { apiClient } from '@utils/apiClient'; // Ensure path is correct
-import { useAuth } from '@contexts/AuthContext'; // Ensure path is correct
+import { useAuth } from '@contexts/AuthContext';
+import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx"; // Ensure path is correct
 
 // --- Frontend DTOs/Payloads (Mirroring Backend) ---
 interface CompleteSignupProfilePayload {
@@ -263,7 +264,8 @@ export default function SignUpPage() {
     }
 
     return (
-        <Box className={styles.container} bg="bgPurple.6">
+        <GradientBackground className={styles.container} gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%,
+                            rgba(55, 197, 231, 0.3) 35%, rgba(255, 255, 255, 1) 100%">
             <Paper m="7%" p="xl" shadow="sm" w="600px" radius="lg">
                 {/* Stepper Component */}
                 <Stepper
@@ -286,7 +288,7 @@ export default function SignUpPage() {
 
                 {/* Title and Description */}
                 <Stack justify="flex-end" align="center" mt="xl">
-                    <Title order={2} size="32px" fw={400} c="mainPurple.6">{title}</Title>
+                    <Title order={2} size="30px" fw={600}>{title}</Title>
                     <Text size="15px" lh="1.5" ta="center">{description}</Text>
                 </Stack>
 
@@ -334,14 +336,14 @@ export default function SignUpPage() {
                 {/* Navigation Buttons */}
                 <Group justify="space-between" mt="xl">
                     <RoundedButton
-                        color="mainPurple.6" textColor="black" variant="outline" size="md" fw="400" w="110px" borderWidth="2"
+                        color="mainBlue.6" textColor="mainBlue.6" variant="outline" size="md" fw="400" w="110px" borderWidth="2"
                         onClick={active === 0 ? handleCancel : handleBack}
                         disabled={isSubmitting || (active === 1 && !!user)} // Prevent back from step 1 if logged in
                     >
                         {active === 0 ? 'Cancel' : 'Back'}
                     </RoundedButton>
                     <RoundedButton
-                        color="mainPurple.6" textColor="white" variant="filled" size="md" fw="500" w="110px" borderWidth="2"
+                        color="mainBlue.6" textColor="white" variant="filled" size="md" fw="500" w="110px" borderWidth="2"
                         onClick={handleNext}
                         loading={isSubmitting}
                         disabled={isSubmitting || (active > 0 && !user)} // Disable if on step 1/2 but not logged in
@@ -350,6 +352,6 @@ export default function SignUpPage() {
                     </RoundedButton>
                 </Group>
             </Paper>
-        </Box>
+        </GradientBackground>
     );
 }

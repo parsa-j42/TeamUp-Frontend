@@ -32,7 +32,7 @@ export function NavBar() {
     return (
         <AppShell.Header>
             <Group h="100%" px="13%" justify="space-between" wrap="nowrap">
-                <Image fit="contain" h={60}
+                <Image fit="contain" h={57}
                        src="/TeamUpLogo.svg" alt="TeamUp Logo"
                        style={{ cursor: 'pointer' }}
                        onClick={handleLogoClick}/>
@@ -46,8 +46,7 @@ export function NavBar() {
                         onKeyDown={handleSearchKeyDown}
                         rightSection={
                             <IconSearch
-                                style={{ width: rem(19), height: rem(19), cursor: 'pointer' }}
-                                color="mainBlue.6"
+                                style={{ width: rem(19), height: rem(19), cursor: 'pointer', color: 'var(--mantine-color-mainBlue-6)' }}
                                 stroke={3}
                                 onClick={handleSearchIconClick}
                             />
@@ -58,8 +57,8 @@ export function NavBar() {
                                 borderWidth: 2,
                             },
                             section: {
-                                backgroundColor: "white",
-                                color: "white",
+                                // backgroundColor: "white",
+                                // color: "white",
                                 cursor: 'pointer', // Indicate clickable section
                             },
                         })}

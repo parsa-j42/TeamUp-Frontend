@@ -1,25 +1,81 @@
 .scrollbar {
     background-color: transparent;
     border-radius: 10px;
+
     @mixin hover {
-        background-color: var(--mantine-color-mainGreen-6) !important;
+        background-color: var(--mantine-color-mainBlue-6) !important;
         & .scrollbarThumb {
-            background-color: var(--mantine-color-mainOrange-6) !important;
+            background-color: var(--mantine-color-lightBlue-6) !important;
             margin: 1px 8px 1px 8px;
         }
     }
 }
 
 .scrollbarThumb {
-    background-color: var(--mantine-color-mainGreen-6);
+    background-color: var(--mantine-color-mainBlue-6);
     margin: 0px 8px 0px 8px;
 
+
     @mixin hover {
-        background-color: var(--mantine-color-mainOrange-6) !important;
+        background-color: var(--mantine-color-lightBlue-6) !important;
         margin: 1px 8px 1px 8px;
+
     }
 }
 
 .scrollbarViewport {
     padding-bottom: 20px !important;
 }
+
+.scrollbarRoot {
+    width: 98% !important;
+}
+
+.categoryPaper {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.2s ease,
+                background-color 0.3s ease;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.5s ease, height 0.5s ease;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    &:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: var(--mantine-shadow-xl);
+        background-color: rgba(var(--mantine-color-blue-4), 0.05);
+    }
+
+    &:hover::before {
+        width: 150%;
+        height: 150%;
+    }
+
+    &:active {
+        transform: translateY(2px) scale(0.98) rotate(-1deg);
+        box-shadow: var(--mantine-shadow-xs);
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    &:active::before {
+        background-color: rgba(255, 255, 255, 0.3);
+        width: 100%;
+        height: 100%;
+        transition: all 0.1s ease;
+    }
+}
+

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import {
-    Box, Paper, Stack, Title, Text, TextInput, Group, PasswordInput,
+    Paper, Stack, Title, Text, TextInput, Group, PasswordInput,
 } from '@mantine/core';
 import styles from './LogInPage.module.css';
 import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import { signIn } from 'aws-amplify/auth';
+import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx";
 
 interface LogInData {
     email?: string;
@@ -116,25 +117,27 @@ export default function LogInPage() {
     const handleCancel = () => { navigate("/landing"); };
 
     return (
-        <Box className={styles.container} bg="bgPurple.6">
-            <Paper m="xl" p="xl" shadow="sm" w="600px" radius="lg">
-                <Stack justify="flex-end" align="center" mt="lg" mb="xl">
-                    <Title order={2} size="32px" fw={400} c="mainPurple.6">Welcome Back</Title>
+        <GradientBackground className={styles.container}
+                            gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 35%,
+                             rgba(255, 255, 255, 1) 100%">
+            <Paper m="xl" px="xl" shadow="sm" w="600px" radius="lg" pt="50px" pb="40px">
+                <Stack justify="flex-end" align="center" mt="lg" mb="xl" pb="xs">
+                    <Title order={2} size="30px" fw={600}>Sign In</Title>
                     {/* Display message from confirmation page if present */}
                     <Text size="15px" lh="1.5" ta="center">
-                        {displayMessage || 'Please enter your credentials to log in.'}
+                        {displayMessage}
                     </Text>
                 </Stack>
-                <Stack mt="md" gap="xl">
+                <Stack mt="xl" gap="xl">
                     <TextInput variant="unstyled" label="Email" placeholder="Enter your email" name="email" type="email" required value={email} onChange={handleInputChange} error={errors.email} classNames={{ wrapper: styles.inputWrapper }} />
                     <PasswordInput variant="unstyled" label="Password" placeholder="Enter your password" name="password" required value={password} onChange={handleInputChange} error={errors.password} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput }} />
                     {errors.apiError && <Text c="red" size="sm" ta="center">{errors.apiError}</Text>}
                 </Stack>
-                <Group justify="space-between" mt="xl">
-                    <RoundedButton color="mainPurple.6" textColor="black" variant="outline" size="md" fw="400" w="110px" borderWidth="2" onClick={handleCancel} disabled={isSubmitting}> Cancel </RoundedButton>
-                    <RoundedButton color="mainPurple.6" textColor="white" variant="filled" size="md" fw="500" w="110px" borderWidth="2" onClick={handleLogin} loading={isSubmitting} disabled={isSubmitting}> Log In </RoundedButton>
+                <Group justify="space-between" mt="100px">
+                    <RoundedButton color="mainBlue.6" textColor="mainBlue.6" variant="outline" size="md" fw="400" w="110px" borderWidth="2" onClick={handleCancel} disabled={isSubmitting}> Cancel </RoundedButton>
+                    <RoundedButton color="mainBlue.6" textColor="white" variant="filled" size="md" fw="500" w="110px" borderWidth="2" onClick={handleLogin} loading={isSubmitting} disabled={isSubmitting}> Log In </RoundedButton>
                 </Group>
             </Paper>
-        </Box>
+        </GradientBackground>
     );
 }

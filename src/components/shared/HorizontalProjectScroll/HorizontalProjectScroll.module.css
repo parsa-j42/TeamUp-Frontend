@@ -1,0 +1,35 @@
+.scrollbarRoot {
+     width: 84% !important;
+}
+
+.scrollbar {
+    background-color: transparent;
+    border-radius: 10px;
+    height: 11px !important; /* Match landing page */
+
+    /* Styles for hover state on the scrollbar track */
+    @mixin hover {
+        background-color: var(--mantine-color-mainBlue-6) !important; /* Blue track on hover */
+        & .scrollbarThumb {
+            background-color: var(--mantine-color-lightBlue-6) !important; /* Lighter blue thumb on hover */
+            margin: 1px 8px 1px 8px; /* Adjust margin slightly on hover if needed */
+        }
+    }
+}
+
+.scrollbarThumb {
+    background-color: var(--mantine-color-mainBlue-6) !important; /* Default blue thumb */
+    border-radius: 10px;
+    margin: 0px 8px 0px 8px; /* Default margin */
+
+    /* Styles for hover state directly on the thumb (redundant if track hover is sufficient) */
+    /* @mixin hover {
+        background-color: var(--mantine-color-lightBlue-6) !important;
+        margin: 1px 8px 1px 8px;
+    } */
+}
+
+.scrollbarViewport {
+    padding-bottom: 20px !important; /* Ensure space for scrollbar */
+    /* Add padding-left if needed, e.g., padding-left: var(--mantine-spacing-md); */
+}
