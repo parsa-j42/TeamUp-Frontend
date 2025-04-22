@@ -15,12 +15,8 @@
     border-radius: var(--mantine-radius-lg); /* Match card radius */
 }
 
+/* Flip the card when hovering over the container */
 .cardContainer:hover .cardInner {
-    /* Optional: Slight lift on hover */
-    /* transform: translateY(-2px); */
-}
-
-.cardInnerFlipped {
     transform: rotateY(180deg);
 }
 
