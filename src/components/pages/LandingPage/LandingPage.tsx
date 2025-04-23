@@ -8,7 +8,7 @@ import GradientBackground from "@components/shared/GradientBackground/GradientBa
 import { ProjectCardProps } from "@components/shared/ProjectCard/ProjectCard.tsx";
 import HorizontalProjectScroll from "@components/shared/HorizontalProjectScroll/HorizontalProjectScroll";
 import { apiClient } from '@utils/apiClient';
-import { ProjectDto } from '../../../types/api';
+import { ProjectDto, RecommendedProjectDto } from '../../../types/api';
 import {
     IconAlertCircle, IconPalette, IconCode, IconBriefcase, IconUsers, IconDeviceTv, IconFlask,
     IconArrowRight
@@ -21,36 +21,66 @@ import classes from './LandingPage.module.css';
 export default function LandingPage() {
     const navigate = useNavigate();
     const theme = useMantineTheme();
-    const { isAuthenticated, initialCheckComplete } = useAuth(); // Get auth state
+    const { isAuthenticated, initialCheckComplete } = useAuth();
 
     // --- State for API Data ---
-    const [recommendedProjects, setRecommendedProjects] = useState<ProjectDto[]>([]);
-    const [isLoadingRecommended, setIsLoadingRecommended] = useState(true);
-    const [recommendedError, setRecommendedError] = useState<string | null>(null);
+    // State for Latest Projects (Fallback)
+    const [latestProjects, setLatestProjects] = useState<ProjectDto[]>([]);
+    const [isLoadingLatest, setIsLoadingLatest] = useState(true);
+    const [latestError, setLatestError] = useState<string | null>(null);
 
-    // --- State for My Projects (only relevant if logged in) ---
+    // State for AI Recommendations (Primary if logged in)
+    const [recommendedProjectsAI, setRecommendedProjectsAI] = useState<RecommendedProjectDto[]>([]);
+    const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true); // Separate loading state
+    const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
+
+    // --- State for My Projects ---
     const [myProjects, setMyProjects] = useState<ProjectDto[]>([]);
-    const [isLoadingMyProjects, setIsLoadingMyProjects] = useState(true); // Initially true
+    const [isLoadingMyProjects, setIsLoadingMyProjects] = useState(true);
     const [myProjectsError, setMyProjectsError] = useState<string | null>(null);
 
-    // --- Fetch Recommended Projects ---
-    const fetchRecommendedProjects = useCallback(async () => {
-        console.log('[LandingPage] Fetching recommended (latest) projects...');
-        setIsLoadingRecommended(true);
-        setRecommendedError(null);
+    // --- Fetch Latest Projects (Fallback) ---
+    const fetchLatestProjects = useCallback(async () => {
+        console.log('[LandingPage] Fetching latest projects (fallback)...');
+        setIsLoadingLatest(true);
+        setLatestError(null);
         try {
             const response = await apiClient<{ projects: ProjectDto[], total: number }>('/projects?take=10&skip=0');
-            setRecommendedProjects(response.projects);
+            setLatestProjects(response.projects);
         } catch (err: any) {
-            console.error('[LandingPage] Error fetching recommended projects:', err);
-            setRecommendedError(err.data?.message || err.message || 'Failed to load recommended projects.');
-            setRecommendedProjects([]);
+            console.error('[LandingPage] Error fetching latest projects:', err);
+            setLatestError(err.data?.message || err.message || 'Failed to load latest projects.');
+            setLatestProjects([]);
         } finally {
-            setIsLoadingRecommended(false);
+            setIsLoadingLatest(false);
         }
     }, []);
 
-    // --- Fetch My Projects (only if authenticated) ---
+    // --- Fetch AI Recommendations ---
+    const fetchRecommendations = useCallback(async () => {
+        if (!isAuthenticated || !initialCheckComplete) {
+            setIsLoadingRecommendations(false);
+            setRecommendedProjectsAI([]);
+            return; // Don't fetch if not authenticated
+        }
+        console.log('[LandingPage] Fetching AI recommendations...');
+        setIsLoadingRecommendations(true); // Use separate loading state
+        setRecommendationsError(null);
+        try {
+            const response = await apiClient<RecommendedProjectDto[]>('/recommendations/projects');
+            setRecommendedProjectsAI(response);
+        } catch (err: any) {
+            console.error('[LandingPage] Error fetching recommendations:', err);
+            if (err.status !== 401) {
+                setRecommendationsError(err.data?.message || err.message || 'Could not load recommendations.');
+            }
+            setRecommendedProjectsAI([]);
+        } finally {
+            setIsLoadingRecommendations(false);
+        }
+    }, [isAuthenticated, initialCheckComplete]);
+
+    // --- Fetch My Projects ---
     const fetchMyProjects = useCallback(async () => {
         if (!isAuthenticated || !initialCheckComplete) {
             setIsLoadingMyProjects(false); // Stop loading if not authenticated
@@ -72,15 +102,19 @@ export default function LandingPage() {
         }
     }, [isAuthenticated, initialCheckComplete]); // Depend on auth state
 
+    // --- Effects ---
     useEffect(() => {
-        fetchRecommendedProjects();
-        // Fetch myProjects only when auth state is confirmed
+        // Always fetch latest projects as a baseline/fallback
+        fetchLatestProjects();
+        // Fetch others based on auth state readiness
         if (initialCheckComplete) {
+            fetchRecommendations();
             fetchMyProjects();
         }
-    }, [fetchRecommendedProjects, fetchMyProjects, initialCheckComplete]); // Add initialCheckComplete dependency
+    }, [fetchLatestProjects, fetchRecommendations, fetchMyProjects, initialCheckComplete]); // Add initialCheckComplete dependency
 
     // --- Map Data for Cards ---
+    // Updated to pass mentorRequest
     const mapProjectToCardProps = (project: ProjectDto): ProjectCardProps & { id: string } => ({
         id: project.id,
         title: project.title,
@@ -88,10 +122,26 @@ export default function LandingPage() {
         skills: project.requiredSkills || [],
         tags: project.tags || [],
         numOfMembers: project.numOfMembers || 'N/A',
-        showFeedbackBadge: project.mentorRequest === 'looking',
+        mentorRequest: project.mentorRequest, // Pass mentorRequest
     });
 
-    const recommendedProjectsForScroll: (ProjectCardProps & { id: string })[] = recommendedProjects.map(mapProjectToCardProps);
+    // Map AI recommendations, including reasons
+    const mapAIRecsToCardProps = (rec: RecommendedProjectDto): ProjectCardProps & { id: string } => ({
+        ...mapProjectToCardProps(rec.project), // Base mapping
+        recommendationReasons: rec.reasons,   // Add reasons
+    });
+
+    // Map latest projects (no reasons)
+    const latestProjectsForScroll: (ProjectCardProps & { id: string })[] = latestProjects.map(mapProjectToCardProps);
+    // Map AI recommendations
+    const recommendedAIForScroll: (ProjectCardProps & { id: string })[] = recommendedProjectsAI.map(mapAIRecsToCardProps);
+
+    // --- Determine which projects to display in the "Recommended" section ---
+    const displayAIRecommendations = isAuthenticated && initialCheckComplete && !isLoadingRecommendations && recommendedProjectsAI.length > 0;
+    const projectsToDisplay = displayAIRecommendations ? recommendedAIForScroll : latestProjectsForScroll;
+    const isLoadingSection = displayAIRecommendations ? isLoadingRecommendations : isLoadingLatest;
+    const errorSection = displayAIRecommendations ? recommendationsError : latestError;
+    const sectionTitle = displayAIRecommendations ? "Recommended For You" : "Latest Projects";
 
     // Categories data
     const categoryIconSize = 48;
@@ -134,15 +184,28 @@ export default function LandingPage() {
                 </Box>
             </GradientBackground>
 
-            {/* Recommended Section */}
+            {/* Recommended / Latest Section - UPDATED */}
             <GradientBackground gradient="linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(55, 197, 231, 0.3) 30%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
                 <Stack pt="50px" pb="50px" pl="13%" pr="0" gap="xl">
-                    <Title order={2} size="31px" fw={400}>Recommended For You</Title>
-                    {isLoadingRecommended && <Center><Loader /></Center>}
-                    {recommendedError && <Alert color="red" title="Error" icon={<IconAlertCircle />}>{recommendedError}</Alert>}
-                    {!isLoadingRecommended && !recommendedError && recommendedProjectsForScroll.length === 0 && <Text c="dimmed">No recommendations found.</Text>}
-                    {!isLoadingRecommended && !recommendedError && recommendedProjectsForScroll.length > 0 && (
-                        <HorizontalProjectScroll projects={recommendedProjectsForScroll} />
+                    {/* Use dynamic title */}
+                    <Title order={2} size="31px" fw={400}>{sectionTitle}</Title>
+
+                    {/* Handle loading state */}
+                    {isLoadingSection && <Center><Loader /></Center>}
+
+                    {/* Handle error state */}
+                    {!isLoadingSection && errorSection && (
+                        <Container size="lg" px={0}><Alert color="red" title="Error" icon={<IconAlertCircle />}>{errorSection}</Alert></Container>
+                    )}
+
+                    {/* Handle no projects found */}
+                    {!isLoadingSection && !errorSection && projectsToDisplay.length === 0 && (
+                        <Container size="lg" px={0}><Text c="dimmed">No projects found.</Text></Container>
+                    )}
+
+                    {/* Display projects */}
+                    {!isLoadingSection && !errorSection && projectsToDisplay.length > 0 && (
+                        <HorizontalProjectScroll projects={projectsToDisplay} />
                     )}
                 </Stack>
             </GradientBackground>
@@ -181,8 +244,7 @@ export default function LandingPage() {
                 </Stack>
             </Container>
 
-            {/* --- My Current Projects Section (Conditional) --- */}
-            {/* Render only if authenticated, check complete, not loading, and projects exist */}
+            {/* My Current Projects Section (Conditional) */}
             {isAuthenticated && initialCheckComplete && !isLoadingMyProjects && myProjects && myProjects.length > 0 && (
                 <GradientBackground gradient="">
                     <Container size="lg" py="xl" mt="xl" mb="xl">
@@ -218,7 +280,6 @@ export default function LandingPage() {
                     <Alert color="red" title="Error Loading Your Projects" icon={<IconAlertCircle />}>{myProjectsError}</Alert>
                 </Container>
             )}
-            {/* --- END: My Current Projects Section --- */}
 
             {/* What is TeamUp? Section */}
             <GradientBackground gradient="">
