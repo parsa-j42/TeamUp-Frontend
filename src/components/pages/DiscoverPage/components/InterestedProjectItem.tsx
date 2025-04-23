@@ -1,28 +1,29 @@
 import { useState } from 'react';
 import { Paper, Group, Stack, Text, Title, Badge, Collapse } from '@mantine/core';
-import { IconUsers } from '@tabler/icons-react'; // Import IconUsers
+import { IconUsers, IconSparkles } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import classes from '../DiscoverPage.module.css';
 
 export interface InterestedProjectItemProps {
     id: string;
     title: string;
-    description: string; // Added description prop
+    description: string;
     skills: string[];
     tags: string[];
-    numOfMembers: string; // Added numOfMembers prop
-    // category?: string; // Removed category, using status badge only
-    status?: string; // e.g., "Open to application"
+    numOfMembers: string;
+    status?: string;
+    recommendationReasons?: string[];
 }
 
 export function InterestedProjectItem({
                                           id,
                                           title,
-                                          description = 'No description available.', // Default description
+                                          description = 'No description available.',
                                           skills = [],
                                           tags = [],
-                                          numOfMembers = 'N/A', // Default members
-                                          status = "Open to application" // Default status
+                                          numOfMembers = 'N/A',
+                                          status = "Open to application",
+                                          recommendationReasons = [] // Default to empty array
                                       }: InterestedProjectItemProps) {
     const navigate = useNavigate();
     const [isHovered, setIsHovered] = useState(false);
@@ -33,7 +34,6 @@ export function InterestedProjectItem({
 
     return (
         <Paper
-            // component="button" // Removed button component, Paper handles click
             onClick={handleNavigate}
             p="lg"
             radius="lg"
@@ -41,9 +41,9 @@ export function InterestedProjectItem({
             withBorder={false}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            style={{ cursor: 'pointer' }} // Add pointer cursor for click indication
+            style={{ cursor: 'pointer' }}
         >
-            <Stack gap="md"> {/* Main vertical stack */}
+            <Stack gap="md">
                 {/* Top Row: Members | Status Badge */}
                 <Group justify="space-between" align="center">
                     <Group gap="xs" align="center">
@@ -55,16 +55,15 @@ export function InterestedProjectItem({
                     </Badge>
                 </Group>
 
-                {/* Title Row (Styled like ProjectCard) */}
+                {/* Title Row */}
                 <Title order={2} size={27} fw={600} c="#1696b6" lineClamp={1}>
                     {title}
                 </Title>
 
-                {/* Skills Row (Styled like ProjectCard) */}
+                {/* Skills Row */}
                 <Group gap="xs" wrap="nowrap">
                     <Text fw={600} size="sm">Primary Skills:</Text>
                     <Group gap={4} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                        {/* Match ProjectCard: slice(0, 3), comma logic */}
                         {skills?.slice(0, 3).map((skill, index) => (
                             <Text key={skill} size="sm" fw={600}>
                                 {skill}{index < (skills.length - 1) && index < 2 ? ',' : ''}
@@ -74,9 +73,8 @@ export function InterestedProjectItem({
                     </Group>
                 </Group>
 
-                {/* Tags Row (Styled like ProjectCard) */}
+                {/* Tags Row */}
                 <Group gap="xs" wrap="nowrap">
-                    {/* Match ProjectCard: slice(0, 4), dimmed text */}
                     <Group gap={4} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
                         {tags?.slice(0, 4).map((tag) => (
                             <Text key={tag} size="sm" c="dimmed">
@@ -87,13 +85,31 @@ export function InterestedProjectItem({
                     </Group>
                 </Group>
 
+                {/* Recommendation Reasons Badges - NEW */}
+                {recommendationReasons.length > 0 && (
+                    <Group gap={6} mt={4}>
+                        <IconSparkles size={16} color="orange" />
+                        {recommendationReasons.map((reason, index) => (
+                            <Badge
+                                key={index}
+                                variant="light"
+                                color="orange"
+                                size="sm"
+                                radius="sm"
+                            >
+                                {reason}
+                            </Badge>
+                        ))}
+                    </Group>
+                )}
+                {/* End Recommendation Reasons */}
+
+
                 {/* Description Section (Revealed on Hover) */}
                 <Collapse in={isHovered}>
-                    <Stack gap="xs" mt="md"> {/* Add margin-top for spacing */}
-                        {/* Title similar to ProjectCard back */}
+                    <Stack gap="xs" mt="md">
                         <Title order={4} c="mainBlue.7" fw={500}>Description</Title>
-                        {/* Description text */}
-                        <Text size="sm" c="black" lineClamp={3}> {/* Limit lines */}
+                        <Text size="sm" c="black" lineClamp={3}>
                             {description}
                         </Text>
                     </Stack>

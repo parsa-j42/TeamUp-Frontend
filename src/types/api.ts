@@ -296,3 +296,8 @@ export interface ApiErrorData {
   error?: string;
 }
 
+// --- Recommendations ---
+export interface RecommendedProjectDto {
+  project: ProjectDto;
+  reasons: string[];
+}
