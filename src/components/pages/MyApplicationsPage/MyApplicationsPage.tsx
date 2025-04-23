@@ -128,7 +128,7 @@ export default function MyApplicationsPage() {
         const showActions = activeTab === 'received' &&
             (app.status === ApplicationStatus.PENDING || app.status === ApplicationStatus.INVITED);
         // Determine if the application was sent or received for the 'all' tab display
-        const isSent = app.applicantId === userDetails?.id;
+        // Removing the unused variable
         const titleText = app.roleAppliedFor
             ? `${app.roleAppliedFor} @ ${app.project.title}`
             : `${app.project.title}`;

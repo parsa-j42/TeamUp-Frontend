@@ -343,13 +343,13 @@ export default function MyProjectDetailsPage() {
                     <Container size="xl">
                         <Group justify="space-between" mb="lg">
                             <Title order={3} className={classes.sectionTitle} mb={0}>Team Members</Title>
-                            {isOwner && (<Button size="xs" onClick={openInviteModal} leftSection={<IconUserPlus size={16} />}> Invite Member </Button>)}
+                            {isOwner && (<Button size="xs" variant="filled" color="mainBlue.6" onClick={openInviteModal} leftSection={<IconUserPlus size={16} />}> Invite Member </Button>)}
                         </Group>
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="xl">
                             {projectData.members.map((member: ProjectMemberDto) => (
                                 <Stack key={member.userId} className={classes.memberCard} gap="xs">
                                     <Avatar src={undefined} size={80} radius="50%" className={classes.memberAvatar}> <IconPhoto size="2rem" color={theme.colors.gray[5]} /> </Avatar>
-                                    <Text 
+                                    <Text
                                         className={classes.memberName}
                                         style={{ cursor: 'pointer' }}
                                         onClick={() => navigate(`/profile/${member.userId}`)}
@@ -541,7 +541,13 @@ export default function MyProjectDetailsPage() {
                         <TextInput
                             required label="Milestone Title" placeholder="Enter milestone title"
                             value={newMilestoneData.title}
-                            onChange={(e) => setNewMilestoneData(d => ({ ...d, title: e.currentTarget.value }))}
+                            onChange={(e) => {
+                                const newTitle = e.currentTarget.value;
+                                setNewMilestoneData({
+                                    title: newTitle,
+                                    date: newMilestoneData.date
+                                });
+                            }}
                         />
                         <DateInput
                             required label="Milestone Date" placeholder="Select date"
