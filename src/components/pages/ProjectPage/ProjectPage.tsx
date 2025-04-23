@@ -197,7 +197,15 @@ export default function ProjectPage() {
                                         <Stack key={member.id} align="left" ta="left" gap="xs">
                                             <Avatar src={undefined /* member.user.avatarUrl? */} radius="xl" size="lg" color="gray" />
                                             {/* Use preferredUsername + lastName */}
-                                            <Text fw={500} mt="xs" lh={1.2}>{`${member.user.preferredUsername} ${member.user.lastName}`}</Text>
+                                            <Text 
+                                                fw={500} 
+                                                mt="xs" 
+                                                lh={1.2}
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => navigate(`/profile/${member.userId}`)}
+                                            >
+                                                {`${member.user.preferredUsername} ${member.user.lastName}`}
+                                            </Text>
                                             <Text size="sm" c="dimmed">{member.role}</Text>
                                         </Stack>
                                     ))}

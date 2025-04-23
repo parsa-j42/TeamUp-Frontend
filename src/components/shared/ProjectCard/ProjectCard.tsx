@@ -142,15 +142,13 @@ export function ProjectCard({
 
                 {/* --- Back Face --- */}
                 <Box className={`${classes.cardFace} ${classes.cardBack}`}>
-                    <Stack justify="space-between" h="100%">
-                        <Stack gap="sm">
-                            <Title order={2} size={27} fw={600} c="#1696b6" lineClamp={1}> {title} </Title>
-                            <Title order={4} c="mainBlue.7" fw={500}>Description</Title>
-                            <Box className={classes.descriptionText}>
-                                <Text> {description} </Text>
-                            </Box>
-                        </Stack>
-                        <Group justify="flex-end">
+                    <Stack gap="sm" style={{ height: '100%' }}>
+                        <Title order={2} size={27} fw={600} c="#1696b6" lineClamp={1}> {title} </Title>
+                        <Title order={4} c="mainBlue.7" fw={500}>Description</Title>
+                        <Box className={classes.descriptionText}>
+                            <Text> {description} </Text>
+                        </Box>
+                        <Group justify="flex-end" mt="auto">
                             <Button variant="filled" color="mainBlue.6" radius="xl" onClick={handleApplyClick} disabled={!id}> Apply </Button>
                         </Group>
                     </Stack>

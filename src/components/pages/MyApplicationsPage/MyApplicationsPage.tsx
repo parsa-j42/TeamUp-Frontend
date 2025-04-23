@@ -25,7 +25,7 @@ export default function MyApplicationsPage() {
     const [applications, setApplications] = useState<ApplicationDto[]>([]);
     const [isLoadingApplications, setIsLoadingApplications] = useState(true);
     const [applicationsError, setApplicationsError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'all' | 'sent' | 'received'>('received');
+    const [activeTab, setActiveTab] = useState<'sent' | 'received'>('received');
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null); // Use null for "All"
     const [projectOptions, setProjectOptions] = useState<{ value: string; label: string }[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(false);
@@ -42,10 +42,8 @@ export default function MyApplicationsPage() {
         console.log(`Fetching applications: filter=${activeTab}, projectId=${selectedProjectId}`);
         try {
             const queryParams: FindApplicationsQueryDto = {
-                // Add applicantId: 'me' when viewing 'all' applications
-                ...(activeTab === 'all' && { applicantId: 'me' }),
-                ...(activeTab !== 'all' && { filter: activeTab }),
-                ...(selectedProjectId && { projectId: selectedProjectId }),
+                filter: activeTab,
+                projectId: selectedProjectId || undefined,
                 take: 50
             };
             // Remove undefined keys (no change needed here)
@@ -92,7 +90,7 @@ export default function MyApplicationsPage() {
 
     // --- Action Handlers ---
     const handleTabChange = (value: string | null) => {
-        if (value === 'all' || value === 'sent' || value === 'received') {
+        if (value === 'sent' || value === 'received') {
             setActiveTab(value);
         }
     };
@@ -131,10 +129,9 @@ export default function MyApplicationsPage() {
             (app.status === ApplicationStatus.PENDING || app.status === ApplicationStatus.INVITED);
         // Determine if the application was sent or received for the 'all' tab display
         const isSent = app.applicantId === userDetails?.id;
-        const titlePrefix = activeTab === 'all' ? (isSent ? '[Sent] ' : '[Received] ') : '';
         const titleText = app.roleAppliedFor
-            ? `${titlePrefix}${app.roleAppliedFor} @ ${app.project.title}`
-            : `${titlePrefix}${app.project.title}`;
+            ? `${app.roleAppliedFor} @ ${app.project.title}`
+            : `${app.project.title}`;
 
         return (
             <Box key={app.id}>
@@ -154,7 +151,7 @@ export default function MyApplicationsPage() {
                             {app.status === ApplicationStatus.INVITED && activeTab !== 'sent' && ' (Invitation)'}
                         </Title>
                         {/* Show applicant info if received, or project info if sent/all */}
-                        {(activeTab === 'received' || (activeTab === 'all' && !isSent)) ? (
+                        {activeTab === 'received' ? (
                             <Group
                                 gap="xs"
                                 className={classes.applicantInfo}
@@ -216,7 +213,7 @@ export default function MyApplicationsPage() {
             <Stack align="center">
                 <Title order={1} className={classes.title}>Application</Title>
                 <Text className={classes.subtitle}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.
+                    {/*Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.*/}
                 </Text>
 
                 <Box className={classes.contentBox} w="100%">
@@ -228,7 +225,6 @@ export default function MyApplicationsPage() {
                         mb="lg"
                     >
                         <Tabs.List>
-                            <Tabs.Tab value="all">View all</Tabs.Tab>
                             <Tabs.Tab value="sent">Sent</Tabs.Tab>
                             <Tabs.Tab value="received">Received</Tabs.Tab>
                         </Tabs.List>
@@ -259,7 +255,7 @@ export default function MyApplicationsPage() {
                     {!isLoadingApplications && !applicationsError && applications.length === 0 && (
                         <Center mih={150}>
                             {/* Updated empty state message */}
-                            <Text c="dimmed">No {activeTab !== 'all' ? activeTab : ''} applications {selectedProjectId ? 'for this project' : (activeTab === 'all' ? 'found' : '')} found.</Text>
+                            <Text c="dimmed">No {activeTab} applications {selectedProjectId ? 'for this project' : ''} found.</Text>
                         </Center>
                     )}
                     {!isLoadingApplications && !applicationsError && applications.length > 0 && (

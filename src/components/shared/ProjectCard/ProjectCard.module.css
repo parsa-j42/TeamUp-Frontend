@@ -41,15 +41,23 @@
     transform: rotateY(180deg);
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Push button to bottom */
     padding: var(--mantine-spacing-lg); /* Add padding */
     box-sizing: border-box; /* Include padding in height/width */
+    overflow: hidden; /* Ensure nothing spills out */
+}
+
+/* Fix the Stack container to take full height and display properly */
+.cardBack > div {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .descriptionText {
     /* Style for the description text on the back */
-    flex-grow: 1; /* Allow text to take available space */
+    flex: 1; /* Allow text to take available space */
     overflow-y: auto; /* Add scroll if description is too long */
+    max-height: calc(100% - 70px); /* Reserve space for title and button */
     margin-bottom: var(--mantine-spacing-md); /* Space before button */
     color: var(--mantine-color-gray-7);
     font-size: var(--mantine-font-size-sm);
