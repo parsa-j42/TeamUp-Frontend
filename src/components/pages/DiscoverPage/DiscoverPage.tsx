@@ -36,7 +36,7 @@ export default function DiscoverPage() {
     const [projectStatus, setProjectStatus] = useState<string | null>(searchParams.get('status') || 'Open');
     const [mentoringFeedback, setMentoringFeedback] = useState<string | null>(searchParams.get('mentorRequest') || '');
     const [tagsKeyword, setTagsKeyword] = useState(searchParams.get('tag') || '');
-    const [showFilters, setShowFilters] = useState(false); // State to control filter visibility
+    const [showFilters, setShowFilters] = useState(true); // State to control filter visibility - Set initial state to true
 
     // --- State for Search Results ---
     const [searchResults, setSearchResults] = useState<ProjectDto[]>([]);
@@ -188,7 +188,7 @@ export default function DiscoverPage() {
                     <Group justify="flex-end" className={styles.headerGroup}>
                         <Button
                             variant="default"
-                            leftSection={<IconFilter size={16} />}
+                            leftSection={<IconFilter color="#37c5e7" size={18} />}
                             className={styles.filterButton}
                             onClick={toggleFilters} // Add onClick handler
                         >
