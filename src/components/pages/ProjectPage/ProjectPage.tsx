@@ -140,7 +140,7 @@ export default function ProjectPage() {
     // --- Render Loading/Error ---
     // Wait for auth check AND project fetch
     if (isAuthLoading || isLoading || !initialCheckComplete) {
-        return ( <Center style={{ height: '80vh' }}> <Loader color="mainPurple.6" /> </Center> );
+        return ( <Center style={{ height: '80vh' }}> <Loader color="mainBlue.6" /> </Center> );
     }
     if (error && !projectData) { // Only show full page error if project data failed to load initially
         return ( <Container style={{ paddingTop: '5vh' }}> <Alert icon={<IconAlertCircle size="1rem" />} title="Error" color="red" radius="md"> {error} </Alert> </Container> );
@@ -228,7 +228,7 @@ export default function ProjectPage() {
                                 <Button
                                     variant="outline"
                                     radius="xl"
-                                    color="mainPurple.6"
+                                    color="mainBlue.6"
                                     fw={400}
                                     onClick={handleBookmarkClick}
                                     loading={isBookmarking}
@@ -238,7 +238,7 @@ export default function ProjectPage() {
                                     {isBookmarked ? 'Bookmarked' : 'Bookmark'}
                                 </Button>
                                 <Button
-                                    color="mainPurple.6"
+                                    color="mainBlue.6"
                                     variant="filled"
                                     radius="xl"
                                     fw={400}
