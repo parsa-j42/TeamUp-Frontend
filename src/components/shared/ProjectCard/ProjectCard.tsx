@@ -1,5 +1,5 @@
 import { Card, Text, Title, Group, Badge, Stack, Button, Box } from '@mantine/core';
-import { IconMessageCircleQuestion, IconSparkles, IconCoffee, IconBulb, IconPalette } from '@tabler/icons-react'; // Added icons
+import { IconUsers, IconMessageCircleQuestion, IconSparkles, IconCoffee, IconBulb } from '@tabler/icons-react'; // Added icons
 import { useNavigate } from 'react-router-dom';
 import classes from './ProjectCard.module.css';
 
@@ -15,8 +15,6 @@ export interface ProjectCardProps {
     mentorRequest?: string; // e.g., 'looking', 'open', 'one-time'
     // Added recommendationReasons
     recommendationReasons?: string[];
-    // Added categoryIcon
-    categoryIcon?: React.ReactNode;
 }
 
 /**
@@ -35,7 +33,6 @@ export function ProjectCard({
                                 numOfMembers = 'N/A',
                                 mentorRequest, // Use mentorRequest directly
                                 recommendationReasons = [], // Default to empty array
-                                categoryIcon = <IconPalette size={17} color="grey" />, // Default icon
                                 ...otherProps
                             }: ProjectCardProps) {
     const navigate = useNavigate();
@@ -106,7 +103,7 @@ export function ProjectCard({
                         {/* Top content stack */}
                         <Stack gap="md">
                             <Group gap="xs">
-                                {categoryIcon}
+                                <IconUsers size={17} color="grey" />
                                 <Text c="dimmed" size="sm">{numOfMembers}</Text>
                             </Group>
                             <Title order={2} size={27} fw={600} c="#1696b6" lineClamp={1}> {title} </Title>
@@ -160,4 +157,3 @@ export function ProjectCard({
         </Box>
     );
 }
-

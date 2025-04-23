@@ -114,40 +114,7 @@ export default function LandingPage() {
     }, [fetchLatestProjects, fetchRecommendations, fetchMyProjects, initialCheckComplete]); // Add initialCheckComplete dependency
 
     // --- Map Data for Cards ---
-    // Categories data
-    const categoryIconSize = 48;
-    const categoryIconColor = theme.colors.mainBlue[6];
-    const categories = [
-        { label: 'Design', icon: <IconPalette size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
-        { label: 'Development', icon: <IconCode size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
-        { label: 'Business', icon: <IconBriefcase size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
-        { label: 'Community', icon: <IconUsers size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
-        { label: 'Content & Media', icon: <IconDeviceTv size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
-        { label: 'Science', icon: <IconFlask size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
-    ];
-
-    // Helper function to get category icon based on project tags
-    const getCategoryIconFromTags = (projectTags: string[] = []): React.ReactNode => {
-        // Default icon if no match
-        const defaultIcon = <IconPalette size={17} />;
-        
-        // Check if any project tag matches a category label (case insensitive)
-        for (const tag of projectTags) {
-            const matchedCategory = categories.find(
-                category => category.label.toLowerCase() === tag.toLowerCase()
-            );
-            
-            if (matchedCategory) {
-                // Return the icon with adjusted size for the card
-                const IconComponent = matchedCategory.icon.type;
-                return <IconComponent size={17} color="grey" />;
-            }
-        }
-        
-        return defaultIcon;
-    };
-
-    // Updated to pass category icon
+    // Updated to pass mentorRequest
     const mapProjectToCardProps = (project: ProjectDto): ProjectCardProps & { id: string } => ({
         id: project.id,
         title: project.title,
@@ -155,8 +122,7 @@ export default function LandingPage() {
         skills: project.requiredSkills || [],
         tags: project.tags || [],
         numOfMembers: project.numOfMembers || 'N/A',
-        mentorRequest: project.mentorRequest,
-        categoryIcon: getCategoryIconFromTags(project.tags), // Pass the appropriate icon
+        mentorRequest: project.mentorRequest, // Pass mentorRequest
     });
 
     // Map AI recommendations, including reasons
@@ -176,6 +142,18 @@ export default function LandingPage() {
     const isLoadingSection = displayAIRecommendations ? isLoadingRecommendations : isLoadingLatest;
     const errorSection = displayAIRecommendations ? recommendationsError : latestError;
     const sectionTitle = displayAIRecommendations ? "Recommended For You" : "Latest Projects";
+
+    // Categories data
+    const categoryIconSize = 48;
+    const categoryIconColor = theme.colors.mainBlue[6];
+    const categories = [
+        { label: 'Design', icon: <IconPalette size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
+        { label: 'Development', icon: <IconCode size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
+        { label: 'Business', icon: <IconBriefcase size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
+        { label: 'Community', icon: <IconUsers size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
+        { label: 'Content & Media', icon: <IconDeviceTv size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
+        { label: 'Science', icon: <IconFlask size={categoryIconSize} color={categoryIconColor} stroke={1.5}/> },
+    ];
 
     // Determine navigation target for Create Project buttons
     const createProjectTarget = isAuthenticated ? "/create-project" : "/SignUp";
@@ -206,7 +184,7 @@ export default function LandingPage() {
                 </Box>
             </GradientBackground>
 
-            {/* Latest Projects Section - UPDATED */}
+            {/* Recommended / Latest Section - UPDATED */}
             <GradientBackground gradient="linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(55, 197, 231, 0.3) 30%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
                 <Stack pt="50px" pb="50px" pl="13%" pr="0" gap="xl">
                     {/* Use dynamic title */}
