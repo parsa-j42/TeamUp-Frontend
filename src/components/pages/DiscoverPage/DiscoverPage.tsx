@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
     Container, Stack, Title, Text, Button, Group, TextInput, Select,
-    Loader, Alert, Center, Box, Grid, Pill
+    Loader, Alert, Center, Box, Grid, Pill, Collapse // Import Collapse
 } from '@mantine/core';
 import { IconFilter, IconAlertCircle, IconSearch,  } from '@tabler/icons-react';
 import { useDebouncedValue } from '@mantine/hooks';
@@ -17,7 +17,6 @@ import styles from './DiscoverPage.module.css';
 const projectStatusOptions = [
     { value: '', label: 'Any Status' }, // Default/clear option
     { value: 'Open', label: 'Open to application' },
-    { value: 'In Progress', label: 'In Progress' },
     { value: 'Closed', label: 'Closed' },
 ];
 const mentorRequestOptions = [
@@ -34,9 +33,10 @@ export default function DiscoverPage() {
     // --- State for Filters ---
     // Use URL params as the source of truth, with local state reflecting them
     const [interestSkillKeyword, setInterestSkillKeyword] = useState(searchParams.get('skill') || '');
-    const [projectStatus, setProjectStatus] = useState<string | null>(searchParams.get('status') || '');
+    const [projectStatus, setProjectStatus] = useState<string | null>(searchParams.get('status') || 'Open');
     const [mentoringFeedback, setMentoringFeedback] = useState<string | null>(searchParams.get('mentorRequest') || '');
     const [tagsKeyword, setTagsKeyword] = useState(searchParams.get('tag') || '');
+    const [showFilters, setShowFilters] = useState(false); // State to control filter visibility
 
     // --- State for Search Results ---
     const [searchResults, setSearchResults] = useState<ProjectDto[]>([]);
@@ -169,6 +169,9 @@ export default function DiscoverPage() {
         filterSetter(defaultValue);
     };
 
+    // --- Toggle Filter Visibility ---
+    const toggleFilters = () => setShowFilters((prev) => !prev);
+
     // --- Active Filter Pills ---
     const activeFilters = [
         { key: 'skill', value: interestSkillKeyword, label: `Skill/Interest: ${interestSkillKeyword}`, clear: () => clearFilter(setInterestSkillKeyword) },
@@ -183,101 +186,108 @@ export default function DiscoverPage() {
                 <Stack gap="xl">
                     {/* Filter Section */}
                     <Group justify="flex-end" className={styles.headerGroup}>
-                        <Button variant="default" leftSection={<IconFilter size={16} />} className={styles.filterButton}>
+                        <Button
+                            variant="default"
+                            leftSection={<IconFilter size={16} />}
+                            className={styles.filterButton}
+                            onClick={toggleFilters} // Add onClick handler
+                        >
                             Filters
                         </Button>
                     </Group>
 
                     {/* Filter Controls - Using Grid for better alignment */}
-                    <Grid gutter="md" className={styles.filterControlsContainer}>
-                        {/* Interests/Skills */}
-                        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                            <Box className={styles.filterControlWrapper}>
-                                <Group justify="space-between" className={styles.filterLabelGroup}>
-                                    <Text component="label" htmlFor="skill-interest-input" className={styles.filterLabel}>Interests/Skills</Text>
-                                    {interestSkillKeyword && (
-                                        <button onClick={() => clearFilter(setInterestSkillKeyword)} className={styles.filterClearButton}>Clear</button>
-                                    )}
-                                </Group>
-                                <TextInput
-                                    id="skill-interest-input"
-                                    placeholder="Keyword"
-                                    leftSection={<IconSearch size={16} />}
-                                    value={interestSkillKeyword}
-                                    onChange={(event) => setInterestSkillKeyword(event.currentTarget.value)}
-                                    className={styles.filterInput}
-                                />
-                            </Box>
-                        </Grid.Col>
+                    <Collapse in={showFilters} transitionDuration={300}> {/* Wrap filters in Collapse */}
+                        <Grid gutter="md" className={styles.filterControlsContainer}>
+                            {/* Interests/Skills */}
+                            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+                                <Box className={styles.filterControlWrapper}>
+                                    <Group justify="space-between" className={styles.filterLabelGroup}>
+                                        <Text component="label" htmlFor="skill-interest-input" className={styles.filterLabel}>Interests/Skills</Text>
+                                        {interestSkillKeyword && (
+                                            <button onClick={() => clearFilter(setInterestSkillKeyword)} className={styles.filterClearButton}>Clear</button>
+                                        )}
+                                    </Group>
+                                    <TextInput classNames={{ input: styles.textInputOutline, label: styles.textInputLabel}}
+                                        id="skill-interest-input"
+                                        placeholder="Keyword"
+                                        leftSection={<IconSearch size={16} />}
+                                        value={interestSkillKeyword}
+                                        onChange={(event) => setInterestSkillKeyword(event.currentTarget.value)}
+                                        // className={styles.filterInput}
+                                    />
+                                </Box>
+                            </Grid.Col>
 
-                        {/* Project Status */}
-                        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                            <Box className={styles.filterControlWrapper}>
-                                <Group justify="space-between" className={styles.filterLabelGroup}>
-                                    <Text component="label" htmlFor="status-select" className={styles.filterLabel}>Project Status</Text>
-                                    {projectStatus && (
-                                        <button onClick={() => clearFilter(setProjectStatus, '')} className={styles.filterClearButton}>Clear</button>
-                                    )}
-                                </Group>
-                                <Select
-                                    id="status-select"
-                                    data={projectStatusOptions}
-                                    value={projectStatus}
-                                    onChange={setProjectStatus}
-                                    className={styles.filterInput}
-                                    allowDeselect={false}
-                                    comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
-                                />
-                            </Box>
-                        </Grid.Col>
+                            {/* Project Status */}
+                            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+                                <Box className={styles.filterControlWrapper}>
+                                    <Group justify="space-between" className={styles.filterLabelGroup}>
+                                        <Text component="label" htmlFor="status-select" className={styles.filterLabel}>Project Status</Text>
+                                        {projectStatus && (
+                                            <button onClick={() => clearFilter(setProjectStatus, '')} className={styles.filterClearButton}>Clear</button>
+                                        )}
+                                    </Group>
+                                    <Select defaultValue="Open"
+                                        id="status-select"
+                                        data={projectStatusOptions}
+                                        value={projectStatus}
+                                        onChange={setProjectStatus}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown}}
+                                        allowDeselect={false}
+                                        comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
+                                    />
+                                </Box>
+                            </Grid.Col>
 
-                        {/* Mentoring/Feedback */}
-                        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                            <Box className={styles.filterControlWrapper}>
-                                <Group justify="space-between" className={styles.filterLabelGroup}>
-                                    <Text component="label" htmlFor="mentor-select" className={styles.filterLabel}>Mentoring/Feedback</Text>
-                                    {mentoringFeedback && (
-                                        <button onClick={() => clearFilter(setMentoringFeedback, '')} className={styles.filterClearButton}>Clear</button>
-                                    )}
-                                </Group>
-                                <Select
-                                    id="mentor-select"
-                                    data={mentorRequestOptions}
-                                    value={mentoringFeedback}
-                                    onChange={setMentoringFeedback}
-                                    className={styles.filterInput}
-                                    allowDeselect={false}
-                                    comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
-                                />
-                            </Box>
-                        </Grid.Col>
+                            {/* Mentoring/Feedback */}
+                            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+                                <Box className={styles.filterControlWrapper}>
+                                    <Group justify="space-between" className={styles.filterLabelGroup}>
+                                        <Text component="label" htmlFor="mentor-select" className={styles.filterLabel}>Mentoring/Feedback</Text>
+                                        {mentoringFeedback && (
+                                            <button onClick={() => clearFilter(setMentoringFeedback, '')} className={styles.filterClearButton}>Clear</button>
+                                        )}
+                                    </Group>
+                                    <Select
+                                        id="mentor-select"
+                                        data={mentorRequestOptions}
+                                        value={mentoringFeedback}
+                                        onChange={setMentoringFeedback}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown}}
+                                        allowDeselect={false}
+                                        comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
+                                    />
+                                </Box>
+                            </Grid.Col>
 
-                        {/* Tags */}
-                        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                            <Box className={styles.filterControlWrapper}>
-                                <Group justify="space-between" className={styles.filterLabelGroup}>
-                                    <Text component="label" htmlFor="tags-input" className={styles.filterLabel}>Tags</Text>
-                                    {tagsKeyword && (
-                                        <button onClick={() => clearFilter(setTagsKeyword)} className={styles.filterClearButton}>Clear</button>
-                                    )}
-                                </Group>
-                                <TextInput
-                                    id="tags-input"
-                                    placeholder="Keyword"
-                                    leftSection={<IconSearch size={16} />}
-                                    value={tagsKeyword}
-                                    onChange={(event) => setTagsKeyword(event.currentTarget.value)}
-                                    className={styles.filterInput}
-                                />
-                            </Box>
-                        </Grid.Col>
-                    </Grid>
+                            {/* Tags */}
+                            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+                                <Box className={styles.filterControlWrapper}>
+                                    <Group justify="space-between" className={styles.filterLabelGroup}>
+                                        <Text component="label" htmlFor="tags-input" className={styles.filterLabel}>Tags</Text>
+                                        {tagsKeyword && (
+                                            <button onClick={() => clearFilter(setTagsKeyword)} className={styles.filterClearButton}>Clear</button>
+                                        )}
+                                    </Group>
+                                    <TextInput
+                                        id="tags-input"
+                                        placeholder="Keyword"
+                                        leftSection={<IconSearch size={16} />}
+                                        value={tagsKeyword}
+                                        onChange={(event) => setTagsKeyword(event.currentTarget.value)}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel}}
+                                    />
+                                </Box>
+                            </Grid.Col>
+                        </Grid>
+                    </Collapse> {/* End Collapse */}
 
                     {/* Active Filter Pills */}
                     {activeFilters.length > 0 && (
                         <Box className={styles.filterPillsContainer}>
                             {activeFilters.map(filter => (
-                                <Pill
+                                <Pill size="lg"
                                     key={filter.key}
                                     withRemoveButton
                                     onRemove={filter.clear}
@@ -288,7 +298,6 @@ export default function DiscoverPage() {
                             ))}
                         </Box>
                     )}
-
 
                     {/* Most Relevant Results Section (Conditional) */}
                     {shouldShowRelevantResults && (
@@ -326,10 +335,12 @@ export default function DiscoverPage() {
                                         key={project.id}
                                         id={project.id}
                                         title={project.title}
+                                        description={project.description} // Pass description
                                         skills={project.requiredSkills || []}
                                         tags={project.tags || []}
+                                        numOfMembers={project.numOfMembers || 'N/A'} // Pass numOfMembers
                                         // Use first tag or placeholder for category
-                                        category={project.tags?.[0] || 'UI/UX'}
+                                        // category={project.tags?.[0] || 'UI/UX'}
                                         // Use actual project status if available and matches options, otherwise default
                                         status={projectStatusOptions.find(opt => opt.value === project.projectType)?.label || 'Open to application'}
                                     />
@@ -342,3 +353,4 @@ export default function DiscoverPage() {
         </Container>
     );
 }
+
