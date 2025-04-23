@@ -18,7 +18,7 @@ const predefinedTags = ['Design', 'Development', 'Business', 'Community', 'Conte
 const projectStatusOptions = [
     { value: '', label: 'Any Status' },
     { value: 'Open', label: 'Open to application' },
-    { value: 'Closed', label: 'Closed' },
+    { value: 'Closed', label: 'Closed' }, // Value for closed status
 ];
 const mentorRequestOptions = [
     { value: '', label: 'Any Preference' },
@@ -103,6 +103,17 @@ export default function DiscoverPage() {
 
     // --- Fetch Main Search Results ---
     const fetchProjects = useCallback(async () => {
+        // --- Check for "Closed" status filter ---
+        if (projectStatus === 'Closed') {
+            console.log("[DiscoverPage] 'Closed' status selected. Skipping API call and clearing results.");
+            setSearchResults([]);
+            setIsLoadingSearch(false); // Ensure loading stops
+            setSearchError(null); // Clear any previous errors
+            return; // Exit the function early
+        }
+        // --- END Check ---
+
+        // Continue only if not "Closed" and filters/search are active
         if (!shouldShowRelevantResults) {
             setSearchResults([]);
             setIsLoadingSearch(false);
@@ -115,7 +126,7 @@ export default function DiscoverPage() {
             tag: selectedTag || undefined,
             mentorRequest: mentoringFeedback || undefined,
         });
-        setIsLoadingSearch(true);
+        setIsLoadingSearch(true); // Set loading true *after* the "Closed" check
         setSearchError(null);
 
         const queryParams: FindProjectsQueryDto = {
@@ -139,7 +150,8 @@ export default function DiscoverPage() {
         } finally {
             setIsLoadingSearch(false);
         }
-    }, [shouldShowRelevantResults, searchTermFromUrl, selectedSkill, selectedTag, mentoringFeedback]);
+        // Pass projectStatus in dependency array so fetchProjects re-runs when it changes
+    }, [shouldShowRelevantResults, searchTermFromUrl, selectedSkill, selectedTag, mentoringFeedback, projectStatus]);
 
     // --- Effects ---
     useEffect(() => {
@@ -148,7 +160,7 @@ export default function DiscoverPage() {
 
     useEffect(() => {
         fetchProjects();
-    }, [fetchProjects]);
+    }, [fetchProjects]); // fetchProjects dependency array now includes projectStatus
 
     useEffect(() => {
         if (initialCheckComplete) {
@@ -163,7 +175,7 @@ export default function DiscoverPage() {
         if (selectedSkill) params.skill = selectedSkill;
         if (selectedTag) params.tag = selectedTag;
         if (mentoringFeedback) params.mentorRequest = mentoringFeedback;
-        if (projectStatus) params.status = projectStatus;
+        if (projectStatus) params.status = projectStatus; // Keep status in URL
 
         setSearchParams(params, { replace: true });
     }, [selectedSkill, selectedTag, mentoringFeedback, projectStatus, searchTermFromUrl, setSearchParams]);
@@ -176,7 +188,7 @@ export default function DiscoverPage() {
         skills: project.requiredSkills || [],
         tags: project.tags || [],
         numOfMembers: project.numOfMembers || 'N/A',
-        showFeedbackBadge: project.mentorRequest === 'looking',
+        mentorRequest: project.mentorRequest,
     });
 
     const searchResultsForScroll: (ProjectCardProps & { id: string })[] = searchResults.map(mapProjectToCardProps);
@@ -203,6 +215,7 @@ export default function DiscoverPage() {
         ...predefinedTags.map(tag => ({ value: tag, label: tag }))
     ];
 
+    // --- Render Logic ---
     return (
         <Container fluid className={styles.pageWrapper}>
             <Container size="lg">
@@ -332,12 +345,14 @@ export default function DiscoverPage() {
                             </Title>
                             {isLoadingSearch && <Center><Loader /></Center>}
                             {searchError && <Alert color="red" title="Search Error" icon={<IconAlertCircle />}>{searchError}</Alert>}
-                            {!isLoadingSearch && !searchError && searchResults.length === 0 && (
+                            {/* Show "No projects" message also if status is Closed */}
+                            {!isLoadingSearch && !searchError && (searchResults.length === 0 || projectStatus === 'Closed') && (
                                 <Center mih={200}>
                                     <Text c="dimmed">No projects found matching your criteria.</Text>
                                 </Center>
                             )}
-                            {!isLoadingSearch && !searchError && searchResults.length > 0 && (
+                            {/* Only show results if not loading, no error, results exist, AND status is not Closed */}
+                            {!isLoadingSearch && !searchError && searchResults.length > 0 && projectStatus !== 'Closed' && (
                                 <HorizontalProjectScroll projects={searchResultsForScroll} />
                             )}
                         </Box>
