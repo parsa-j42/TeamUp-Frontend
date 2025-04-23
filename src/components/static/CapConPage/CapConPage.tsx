@@ -68,7 +68,7 @@ const CapConPage: React.FC = () => {
                     <Box className={classes.headerButtonsContainer}>
                         <Button
                             component="a"
-                            href="https://www.figma.com/proto/BNzSnL2hmirBBRYGv35Tsp/Capstone-Wireframe?node-id=0-1&t=v2j67LxFVFVBDRNc-1"
+                            href="https://www.figma.com/proto/BNzSnL2hmirBBRYGv35Tsp/Capstone-Wireframe?page-id=687%3A4524&node-id=687-4902&viewport=-1853%2C-851%2C0.2&t=fU0B3lqVmCi6zP1O-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=689%3A6042&show-proto-sidebar=1"
                             target="_blank"
                             rel="noopener noreferrer"
                             py="1px"
