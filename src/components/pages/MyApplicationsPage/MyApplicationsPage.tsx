@@ -216,7 +216,7 @@ export default function MyApplicationsPage() {
             <Stack align="center">
                 <Title order={1} className={classes.title}>Application</Title>
                 <Text className={classes.subtitle}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.
+                    {/*Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.*/}
                 </Text>
 
                 <Box className={classes.contentBox} w="100%">
