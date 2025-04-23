@@ -458,7 +458,8 @@ export default function ProfilePage() {
 
     // --- Render Main Content ---
     return (
-        <GradientBackground gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
+        <GradientBackground
+            gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Container mx="12%" size="100%" style={{borderRadius: theme.radius.md}} p="xl">
                 {/* General Page Error */}
                 {error && !profileEditOpened && !skillsEditOpened && !interestsEditOpened && !experienceEditOpened && !portfolioProjectAddOpened && !portfolioProjectEditOpened && (
@@ -641,7 +642,7 @@ export default function ProfilePage() {
             {/* --- Modals (Keep unchanged, they are only opened if isOwnProfile is true) --- */}
             {/* Profile Info Edit Modal */}
             <Modal opened={profileEditOpened} onClose={closeProfileEdit} title="Edit Profile Information" centered
-                   size="md">
+                   size="md" radius="md">
                 <Stack> {profileModalError &&
                     <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton
                            onClose={() => setProfileModalError(null)}>{profileModalError}</Alert>} <TextInput
@@ -654,26 +655,30 @@ export default function ProfilePage() {
                                                                      value={profileEditData.institution || ''}
                                                                      onChange={handleProfileInputChange}/> <Textarea
                     name="bio" label="Bio" value={profileEditData.bio || ''} onChange={handleProfileInputChange}
-                    minRows={3}/> <Group justify="flex-end" mt="md"> <Button variant="default"
+                    minRows={3}/> <Group justify="flex-end" mt="md"> <Button color="mainBlue.6" variant="outline"
                                                                              onClick={closeProfileEdit}
                                                                              disabled={isSavingProfile}>Cancel</Button>
                     <Button color="mainBlue.6" onClick={handleProfileInfoSave} loading={isSavingProfile}>Save
                         Changes</Button> </Group> </Stack>
             </Modal>
             {/* Skills Edit Modal */}
-            <Modal opened={skillsEditOpened} onClose={closeSkillsEdit} title="Edit Skills" centered size="lg">
+            <Modal opened={skillsEditOpened} onClose={closeSkillsEdit} title="Edit Skills" centered size="lg"
+                   radius="md">
                 <Stack> {skillsModalError &&
                     <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton
                            onClose={() => setSkillsModalError(null)}>{skillsModalError}</Alert>} <TagsInput
                     label="Your Skills" placeholder="Enter skills and press Enter"
                     description="Add relevant skills one by one." data={[]} value={skillsEditData}
                     onChange={setSkillsEditData} clearable/> <Group justify="flex-end" mt="md"> <Button
-                    variant="default" onClick={closeSkillsEdit} disabled={isSavingSkills}>Cancel</Button> <Button
-                    color="mainBlue.6" onClick={handleSkillsSave} loading={isSavingSkills}>Save Skills</Button>
+                    color="mainBlue.6" variant="outline" onClick={closeSkillsEdit}
+                    disabled={isSavingSkills}>Cancel</Button>
+                    <Button
+                        color="mainBlue.6" onClick={handleSkillsSave} loading={isSavingSkills}>Save Skills</Button>
                 </Group> </Stack>
             </Modal>
             {/* Skills Show All Modal */}
-            <Modal opened={skillsShowAllOpened} onClose={closeSkillsShowAll} title="All Skills" centered size="lg">
+            <Modal opened={skillsShowAllOpened} onClose={closeSkillsShowAll} title="All Skills" centered size="lg"
+                   radius="md">
                 <ScrollArea h={400}> <Stack gap="md"> {(profileUserData?.profile?.skills || []).map((skill, index) => (
                     <React.Fragment key={skill.id}> <Stack gap="xs"> <Title order={5} fw={500}>{skill.name}</Title>
                         <Text size="sm" c="black">{skill.description || 'No description provided.'}</Text>
@@ -682,20 +687,23 @@ export default function ProfilePage() {
                 variant="default" onClick={closeSkillsShowAll}>Close</Button></Group>
             </Modal>
             {/* Interests Edit Modal */}
-            <Modal opened={interestsEditOpened} onClose={closeInterestsEdit} title="Edit Interests" centered size="lg">
+            <Modal opened={interestsEditOpened} onClose={closeInterestsEdit} title="Edit Interests" centered size="lg"
+                   radius="md">
                 <Stack> {interestsModalError &&
                     <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton
                            onClose={() => setInterestsModalError(null)}>{interestsModalError}</Alert>} <TagsInput
                     label="Your Interests" placeholder="Enter interests and press Enter"
                     description="Add relevant interests one by one." data={[]} value={interestsEditData}
                     onChange={setInterestsEditData} clearable/> <Group justify="flex-end" mt="md"> <Button
-                    variant="default" onClick={closeInterestsEdit} disabled={isSavingInterests}>Cancel</Button> <Button
-                    color="mainBlue.6" onClick={handleInterestsSave} loading={isSavingInterests}>Save
-                    Interests</Button> </Group> </Stack>
+                    color="mainBlue.6" variant="outline" onClick={closeInterestsEdit}
+                    disabled={isSavingInterests}>Cancel</Button>
+                    <Button
+                        color="mainBlue.6" onClick={handleInterestsSave} loading={isSavingInterests}>Save
+                        Interests</Button> </Group> </Stack>
             </Modal>
             {/* Interests Show All Modal */}
             <Modal opened={interestsShowAllOpened} onClose={closeInterestsShowAll} title="All Interests" centered
-                   size="lg">
+                   size="lg" radius="md">
                 <ScrollArea h={400}> <Stack
                     gap="md"> {(profileUserData?.profile?.interests || []).map((interest, index) => (
                     <React.Fragment key={interest.id}> <Stack gap="xs"> <Title order={5}
@@ -707,7 +715,7 @@ export default function ProfilePage() {
                 variant="default" onClick={closeInterestsShowAll}>Close</Button></Group>
             </Modal>
             {/* Experience Edit/Add Modal */}
-            <Modal opened={experienceEditOpened} onClose={closeExperienceEdit}
+            <Modal opened={experienceEditOpened} onClose={closeExperienceEdit} radius="md"
                    title={isEditingExperience ? "Edit Experience" : "Add Experience"} centered size="lg">
                 <Stack> {experienceModalError &&
                     <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton
@@ -722,13 +730,15 @@ export default function ProfilePage() {
                                                                                                                 value={currentExperience.description || ''}
                                                                                                                 onChange={handleExperienceInputChange}
                                                                                                                 minRows={3}/>
-                    <Group justify="flex-end" mt="md"> <Button variant="default" onClick={closeExperienceEdit}
+                    <Group justify="flex-end" mt="md"> <Button color="mainBlue.6" variant="outline"
+                                                               onClick={closeExperienceEdit}
                                                                disabled={isSavingExperience}>Cancel</Button> <Button
                         color="mainBlue.6" onClick={handleExperienceSave} loading={isSavingExperience}>Save
                         Experience</Button> </Group> </Stack>
             </Modal>
             {/* Experience Show All Modal */}
             <Modal opened={experienceShowAllOpened} onClose={closeExperienceShowAll} title="All Experience" centered
+                   radius="md"
                    size="lg">
                 <ScrollArea h={400}> <Stack
                     gap="md"> {(profileUserData?.profile?.workExperiences || []).map((exp, index) => (
@@ -743,7 +753,7 @@ export default function ProfilePage() {
                 variant="default" onClick={closeExperienceShowAll}>Close</Button></Group>
             </Modal>
             {/* Portfolio Project Modals */}
-            <Modal opened={portfolioProjectEditOpened} onClose={closePortfolioProjectEdit}
+            <Modal opened={portfolioProjectEditOpened} onClose={closePortfolioProjectEdit} radius="md"
                    title={`Edit Portfolio Project: ${editingPortfolioProject?.title || ''}`} centered size="lg">
                 {editingPortfolioProject && (<Stack> {portfolioEditModalError &&
                     <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton
@@ -770,13 +780,14 @@ export default function ProfilePage() {
                                                                                       }}> <IconPhoto size="3rem"
                                                                                                      color={theme.colors.gray[5]}/>
                         <Text size="sm" c="dimmed" mt="xs">Image Upload Not Implemented</Text> </Paper> </Box> <Group
-                        justify="flex-end" mt="md"> <Button variant="default" onClick={closePortfolioProjectEdit}
+                        justify="flex-end" mt="md"> <Button color="mainBlue.6" variant="outline"
+                                                            onClick={closePortfolioProjectEdit}
                                                             disabled={isSavingEditedPortfolioProject}>Cancel</Button>
                         <Button color="mainBlue.6" onClick={handlePortfolioProjectEditSave}
                                 loading={isSavingEditedPortfolioProject}>Save Changes</Button> </Group> </Stack>)}
             </Modal>
             <Modal opened={portfolioProjectAddOpened} onClose={closePortfolioProjectAdd} title="Add Portfolio Project"
-                   centered size="lg">
+                   centered size="lg" radius="md">
                 <Stack> {portfolioAddModalError &&
                     <Alert color="red" title="Save Error" icon={<IconAlertCircle size="1rem"/>} withCloseButton
                            onClose={() => setPortfolioAddModalError(null)}>{portfolioAddModalError}</Alert>} <TextInput
@@ -803,7 +814,8 @@ export default function ProfilePage() {
                                                                                       }}> <IconPhoto size="3rem"
                                                                                                      color={theme.colors.gray[5]}/>
                         <Text size="sm" c="dimmed" mt="xs">Image Upload Not Implemented</Text> </Paper> </Box> <Group
-                        justify="flex-end" mt="md"> <Button variant="default" onClick={closePortfolioProjectAdd}
+                        justify="flex-end" mt="md"> <Button color="mainBlue.6" variant="outline"
+                                                            onClick={closePortfolioProjectAdd}
                                                             disabled={isSavingNewPortfolioProject}>Cancel</Button>
                         <Button color="mainBlue.6" onClick={handlePortfolioProjectAddSave}
                                 loading={isSavingNewPortfolioProject}>Add Project</Button> </Group> </Stack>
