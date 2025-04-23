@@ -1,110 +1,128 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-    Container, Stack, Title, Text, Button, Group, TextInput, Select,
-    Loader, Alert, Center, Box, Grid, Pill, Collapse // Import Collapse
+    Container, Stack, Title, Text, Button, Group, Select,
+    Loader, Alert, Center, Box, Grid, Pill, Collapse
 } from '@mantine/core';
-import { IconFilter, IconAlertCircle, IconSearch,  } from '@tabler/icons-react';
-import { useDebouncedValue } from '@mantine/hooks';
+import { IconFilter, IconAlertCircle, IconChevronDown } from '@tabler/icons-react';
 import { apiClient } from '@utils/apiClient';
-import { ProjectDto, FindProjectsQueryDto } from '../../../types/api';
+import { ProjectDto, FindProjectsQueryDto, SkillDto, RecommendedProjectDto } from '../../../types/api';
 import { ProjectCardProps } from '@components/shared/ProjectCard/ProjectCard';
-import HorizontalProjectScroll from "@components/shared/HorizontalProjectScroll/HorizontalProjectScroll"; // Adjust path
+import HorizontalProjectScroll from "@components/shared/HorizontalProjectScroll/HorizontalProjectScroll";
 import { InterestedProjectItem } from './components/InterestedProjectItem';
 import styles from './DiscoverPage.module.css';
+import { useAuth } from '@contexts/AuthContext';
 
-// Placeholder options (can be fetched if dynamic)
+// --- Predefined Options ---
+const predefinedTags = ['Design', 'Development', 'Business', 'Community', 'Content & Media', 'Science'];
 const projectStatusOptions = [
-    { value: '', label: 'Any Status' }, // Default/clear option
+    { value: '', label: 'Any Status' },
     { value: 'Open', label: 'Open to application' },
     { value: 'Closed', label: 'Closed' },
 ];
 const mentorRequestOptions = [
-    { value: '', label: 'Any Preference' }, // Default/clear option
+    { value: '', label: 'Any Preference' },
     { value: 'looking', label: 'Looking for a Mentor' },
     { value: 'open', label: 'Open for Feedback' },
-    { value: 'one-time', label: 'One-time coffee chat' }, // Added from screenshot
+    { value: 'one-time', label: 'One-time coffee chat' },
 ];
+// --- End Predefined Options ---
 
 export default function DiscoverPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const searchTermFromUrl = searchParams.get('search') || '';
+    const { isAuthenticated, initialCheckComplete } = useAuth(); // Get auth state
 
     // --- State for Filters ---
-    // Use URL params as the source of truth, with local state reflecting them
-    const [interestSkillKeyword, setInterestSkillKeyword] = useState(searchParams.get('skill') || '');
+    const [selectedSkill, setSelectedSkill] = useState<string | null>(searchParams.get('skill') || null);
     const [projectStatus, setProjectStatus] = useState<string | null>(searchParams.get('status') || 'Open');
     const [mentoringFeedback, setMentoringFeedback] = useState<string | null>(searchParams.get('mentorRequest') || '');
-    const [tagsKeyword, setTagsKeyword] = useState(searchParams.get('tag') || '');
-    const [showFilters, setShowFilters] = useState(false); // State to control filter visibility
+    const [selectedTag, setSelectedTag] = useState<string | null>(searchParams.get('tag') || null);
+    const [showFilters, setShowFilters] = useState(true);
+
+    // --- State for Skills Dropdown ---
+    const [allSkills, setAllSkills] = useState<{ value: string; label: string }[]>([]);
+    const [isLoadingSkills, setIsLoadingSkills] = useState(false);
+    const [skillsError, setSkillsError] = useState<string | null>(null);
 
     // --- State for Search Results ---
     const [searchResults, setSearchResults] = useState<ProjectDto[]>([]);
     const [isLoadingSearch, setIsLoadingSearch] = useState(false);
     const [searchError, setSearchError] = useState<string | null>(null);
 
-    // --- State for "Interested" Projects ---
-    const [interestedProjects, setInterestedProjects] = useState<ProjectDto[]>([]);
-    const [isLoadingInterested, setIsLoadingInterested] = useState(true);
-    const [interestedError, setInterestedError] = useState<string | null>(null);
-
-    // --- Debounce Text Filter Inputs ---
-    const [debouncedInterestSkill] = useDebouncedValue(interestSkillKeyword, 500);
-    const [debouncedTagsKeyword] = useDebouncedValue(tagsKeyword, 500);
+    // --- State for Recommendations ---
+    const [recommendedProjects, setRecommendedProjects] = useState<RecommendedProjectDto[]>([]);
+    const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+    const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
 
     // --- Determine if any filters are active ---
-    const filtersAreActive = !!debouncedInterestSkill || !!projectStatus || !!mentoringFeedback || !!debouncedTagsKeyword;
+    const filtersAreActive = !!selectedSkill || !!projectStatus || !!mentoringFeedback || !!selectedTag;
     const shouldShowRelevantResults = !!searchTermFromUrl || filtersAreActive;
 
-    // --- Fetch "Interested" Projects ---
-    const fetchInterestedProjects = useCallback(async () => {
-        console.log('[DiscoverPage] Fetching "interested" projects (skip=10)...');
-        setIsLoadingInterested(true);
-        setInterestedError(null);
+    // --- Fetch Skills for Dropdown ---
+    const fetchSkills = useCallback(async () => {
+        console.log('[DiscoverPage] Fetching skills for filter...');
+        setIsLoadingSkills(true);
+        setSkillsError(null);
         try {
-            // Attempt to fetch projects skipping the first 10
-            const response = await apiClient<{ projects: ProjectDto[], total: number }>('/projects?take=5&skip=10');
-            setInterestedProjects(response.projects);
-            if (response.projects.length === 0) {
-                console.log('[DiscoverPage] No projects found with skip=10, trying skip=0 for interested section.');
-                // Fallback: If skip=10 returns nothing, fetch first 5 instead
-                const fallbackResponse = await apiClient<{ projects: ProjectDto[], total: number }>('/projects?take=5&skip=0');
-                setInterestedProjects(fallbackResponse.projects);
-            }
+            const skillsData = await apiClient<SkillDto[]>('/skills');
+            const skillOptions = skillsData.map(skill => ({ value: skill.name, label: skill.name }));
+            setAllSkills([{ value: '', label: 'Any Skill' }, ...skillOptions]);
         } catch (err: any) {
-            console.error("Error fetching interested projects:", err);
-            setInterestedError("Could not load projects you might be interested in.");
-            setInterestedProjects([]); // Ensure empty on error
+            console.error("Error fetching skills:", err);
+            setSkillsError("Could not load skills filter.");
+            setAllSkills([{ value: '', label: 'Error loading skills' }]);
         } finally {
-            setIsLoadingInterested(false);
+            setIsLoadingSkills(false);
         }
     }, []);
 
-    // --- Fetch Main Search Results (only if filters/search active) ---
+    // --- Fetch Recommendations ---
+    const fetchRecommendations = useCallback(async () => {
+        if (!isAuthenticated || !initialCheckComplete) {
+            setIsLoadingRecommendations(false);
+            setRecommendedProjects([]);
+            return;
+        }
+        console.log('[DiscoverPage] Fetching recommendations...');
+        setIsLoadingRecommendations(true);
+        setRecommendationsError(null);
+        try {
+            const response = await apiClient<RecommendedProjectDto[]>('/recommendations/projects');
+            setRecommendedProjects(response);
+        } catch (err: any) {
+            console.error("Error fetching recommendations:", err);
+            if (err.status !== 401) {
+                setRecommendationsError("Could not load recommendations at this time.");
+            }
+            setRecommendedProjects([]);
+        } finally {
+            setIsLoadingRecommendations(false);
+        }
+    }, [isAuthenticated, initialCheckComplete]);
+
+    // --- Fetch Main Search Results ---
     const fetchProjects = useCallback(async () => {
-        // Only fetch if search term exists or filters are active
         if (!shouldShowRelevantResults) {
-            setSearchResults([]); // Clear results if no search/filters
+            setSearchResults([]);
             setIsLoadingSearch(false);
             return;
         }
 
         console.log("Fetching relevant projects with:", {
             search: searchTermFromUrl,
-            skill: debouncedInterestSkill,
-            tag: debouncedTagsKeyword,
+            skill: selectedSkill || undefined,
+            tag: selectedTag || undefined,
             mentorRequest: mentoringFeedback || undefined,
-            status: projectStatus || undefined,
         });
         setIsLoadingSearch(true);
         setSearchError(null);
 
         const queryParams: FindProjectsQueryDto = {
             search: searchTermFromUrl || undefined,
-            skill: debouncedInterestSkill || undefined,
-            tag: debouncedTagsKeyword || undefined,
+            skill: selectedSkill || undefined,
+            tag: selectedTag || undefined,
             mentorRequest: mentoringFeedback || undefined,
-            // status: projectStatus || undefined, // Add when backend supports it
             take: 20,
             skip: 0,
         };
@@ -121,35 +139,34 @@ export default function DiscoverPage() {
         } finally {
             setIsLoadingSearch(false);
         }
-    }, [shouldShowRelevantResults, searchTermFromUrl, debouncedInterestSkill, debouncedTagsKeyword, mentoringFeedback, projectStatus]);
+    }, [shouldShowRelevantResults, searchTermFromUrl, selectedSkill, selectedTag, mentoringFeedback]);
 
     // --- Effects ---
     useEffect(() => {
-        // Fetch interested projects on mount
-        fetchInterestedProjects();
-    }, [fetchInterestedProjects]);
+        fetchSkills();
+    }, [fetchSkills]);
 
     useEffect(() => {
-        // Fetch relevant results whenever dependencies change
         fetchProjects();
-    }, [fetchProjects]); // Dependencies are implicitly handled by useCallback deps
+    }, [fetchProjects]);
+
+    useEffect(() => {
+        if (initialCheckComplete) {
+            fetchRecommendations();
+        }
+    }, [fetchRecommendations, initialCheckComplete]);
 
     // Update URL search params when local filter state changes
     useEffect(() => {
         const params: Record<string, string> = {};
-        // Include search term from URL if it exists (managed by NavBar)
         if (searchTermFromUrl) params.search = searchTermFromUrl;
-
-        // Add local filters to params if they have values
-        if (interestSkillKeyword) params.skill = interestSkillKeyword;
-        if (tagsKeyword) params.tag = tagsKeyword;
+        if (selectedSkill) params.skill = selectedSkill;
+        if (selectedTag) params.tag = selectedTag;
         if (mentoringFeedback) params.mentorRequest = mentoringFeedback;
         if (projectStatus) params.status = projectStatus;
 
-        // Update URL, replacing history state
         setSearchParams(params, { replace: true });
-    }, [interestSkillKeyword, tagsKeyword, mentoringFeedback, projectStatus, searchTermFromUrl, setSearchParams]);
-
+    }, [selectedSkill, selectedTag, mentoringFeedback, projectStatus, searchTermFromUrl, setSearchParams]);
 
     // --- Map Data for Cards ---
     const mapProjectToCardProps = (project: ProjectDto): ProjectCardProps & { id: string } => ({
@@ -165,7 +182,7 @@ export default function DiscoverPage() {
     const searchResultsForScroll: (ProjectCardProps & { id: string })[] = searchResults.map(mapProjectToCardProps);
 
     // --- Filter Clear Handlers ---
-    const clearFilter = (filterSetter: React.Dispatch<React.SetStateAction<any>>, defaultValue: any = '') => {
+    const clearFilter = (filterSetter: React.Dispatch<React.SetStateAction<any>>, defaultValue: any = null) => {
         filterSetter(defaultValue);
     };
 
@@ -174,11 +191,17 @@ export default function DiscoverPage() {
 
     // --- Active Filter Pills ---
     const activeFilters = [
-        { key: 'skill', value: interestSkillKeyword, label: `Skill/Interest: ${interestSkillKeyword}`, clear: () => clearFilter(setInterestSkillKeyword) },
+        { key: 'skill', value: selectedSkill, label: `Skill: ${selectedSkill}`, clear: () => clearFilter(setSelectedSkill, null) },
         { key: 'status', value: projectStatus, label: `Status: ${projectStatusOptions.find(o => o.value === projectStatus)?.label}`, clear: () => clearFilter(setProjectStatus, '') },
         { key: 'mentorRequest', value: mentoringFeedback, label: `Mentoring: ${mentorRequestOptions.find(o => o.value === mentoringFeedback)?.label}`, clear: () => clearFilter(setMentoringFeedback, '') },
-        { key: 'tag', value: tagsKeyword, label: `Tag: ${tagsKeyword}`, clear: () => clearFilter(setTagsKeyword) },
-    ].filter(f => f.value); // Only include filters that have a value
+        { key: 'tag', value: selectedTag, label: `Tag: ${selectedTag}`, clear: () => clearFilter(setSelectedTag, null) },
+    ].filter(f => f.value);
+
+    // --- Prepare Tag Options ---
+    const tagOptions = [
+        { value: '', label: 'Any Tag' },
+        ...predefinedTags.map(tag => ({ value: tag, label: tag }))
+    ];
 
     return (
         <Container fluid className={styles.pageWrapper}>
@@ -188,38 +211,44 @@ export default function DiscoverPage() {
                     <Group justify="flex-end" className={styles.headerGroup}>
                         <Button
                             variant="default"
-                            leftSection={<IconFilter size={16} />}
+                            leftSection={<IconFilter color="#37c5e7" size={18} />}
                             className={styles.filterButton}
-                            onClick={toggleFilters} // Add onClick handler
+                            onClick={toggleFilters}
                         >
                             Filters
                         </Button>
                     </Group>
 
-                    {/* Filter Controls - Using Grid for better alignment */}
-                    <Collapse in={showFilters} transitionDuration={300}> {/* Wrap filters in Collapse */}
+                    {/* Filter Controls */}
+                    <Collapse in={showFilters} transitionDuration={300}>
                         <Grid gutter="md" className={styles.filterControlsContainer}>
-                            {/* Interests/Skills */}
+                            {/* Skill Select */}
                             <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                                 <Box className={styles.filterControlWrapper}>
                                     <Group justify="space-between" className={styles.filterLabelGroup}>
-                                        <Text component="label" htmlFor="skill-interest-input" className={styles.filterLabel}>Interests/Skills</Text>
-                                        {interestSkillKeyword && (
-                                            <button onClick={() => clearFilter(setInterestSkillKeyword)} className={styles.filterClearButton}>Clear</button>
+                                        <Text component="label" htmlFor="skill-select" className={styles.filterLabel}>Skill</Text>
+                                        {selectedSkill && (
+                                            <button onClick={() => clearFilter(setSelectedSkill, null)} className={styles.filterClearButton}>Clear</button>
                                         )}
                                     </Group>
-                                    <TextInput classNames={{ input: styles.textInputOutline, label: styles.textInputLabel}}
-                                        id="skill-interest-input"
-                                        placeholder="Keyword"
-                                        leftSection={<IconSearch size={16} />}
-                                        value={interestSkillKeyword}
-                                        onChange={(event) => setInterestSkillKeyword(event.currentTarget.value)}
-                                        // className={styles.filterInput}
+                                    <Select
+                                        id="skill-select"
+                                        placeholder="Select skill"
+                                        data={allSkills}
+                                        value={selectedSkill}
+                                        onChange={setSelectedSkill}
+                                        searchable
+                                        disabled={isLoadingSkills}
+                                        error={skillsError}
+                                        rightSection={isLoadingSkills ? <Loader size={16} /> : <IconChevronDown size={16} />}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown }}
+                                        comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
+                                        nothingFoundMessage={isLoadingSkills ? "Loading..." : "No skills found"}
                                     />
                                 </Box>
                             </Grid.Col>
 
-                            {/* Project Status */}
+                            {/* Project Status Select */}
                             <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                                 <Box className={styles.filterControlWrapper}>
                                     <Group justify="space-between" className={styles.filterLabelGroup}>
@@ -228,19 +257,19 @@ export default function DiscoverPage() {
                                             <button onClick={() => clearFilter(setProjectStatus, '')} className={styles.filterClearButton}>Clear</button>
                                         )}
                                     </Group>
-                                    <Select defaultValue="Open"
+                                    <Select
                                         id="status-select"
                                         data={projectStatusOptions}
                                         value={projectStatus}
                                         onChange={setProjectStatus}
-                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown}}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown }}
                                         allowDeselect={false}
                                         comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
                                     />
                                 </Box>
                             </Grid.Col>
 
-                            {/* Mentoring/Feedback */}
+                            {/* Mentoring Select */}
                             <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                                 <Box className={styles.filterControlWrapper}>
                                     <Group justify="space-between" className={styles.filterLabelGroup}>
@@ -254,52 +283,48 @@ export default function DiscoverPage() {
                                         data={mentorRequestOptions}
                                         value={mentoringFeedback}
                                         onChange={setMentoringFeedback}
-                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown}}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown }}
                                         allowDeselect={false}
                                         comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
                                     />
                                 </Box>
                             </Grid.Col>
 
-                            {/* Tags */}
+                            {/* Tag Select */}
                             <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
                                 <Box className={styles.filterControlWrapper}>
                                     <Group justify="space-between" className={styles.filterLabelGroup}>
-                                        <Text component="label" htmlFor="tags-input" className={styles.filterLabel}>Tags</Text>
-                                        {tagsKeyword && (
-                                            <button onClick={() => clearFilter(setTagsKeyword)} className={styles.filterClearButton}>Clear</button>
+                                        <Text component="label" htmlFor="tag-select" className={styles.filterLabel}>Tag</Text>
+                                        {selectedTag && (
+                                            <button onClick={() => clearFilter(setSelectedTag, null)} className={styles.filterClearButton}>Clear</button>
                                         )}
                                     </Group>
-                                    <TextInput
-                                        id="tags-input"
-                                        placeholder="Keyword"
-                                        leftSection={<IconSearch size={16} />}
-                                        value={tagsKeyword}
-                                        onChange={(event) => setTagsKeyword(event.currentTarget.value)}
-                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel}}
+                                    <Select
+                                        id="tag-select"
+                                        placeholder="Select tag"
+                                        data={tagOptions}
+                                        value={selectedTag}
+                                        onChange={setSelectedTag}
+                                        classNames={{ input: styles.textInputOutline, label: styles.textInputLabel, dropdown: styles.dropdown }}
+                                        comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
                                     />
                                 </Box>
                             </Grid.Col>
                         </Grid>
-                    </Collapse> {/* End Collapse */}
+                    </Collapse>
 
                     {/* Active Filter Pills */}
                     {activeFilters.length > 0 && (
                         <Box className={styles.filterPillsContainer}>
                             {activeFilters.map(filter => (
-                                <Pill size="lg"
-                                    key={filter.key}
-                                    withRemoveButton
-                                    onRemove={filter.clear}
-                                    className={styles.filterPill}
-                                >
+                                <Pill size="lg" key={filter.key} withRemoveButton onRemove={filter.clear} className={styles.filterPill}>
                                     {filter.label}
                                 </Pill>
                             ))}
                         </Box>
                     )}
 
-                    {/* Most Relevant Results Section (Conditional) */}
+                    {/* Most Relevant Results Section */}
                     {shouldShowRelevantResults && (
                         <Box className={styles.resultsSection}>
                             <Title order={2} className={styles.sectionTitle}>
@@ -321,28 +346,34 @@ export default function DiscoverPage() {
                     {/* You Might Be Interested In Section */}
                     <Box className={styles.resultsSection}>
                         <Title order={2} className={styles.sectionTitle}>You might be interested in...</Title>
-                        {isLoadingInterested && <Center><Loader /></Center>}
-                        {interestedError && <Alert color="red" title="Error" icon={<IconAlertCircle />}>{interestedError}</Alert>}
-                        {!isLoadingInterested && !interestedError && interestedProjects.length === 0 && (
+                        {isAuthenticated && isLoadingRecommendations && <Center><Loader /></Center>}
+                        {isAuthenticated && recommendationsError && <Alert color="orange" title="Recommendations Unavailable" icon={<IconAlertCircle />}>{recommendationsError}</Alert>}
+                        {isAuthenticated && !isLoadingRecommendations && !recommendationsError && recommendedProjects.length === 0 && (
                             <Center mih={100}>
-                                <Text c="dimmed">No other projects to show right now.</Text>
+                                <Text c="dimmed">No specific recommendations found for you right now.</Text>
                             </Center>
                         )}
-                        {!isLoadingInterested && !interestedError && interestedProjects.length > 0 && (
+                        {!isAuthenticated && !initialCheckComplete && (
+                            <Center><Loader size="sm" /></Center>
+                        )}
+                        {!isAuthenticated && initialCheckComplete && (
+                            <Center mih={100}>
+                                <Text c="dimmed">Log in to see personalized recommendations.</Text>
+                            </Center>
+                        )}
+                        {isAuthenticated && !isLoadingRecommendations && !recommendationsError && recommendedProjects.length > 0 && (
                             <Stack gap="md">
-                                {interestedProjects.map(project => (
+                                {recommendedProjects.map(({ project, reasons }) => (
                                     <InterestedProjectItem
                                         key={project.id}
                                         id={project.id}
                                         title={project.title}
-                                        description={project.description} // Pass description
+                                        description={project.description}
                                         skills={project.requiredSkills || []}
                                         tags={project.tags || []}
-                                        numOfMembers={project.numOfMembers || 'N/A'} // Pass numOfMembers
-                                        // Use first tag or placeholder for category
-                                        // category={project.tags?.[0] || 'UI/UX'}
-                                        // Use actual project status if available and matches options, otherwise default
+                                        numOfMembers={project.numOfMembers || 'N/A'}
                                         status={projectStatusOptions.find(opt => opt.value === project.projectType)?.label || 'Open to application'}
+                                        recommendationReasons={reasons}
                                     />
                                 ))}
                             </Stack>
@@ -353,4 +384,3 @@ export default function DiscoverPage() {
         </Container>
     );
 }
-
