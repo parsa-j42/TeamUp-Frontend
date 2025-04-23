@@ -42,10 +42,13 @@ export default function MyApplicationsPage() {
         console.log(`Fetching applications: filter=${activeTab}, projectId=${selectedProjectId}`);
         try {
             const queryParams: FindApplicationsQueryDto = {
+                // Add applicantId: 'me' when viewing 'all' applications
+                ...(activeTab === 'all' && { applicantId: 'me' }),
                 ...(activeTab !== 'all' && { filter: activeTab }),
                 ...(selectedProjectId && { projectId: selectedProjectId }),
                 take: 50
             };
+            // Remove undefined keys (no change needed here)
             Object.keys(queryParams).forEach(key => queryParams[key as keyof FindApplicationsQueryDto] === undefined && delete queryParams[key as keyof FindApplicationsQueryDto]);
 
             const params = new URLSearchParams(queryParams as any).toString();
@@ -53,6 +56,7 @@ export default function MyApplicationsPage() {
             setApplications(data.applications);
         } catch (err: any) {
             console.error('[MyApplicationsPage] Error fetching applications:', err);
+            // Ensure the error message reflects the actual backend response if available
             setApplicationsError(err.data?.message || err.message || 'Failed to load applications.');
             setApplications([]);
         } finally {
@@ -125,9 +129,12 @@ export default function MyApplicationsPage() {
     const renderApplicationItem = (app: ApplicationDto) => {
         const showActions = activeTab === 'received' &&
             (app.status === ApplicationStatus.PENDING || app.status === ApplicationStatus.INVITED);
+        // Determine if the application was sent or received for the 'all' tab display
+        const isSent = app.applicantId === userDetails?.id;
+        const titlePrefix = activeTab === 'all' ? (isSent ? '[Sent] ' : '[Received] ') : '';
         const titleText = app.roleAppliedFor
-            ? `${app.roleAppliedFor} @ ${app.project.title}`
-            : app.project.title;
+            ? `${titlePrefix}${app.roleAppliedFor} @ ${app.project.title}`
+            : `${titlePrefix}${app.project.title}`;
 
         return (
             <Box key={app.id}>
@@ -135,16 +142,19 @@ export default function MyApplicationsPage() {
                     {/* Left Side */}
                     <Stack gap="xs" style={{ flexGrow: 1, overflow: 'hidden', marginRight: 'var(--mantine-spacing-md)' }}>
                         <Group gap="xs" className={classes.itemHeader}>
-                            <IconClock size={16} color='black' stroke={1.5}/> {/* Icon color black */}
-                            <Text size="xs" c="black" title={dayjs(app.createdAt).format('YYYY-MM-DD HH:mm')}> {/* Time text black */}
+                            <IconClock size={16} color='black' stroke={1.5}/>
+                            <Text size="xs" c="black" title={dayjs(app.createdAt).format('YYYY-MM-DD HH:mm')}>
                                 {formatRelativeTime(app.createdAt)}
                             </Text>
+                            {/* Display status clearly, especially in 'all' view */}
+                            <Text size="xs" c="dimmed">({app.status})</Text>
                         </Group>
                         <Title order={4} className={classes.itemTitle} lineClamp={1}>
                             {titleText}
-                            {app.status === ApplicationStatus.INVITED && activeTab === 'received' && ' (Invitation)'}
+                            {app.status === ApplicationStatus.INVITED && activeTab !== 'sent' && ' (Invitation)'}
                         </Title>
-                        {(activeTab === 'received') ? (
+                        {/* Show applicant info if received, or project info if sent/all */}
+                        {(activeTab === 'received' || (activeTab === 'all' && !isSent)) ? (
                             <Group
                                 gap="xs"
                                 className={classes.applicantInfo}
@@ -152,24 +162,23 @@ export default function MyApplicationsPage() {
                                 wrap="nowrap"
                             >
                                 <Avatar radius="xl" size="sm" className={classes.applicantAvatar}>
-                                    {/* Placeholder initials or icon */}
                                     {app.applicant.firstName?.[0] || '?'}
                                     {app.applicant.lastName?.[0] || ''}
                                 </Avatar>
                                 <Text size="sm" className={classes.applicantNameText} lineClamp={1}>
-                                    {`${app.applicant.preferredUsername} ${app.applicant.lastName}`} - Go to profile page if clicked
+                                    Applicant: {`${app.applicant.preferredUsername} ${app.applicant.lastName}`}
                                 </Text>
                             </Group>
                         ) : (
                             <Group gap="xs">
                                 <Text size="sm" c="dimmed" lineClamp={1}>
-                                    Project: {app.project.title} (Status: {app.status})
+                                    Project: {app.project.title}
                                 </Text>
                             </Group>
                         )}
                     </Stack>
 
-                    {/* Right Side: Action Buttons */}
+                    {/* Right Side: Action Buttons (Only show for received pending/invited) */}
                     {showActions && (
                         <Group gap="sm" wrap="nowrap" style={{ flexShrink: 0 }}>
                             <Button
@@ -249,7 +258,8 @@ export default function MyApplicationsPage() {
                     )}
                     {!isLoadingApplications && !applicationsError && applications.length === 0 && (
                         <Center mih={150}>
-                            <Text c="dimmed">No {activeTab !== 'all' ? activeTab : ''} applications {selectedProjectId ? 'for this project' : ''} found.</Text>
+                            {/* Updated empty state message */}
+                            <Text c="dimmed">No {activeTab !== 'all' ? activeTab : ''} applications {selectedProjectId ? 'for this project' : (activeTab === 'all' ? 'found' : '')} found.</Text>
                         </Center>
                     )}
                     {!isLoadingApplications && !applicationsError && applications.length > 0 && (

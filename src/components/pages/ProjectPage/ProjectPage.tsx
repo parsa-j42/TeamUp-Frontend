@@ -192,7 +192,7 @@ export default function ProjectPage() {
                             {members.length === 0 ? (
                                 <Text size="sm" c="dimmed">No members yet.</Text>
                             ) : (
-                                <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
+                                <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="sm">
                                     {members.map((member) => (
                                         <Stack key={member.id} align="left" ta="left" gap="xs">
                                             <Avatar src={undefined /* member.user.avatarUrl? */} radius="xl" size="lg" color="gray" />
