@@ -578,7 +578,7 @@ export default function ProfilePage() {
             </Container>
 
             {/* --- Portfolio Projects Section --- */}
-            <Container size="100%" mt="lg" p="xl" pt="0">
+            <Container mx="12%" size="100%" mt="lg" p="xl" pt="0">
                 <Paper radius="md" p="lg" shadow="sm">
                     <Stack gap="lg">
                         <Title order={3} fw={500}>Portfolio Projects</Title>
