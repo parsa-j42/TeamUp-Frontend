@@ -142,7 +142,10 @@ export function ProjectCard({
                     {/* Back Face Content */}
                     <Stack justify="space-between" h="100%">
                         <Stack gap="sm">
-                            <Title order={4} c="#1696b6" fw={600}>Description</Title>
+                            <Title order={2} size={27} fw={600} c="#1696b6" lineClamp={1}>
+                                {title}
+                            </Title>
+                            <Title order={4} c="mainBlue.7" fw={500}>Description</Title>
                             <Box className={classes.descriptionText}>
                                 <Text>
                                     {description}
@@ -152,7 +155,7 @@ export function ProjectCard({
                         <Group justify="flex-end">
                             <Button
                                 variant="filled"
-                                color="mainPurple.6"
+                                color="mainBlue.6"
                                 radius="xl"
                                 onClick={handleApplyClick}
                                 disabled={!id} // Disable if no ID

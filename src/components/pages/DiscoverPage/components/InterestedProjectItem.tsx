@@ -1,26 +1,31 @@
-import { Paper, Group, Stack, Text, Title, Badge, useMantineTheme } from '@mantine/core';
+import { useState } from 'react';
+import { Paper, Group, Stack, Text, Title, Badge, Collapse } from '@mantine/core';
+import { IconUsers } from '@tabler/icons-react'; // Import IconUsers
 import { useNavigate } from 'react-router-dom';
 import classes from '../DiscoverPage.module.css';
 
 export interface InterestedProjectItemProps {
     id: string;
     title: string;
+    description: string; // Added description prop
     skills: string[];
     tags: string[];
-    category?: string; // e.g., "UI/UX"
+    numOfMembers: string; // Added numOfMembers prop
+    // category?: string; // Removed category, using status badge only
     status?: string; // e.g., "Open to application"
 }
 
 export function InterestedProjectItem({
                                           id,
                                           title,
+                                          description = 'No description available.', // Default description
                                           skills = [],
                                           tags = [],
-                                          category = "UI/UX", // Default category from screenshot
-                                          status = "Open to application" // Default status from screenshot
+                                          numOfMembers = 'N/A', // Default members
+                                          status = "Open to application" // Default status
                                       }: InterestedProjectItemProps) {
-    const theme = useMantineTheme();
     const navigate = useNavigate();
+    const [isHovered, setIsHovered] = useState(false);
 
     const handleNavigate = () => {
         navigate(`/project/${id}`);
@@ -28,53 +33,72 @@ export function InterestedProjectItem({
 
     return (
         <Paper
-            component="button" // Make it clickable
+            // component="button" // Removed button component, Paper handles click
             onClick={handleNavigate}
             p="lg"
-            radius="lg" // Use larger radius as per screenshot
-            className={classes.interestedItemPaper} // Apply specific styles
-            withBorder={false} // No border shown in screenshot
+            radius="lg"
+            className={classes.interestedItemPaper}
+            withBorder={false}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{ cursor: 'pointer' }} // Add pointer cursor for click indication
         >
-            <Group justify="space-between" wrap="nowrap" align="flex-start"> {/* Align badges top */}
-                {/* Left Side: Title, Skills, Tags */}
-                <Stack gap="xs" style={{ flexGrow: 1, overflow: 'hidden' }}>
-                    <Text size="sm" c="dimmed" lineClamp={1}>team name</Text> {/* Placeholder */}
-                    <Title order={3} size="h4" fw={600} c={theme.colors.mainBlue[6]} lineClamp={1}>
-                        {title}
-                    </Title>
-                    {/* Skills Section */}
-                    <Group gap="xs" wrap="nowrap">
-                        <Text fw={600} size="sm" c="black">Primary Skills:</Text>
-                        <Group gap={4} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                            {skills.slice(0, 3).map((skill, index) => (
-                                <Text key={skill} size="sm" fw={600} c="black">
-                                    {skill}{index < (skills.length - 1) && index < 2 ? ',' : ''}
-                                </Text>
-                            ))}
-                            {skills.length > 3 && <Text size="sm" fw={600} c="black">...</Text>}
-                        </Group>
+            <Stack gap="md"> {/* Main vertical stack */}
+                {/* Top Row: Members | Status Badge */}
+                <Group justify="space-between" align="center">
+                    <Group gap="xs" align="center">
+                        <IconUsers size={17} color="grey" />
+                        <Text c="dimmed" size="sm">{numOfMembers}</Text>
                     </Group>
-                    {/* Tags Section */}
-                    <Group gap={4} wrap="nowrap" style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                        {tags.slice(0, 5).map((tag) => (
-                            <Text key={tag} size="sm" c="dimmed">
-                                #{tag}
-                            </Text>
-                        ))}
-                        {tags.length > 5 && <Text size="sm" c="dimmed">...</Text>}
-                    </Group>
-                </Stack>
-
-                {/* Right Side: Badges */}
-                <Group gap="sm" style={{ flexShrink: 0 }}> {/* Prevent shrinking */}
-                    <Badge variant="outline" radius="sm" className={classes.interestedItemBadge}>
-                        {category}
-                    </Badge>
                     <Badge variant="outline" radius="sm" className={classes.interestedItemBadge}>
                         {status}
                     </Badge>
                 </Group>
-            </Group>
+
+                {/* Title Row (Styled like ProjectCard) */}
+                <Title order={2} size={27} fw={600} c="#1696b6" lineClamp={1}>
+                    {title}
+                </Title>
+
+                {/* Skills Row (Styled like ProjectCard) */}
+                <Group gap="xs" wrap="nowrap">
+                    <Text fw={600} size="sm">Primary Skills:</Text>
+                    <Group gap={4} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {/* Match ProjectCard: slice(0, 3), comma logic */}
+                        {skills?.slice(0, 3).map((skill, index) => (
+                            <Text key={skill} size="sm" fw={600}>
+                                {skill}{index < (skills.length - 1) && index < 2 ? ',' : ''}
+                            </Text>
+                        ))}
+                        {skills?.length > 3 && <Text size="sm" fw={600}>...</Text>}
+                    </Group>
+                </Group>
+
+                {/* Tags Row (Styled like ProjectCard) */}
+                <Group gap="xs" wrap="nowrap">
+                    {/* Match ProjectCard: slice(0, 4), dimmed text */}
+                    <Group gap={4} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        {tags?.slice(0, 4).map((tag) => (
+                            <Text key={tag} size="sm" c="dimmed">
+                                #{tag}
+                            </Text>
+                        ))}
+                        {tags?.length > 4 && <Text size="sm" c="dimmed">...</Text>}
+                    </Group>
+                </Group>
+
+                {/* Description Section (Revealed on Hover) */}
+                <Collapse in={isHovered}>
+                    <Stack gap="xs" mt="md"> {/* Add margin-top for spacing */}
+                        {/* Title similar to ProjectCard back */}
+                        <Title order={4} c="mainBlue.7" fw={500}>Description</Title>
+                        {/* Description text */}
+                        <Text size="sm" c="black" lineClamp={3}> {/* Limit lines */}
+                            {description}
+                        </Text>
+                    </Stack>
+                </Collapse>
+            </Stack>
         </Paper>
     );
 }

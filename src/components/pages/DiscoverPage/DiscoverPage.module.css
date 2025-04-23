@@ -21,7 +21,7 @@
 
 /* --- Filter Controls --- */
 .filterControlsContainer {
-    margin-bottom: var(--mantine-spacing-xl);
+    margin-bottom: 0;
     /* Use Grid for precise layout */
 }
 
@@ -83,8 +83,8 @@
 }
 
 .filterPillsContainer {
-    margin-top: var(--mantine-spacing-md);
-    margin-bottom: var(--mantine-spacing-lg);
+    margin-top: 0;
+    /*margin-bottom: var(--mantine-spacing-lg);*/
     display: flex;
     flex-wrap: wrap;
     gap: var(--mantine-spacing-xs);
@@ -96,7 +96,7 @@
     color: #e67700; /* Dark yellow text */
     font-weight: 500;
     border-radius: var(--mantine-radius-xl);
-    padding: 3px var(--mantine-spacing-xs); /* Adjust padding */
+    padding-bottom: 3px var(--mantine-spacing-xl); /* Adjust padding */
     font-size: var(--mantine-font-size-xs);
 
     & .mantine-Pill-remove {
@@ -122,25 +122,45 @@
 
 /* Styles for the InterestedProjectItem */
 .interestedItemPaper {
-    background-color: #e7f5ff; /* Light blue background */
+    background-color: #effafd; /* Light blue background */
     border: none; /* No border */
-    transition: box-shadow 0.2s ease;
+    /* Add height to transition for Collapse effect */
+    transition: box-shadow 0.3s ease, height 0.3s ease;
     cursor: pointer;
-    border-radius: var(--mantine-radius-lg); /* Match screenshot radius */
+    border-radius: var(--mantine-radius-lg);
+    box-shadow: var(--mantine-shadow-md);
+    overflow: hidden; /* Ensure content doesn't overflow during transition */
 
     &:hover {
-        box-shadow: var(--mantine-shadow-sm);
+        box-shadow: var(--mantine-shadow-xxl);
     }
 }
 
 .interestedItemBadge {
-    background-color: white;
-    border: 1px solid #fcc419; /* Yellow border */
-    color: #e67700; /* Dark yellow text */
+    background-color: #faf4dc;
+    border: 2px solid #ffb701; /* Yellow border */
+    color: black; /* Dark yellow text */
     font-weight: 500;
     text-transform: none;
-    border-radius: var(--mantine-radius-sm); /* Match screenshot radius */
+    border-radius: var(--mantine-radius-md); /* Match screenshot radius */
     font-size: var(--mantine-font-size-xs); /* Match screenshot size */
     height: auto; /* Adjust height automatically */
     padding: 4px 8px; /* Adjust padding */
+}
+
+.textInputOutline:focus-within {
+    border-color: transparent !important;
+    outline: none  !important;
+    box-shadow: 0 0 12px var(--mantine-color-mainBlue-6);
+    border-radius: 12px;
+}
+
+.dropdown {
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.7) 0%, rgba(55, 197, 231, 0.2) 50%, rgba(255, 255, 255, 0.1) 100%);
+    color: black;
+    border: none;
+    box-shadow: #37c5e7 0px 0px 0px 1px, #37c5e7 0px 4px 16px;
+    border-radius: 15px;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }

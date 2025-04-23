@@ -1,7 +1,7 @@
 .cardContainer {
     perspective: 1000px; /* Needed for the 3D flip effect */
-    width: 430px; /* Match card width */
-    height: 270px; /* Match card height */
+    width: 450px; /* Match card width */
+    height: 280px; /* Match card height */
     cursor: pointer;
 }
 
