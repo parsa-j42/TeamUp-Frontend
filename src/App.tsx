@@ -8,6 +8,7 @@ import { AppRouter } from "./routes";
 import { BrowserRouter, useLocation } from "react-router-dom";
 import { AuthProvider } from '@contexts/AuthContext';
 import {ShellFooter} from "@components/layout/ShellFooter/ShellFooter.tsx";
+import { DemoBanner } from '@components/shared/DemoBanner/DemoBanner';
 import './global.css';
 
 const AppContent = () => {
@@ -51,6 +52,7 @@ const AppContent = () => {
         >
             {shouldShowNavbar && <NavBar />}
             <AppShell.Main px="13%" pt={`calc(60px + var(--mantine-spacing-xs))`} pb="0">
+                <DemoBanner />
                 <AppRouter />
             </AppShell.Main>
             <ShellFooter/>

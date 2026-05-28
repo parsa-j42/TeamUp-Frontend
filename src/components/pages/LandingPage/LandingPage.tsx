@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { signIn } from 'aws-amplify/auth';
 import {
     Box, Button, Group, Image, Stack, Text, Title, useMantineTheme, Loader, Alert, Center,
     Container, SimpleGrid, Paper, Anchor
@@ -38,6 +39,27 @@ export default function LandingPage() {
     const [myProjects, setMyProjects] = useState<ProjectDto[]>([]);
     const [isLoadingMyProjects, setIsLoadingMyProjects] = useState(true);
     const [myProjectsError, setMyProjectsError] = useState<string | null>(null);
+
+    // --- Demo login ---
+    const [isDemoLoading, setIsDemoLoading] = useState(false);
+    const [demoError, setDemoError] = useState<string | null>(null);
+    const demoEmail = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
+    const demoPassword = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
+    const showDemoButton = !isAuthenticated && initialCheckComplete && !!demoEmail && !!demoPassword;
+
+    const handleDemoLogin = async () => {
+        if (isDemoLoading || !demoEmail || !demoPassword) return;
+        setIsDemoLoading(true);
+        setDemoError(null);
+        try {
+            await signIn({ username: demoEmail, password: demoPassword });
+            navigate('/discover');
+        } catch {
+            setDemoError('Demo login failed. Please try again.');
+        } finally {
+            setIsDemoLoading(false);
+        }
+    };
 
     // --- Fetch Latest Projects (Fallback) ---
     const fetchLatestProjects = useCallback(async () => {
@@ -177,7 +199,14 @@ export default function LandingPage() {
                                         onClick={() => navigate(createProjectTarget)}>Create Project</Button>
                                 <Button variant="filled" color="mainBlue.6" radius="md" size="lg" w="195px"
                                         onClick={() => navigate("/Discover")}>Find a Project</Button>
+                                {showDemoButton && (
+                                    <Button variant="outline" color="mainBlue.6" radius="md" size="lg" w="195px"
+                                            onClick={handleDemoLogin} loading={isDemoLoading}>
+                                        Try Demo
+                                    </Button>
+                                )}
                             </Group>
+                            {demoError && <Text size="sm" c="red" mt="xs">{demoError}</Text>}
                         </Stack>
                         <Image src="/landing_image.png" h={450} w="auto" style={{ flexShrink: 0 }}/>
                     </Group>
