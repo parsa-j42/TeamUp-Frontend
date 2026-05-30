@@ -24,7 +24,7 @@ export function DemoBanner() {
     return (
         <Box style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1000 }}>
             <Group gap={6} p="xs" bg="blue.1" style={{ borderRadius: 999, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
-                <Badge color="blue" variant="filled" radius="xl" size="md">
+                <Badge color="blue" variant="white" radius="xl" size="md">
                     Demo mode
                 </Badge>
                 <ActionIcon variant="subtle" color="blue" size="sm" onClick={handleDismiss} aria-label="Dismiss">
