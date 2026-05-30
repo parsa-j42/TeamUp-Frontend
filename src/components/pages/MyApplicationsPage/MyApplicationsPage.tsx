@@ -135,7 +135,7 @@ export default function MyApplicationsPage() {
 
         return (
             <Box key={app.id}>
-                <Group justify="space-between" align="center" wrap="nowrap" className={classes.applicationItem}>
+                <Group justify="space-between" align="center" gap="sm" className={classes.applicationItem}>
                     {/* Left Side */}
                     <Stack gap="xs" style={{ flexGrow: 1, overflow: 'hidden', marginRight: 'var(--mantine-spacing-md)' }}>
                         <Group gap="xs" className={classes.itemHeader}>

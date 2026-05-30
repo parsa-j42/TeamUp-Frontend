@@ -13,7 +13,7 @@
 
 .title {
     font-weight: 600;
-    font-size: 28px; /* Adjust as needed */
+    font-size: clamp(1.5rem, 4vw, 28px);
     color: var(--mantine-color-black);
 }
 
@@ -51,9 +51,8 @@
 
 .projectsGrid {
     display: grid;
-    /* Adjust minmax for MyProjectItemCard width + gap */
-    /* Using 1fr allows cards to stretch */
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    /* Cards aim for 450px but collapse to full width before overflowing a phone. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 450px), 1fr));
     gap: var(--mantine-spacing-xl);
     padding-left: var(--mantine-spacing-md); /* Add some padding */
     padding-right: var(--mantine-spacing-md);

@@ -5,7 +5,7 @@
 }
 
 .pageTitle {
-    font-size: 32px;
+    font-size: clamp(1.6rem, 5vw, 32px);
     font-weight: 600;
     margin-top: var(--mantine-spacing-xl);
     margin-bottom: var(--mantine-spacing-xl);
@@ -14,7 +14,7 @@
 .sectionCardGlass {
     /*background-color: white;*/
     border-radius: var(--mantine-radius-md);
-    padding: var(--mantine-spacing-xl);
+    padding: clamp(16px, 3vw, 32px);
     margin-bottom: var(--mantine-spacing-xl);
     box-shadow: var(--mantine-shadow-xs);
 }
@@ -22,13 +22,13 @@
 .sectionCard {
     /*background-color: white;*/
     border-radius: var(--mantine-radius-md);
-    padding: var(--mantine-spacing-xl);
+    padding: clamp(16px, 3vw, 32px);
     margin-bottom: var(--mantine-spacing-xl);
 }
 
 .greySection {
     background-color: #f6f6f6;
-    padding: var(--mantine-spacing-xl);
+    padding: clamp(16px, 3vw, 32px);
     margin-bottom: var(--mantine-spacing-xl);
     box-shadow: var(--mantine-shadow-xs);
 }
@@ -44,7 +44,7 @@
 }
 
 .projectHeaderTitle {
-    font-size: 28px;
+    font-size: clamp(1.5rem, 4vw, 28px);
     font-weight: 600;
     margin-bottom: var(--mantine-spacing-xs);
 }
@@ -56,7 +56,7 @@
 }
 
 .sectionTitle {
-    font-size: 22px;
+    font-size: clamp(1.25rem, 3vw, 22px);
     font-weight: 600;
     margin-bottom: var(--mantine-spacing-lg);
 }
@@ -169,7 +169,7 @@
 }
 
 .taskTitle {
-    font-size: 24px; /* Large task title */
+    font-size: clamp(1.25rem, 3.5vw, 24px); /* Large task title */
     font-weight: 600;
     margin-bottom: var(--mantine-spacing-sm);
 }

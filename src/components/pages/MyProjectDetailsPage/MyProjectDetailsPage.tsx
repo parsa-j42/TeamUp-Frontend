@@ -325,7 +325,7 @@ export default function MyProjectDetailsPage() {
     // --- Render Page ---
     return (
         <GradientBackground className={classes.pageWrapper} gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.15) 0%, rgba(255, 255, 255, 1) 40%, rgba(255, 255, 255, 1) 100%)" py="10px">
-            <Container size="xl" px="12%" style={{ maxWidth: '100%' }}>
+            <Container size="xl" px="var(--page-gutter)" style={{ maxWidth: '100%' }}>
                 <Title order={1} className={classes.pageTitle}>My Project Details</Title>
 
                 {error && !editMilestoneModalOpened && !addTaskModalOpened && !assignTaskModalOpened && !inviteModalOpened && ( // Hide general error if a modal has specific error
