@@ -116,7 +116,7 @@
 .sectionTitle {
     margin-bottom: var(--mantine-spacing-lg);
     font-weight: 600;
-    font-size: 28px;
+    font-size: clamp(1.35rem, 4vw, 28px);
     color: var(--mantine-color-black);
 }
 

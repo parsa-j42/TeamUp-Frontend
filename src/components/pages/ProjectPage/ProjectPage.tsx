@@ -161,8 +161,8 @@ export default function ProjectPage() {
     return (
         <GradientBackground gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%,
                 rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
-            <Box p="xl">
-                <Container size="md" py="xl" px="xl" bg="rgba(217, 217, 217, 0.40)" style={{ borderRadius: theme.radius.md }} >
+            <Box p="clamp(12px, 3vw, 32px)">
+                <Container size="md" py="xl" px="clamp(16px, 4vw, 32px)" bg="rgba(217, 217, 217, 0.40)" style={{ borderRadius: theme.radius.md }} >
                     {/* Display API error for actions (e.g., apply/bookmark failure) */}
                     {error && ( <Alert icon={<IconAlertCircle size="1rem" />} title="Action Error" color="red" withCloseButton onClose={() => setError(null)} mb="lg"> {error} </Alert> )}
 
