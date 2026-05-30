@@ -31,6 +31,41 @@
     width: 98% !important;
 }
 
+/* Fluid headings: keep the desktop sizes at the top of the clamp, scale down on phones. */
+.heroTitle {
+    font-size: clamp(1.9rem, 6vw, 46px);
+}
+
+.sectionTitle {
+    font-size: clamp(1.4rem, 4vw, 31px);
+}
+
+/* Hero artwork: full height on desktop, shrinks to the column width below md. */
+.heroImage {
+    height: 450px;
+    width: auto;
+    max-width: 100%;
+}
+
+@media (max-width: 62em) {
+    .heroImage {
+        height: auto;
+        width: 100%;
+        max-width: 420px;
+    }
+}
+
+/* Hero CTA buttons keep their fixed width on desktop and go full width on phones. */
+.heroButton {
+    width: 195px;
+}
+
+@media (max-width: 36em) {
+    .heroButton {
+        width: 100%;
+    }
+}
+
 .categoryPaper {
     cursor: pointer;
     position: relative;

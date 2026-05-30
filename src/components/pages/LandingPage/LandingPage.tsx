@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { signIn } from 'aws-amplify/auth';
 import {
-    Box, Button, Group, Image, Stack, Text, Title, useMantineTheme, Loader, Alert, Center,
+    Box, Button, Flex, Group, Image, Stack, Text, Title, useMantineTheme, Loader, Alert, Center,
     Container, SimpleGrid, Paper, Anchor
 } from '@mantine/core';
 import { useNavigate } from "react-router-dom";
@@ -184,23 +184,28 @@ export default function LandingPage() {
         <Stack gap={0}>
             {/* Top Section */}
             <GradientBackground gradient="linear-gradient(270deg, rgba(255, 255, 255, 1) 0%, rgba(55, 197, 231, 0.3) 50%, rgba(255, 255, 255, 1) 100%)">
-                <Box pt="80px" pb="80px" mb="xl" pl="13%" pr="13%">
-                    <Group justify="center" align="top" gap="100px" wrap="nowrap">
-                        <Stack align="flex-start" gap="xs" style={{ flexShrink: 0 }}>
-                            <Title order={1} ta="left" size="46px" fw={600} lh={1.2}>
-                                Turn your ideas <br/>into reality. <br/>
-                                <Text span c="mainBlue.6" inherit>Build. Collaborate. <br/>Launch.</Text>
+                <Box pt="clamp(48px, 8vw, 80px)" pb="clamp(48px, 8vw, 80px)" mb="xl" px="var(--page-gutter)">
+                    <Flex
+                        justify="center"
+                        align={{ base: 'center', md: 'flex-start' }}
+                        direction={{ base: 'column', md: 'row' }}
+                        gap={{ base: 'xl', md: '100px' }}
+                    >
+                        <Stack align="flex-start" gap="xs">
+                            <Title order={1} ta="left" fw={600} lh={1.2} className={classes.heroTitle}>
+                                Turn your ideas into reality.{' '}
+                                <Text span c="mainBlue.6" inherit>Build. Collaborate. Launch.</Text>
                             </Title>
                             <Text size="lg" ta="left" lh={1.4}>
-                                Post your project ideas and find the <br/> best‑fit team members.
+                                Post your project ideas and find the best‑fit team members.
                             </Text>
-                            <Group mt="xl">
-                                <Button variant="filled" color="mainBlue.6" radius="md" size="lg" w="195px"
+                            <Group mt="xl" w="100%">
+                                <Button variant="filled" color="mainBlue.6" radius="md" size="lg" className={classes.heroButton}
                                         onClick={() => navigate(createProjectTarget)}>Create Project</Button>
-                                <Button variant="filled" color="mainBlue.6" radius="md" size="lg" w="195px"
+                                <Button variant="filled" color="mainBlue.6" radius="md" size="lg" className={classes.heroButton}
                                         onClick={() => navigate("/Discover")}>Find a Project</Button>
                                 {showDemoButton && (
-                                    <Button variant="outline" color="mainBlue.6" radius="md" size="lg" w="195px"
+                                    <Button variant="outline" color="mainBlue.6" radius="md" size="lg" className={classes.heroButton}
                                             onClick={handleDemoLogin} loading={isDemoLoading}>
                                         Try Demo
                                     </Button>
@@ -208,16 +213,16 @@ export default function LandingPage() {
                             </Group>
                             {demoError && <Text size="sm" c="red" mt="xs">{demoError}</Text>}
                         </Stack>
-                        <Image src="/landing_image.png" h={450} w="auto" style={{ flexShrink: 0 }}/>
-                    </Group>
+                        <Image src="/landing_image.png" className={classes.heroImage} />
+                    </Flex>
                 </Box>
             </GradientBackground>
 
             {/* Recommended / Latest Section - UPDATED */}
             <GradientBackground gradient="linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(55, 197, 231, 0.3) 30%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
-                <Stack pt="50px" pb="50px" pl="13%" pr="0" gap="xl">
+                <Stack pt="50px" pb="50px" pl="var(--page-gutter)" pr="0" gap="xl">
                     {/* Use dynamic title */}
-                    <Title order={2} size="31px" fw={400}>{sectionTitle}</Title>
+                    <Title order={2} fw={400} className={classes.sectionTitle}>{sectionTitle}</Title>
 
                     {/* Handle loading state */}
                     {isLoadingSection && <Center><Loader /></Center>}
@@ -242,7 +247,7 @@ export default function LandingPage() {
             {/* Explore Project By Category Section */}
             <Container size="lg" py="xl" mt="60px" mb="130px">
                 <Stack align="center" gap="lg">
-                    <Title order={2} ta="center" size="31px" fw={400}>Explore Project By Category</Title>
+                    <Title order={2} ta="center" fw={400} className={classes.sectionTitle}>Explore Project By Category</Title>
                     <Text ta="center" size="lg" c="dimmed" maw={600}>
                         Find projects that match your interests and skills
                     </Text>
@@ -279,10 +284,10 @@ export default function LandingPage() {
                     <Container size="lg" py="xl" mt="xl" mb="xl">
                         <Stack gap="lg">
                             <Group justify="space-between" mb="xl">
-                                <Title order={2} size="31px" fw={400}>My Current Projects</Title>
+                                <Title order={2} fw={400} className={classes.sectionTitle}>My Current Projects</Title>
                             </Group>
                             {/* No needT for separate loading/error here as it depends on the outer condition */}
-                            <Group justify="center" gap="80px">
+                            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
                                 {myProjects.slice(0, 2).map((project) => (
                                     <MyProjectItemCard
                                         key={project.id}
@@ -294,7 +299,7 @@ export default function LandingPage() {
                                         members={project.members || []}
                                     />
                                 ))}
-                            </Group>
+                            </SimpleGrid>
                         </Stack>
                         <Group justify="flex-end">
                             <Anchor onClick={() => navigate('/my-projects')} c="dimmed" size="sm">
@@ -315,7 +320,7 @@ export default function LandingPage() {
                 <Box bg={theme.colors.gray[1]} py={110}>
                     <Container size="lg">
                         <Stack align="center" gap="lg">
-                            <Title order={2} ta="center" size="31px" fw={400}>What is TeamUp?</Title>
+                            <Title order={2} ta="center" fw={400} className={classes.sectionTitle}>What is TeamUp?</Title>
                             <Text ta="center" size="lg" lh={1.6} maw={700}>
                                 TeamUp helps students and creators find the perfect teammates and bring ideas to life.
                                 Whether you're starting your own project or joining someone else's — you're in the right place.
@@ -334,7 +339,7 @@ export default function LandingPage() {
             >
                 <Container size="lg">
                     <Stack align="center" gap="xl" py="140px">
-                        <Title order={2} ta="center" size="31px" fw={500}>
+                        <Title order={2} ta="center" fw={500} className={classes.sectionTitle}>
                             Have an idea? Post your first project now
                         </Title>
                         <Button
