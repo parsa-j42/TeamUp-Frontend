@@ -1,7 +1,40 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html, body {
     overflow-x: hidden;
     width: 100%;
     position: relative;
     margin: 0;
     padding: 0;
+}
+
+/*
+ * Single source of truth for the horizontal page gutter. The desktop design was
+ * built around a 13% inset; on smaller screens that inset eats the whole viewport,
+ * so we step it down with the layout. Everything that used to hardcode "13%"
+ * (shell, navbar, footer, full-bleed sections) reads this variable instead.
+ * Breakpoints mirror Mantine's defaults (lg 75em, md 62em, sm 48em).
+ */
+:root {
+    --page-gutter: 13%;
+}
+
+@media (max-width: 75em) {
+    :root { --page-gutter: 8%; }
+}
+
+@media (max-width: 62em) {
+    :root { --page-gutter: 6%; }
+}
+
+@media (max-width: 48em) {
+    :root { --page-gutter: 24px; }
+}
+
+@media (max-width: 30em) {
+    :root { --page-gutter: 16px; }
 }

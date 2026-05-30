@@ -39,19 +39,10 @@ const AppContent = () => {
                 offset: false
             }}
             padding="md"
-            navbar={shouldShowNavbar ? {
-                width: 300,
-                breakpoint: 'sm',
-                collapsed: { mobile: false, desktop: false }
-            } : {
-                width: 0,
-                breakpoint: 'sm',
-                collapsed: { mobile: true, desktop: true }
-            }}
             footer={shouldShowFooter ? {height: 60 } : {height: 0}}
         >
             {shouldShowNavbar && <NavBar />}
-            <AppShell.Main px="13%" pt={`calc(60px + var(--mantine-spacing-xs))`} pb="0">
+            <AppShell.Main px="var(--page-gutter)" pt={`calc(60px + var(--mantine-spacing-xs))`} pb="0">
                 <DemoBanner />
                 <AppRouter />
             </AppShell.Main>

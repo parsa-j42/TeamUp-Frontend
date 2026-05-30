@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Group, Menu, Title, Skeleton } from "@mantine/core";
+import { Avatar, Box, Button, Divider, Group, Menu, Stack, Title, Skeleton } from "@mantine/core";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@contexts/AuthContext";
 import {
@@ -9,7 +9,13 @@ import {
     IconInbox
 } from "@tabler/icons-react";
 
-export function LoggedIn() {
+interface LoggedInProps {
+    // "vertical" lays the menu out as a full-width list for the mobile drawer.
+    orientation?: 'horizontal' | 'vertical';
+    onNavigate?: () => void;
+}
+
+export function LoggedIn({ orientation = 'horizontal', onNavigate }: LoggedInProps) {
     const navigate = useNavigate();
     // Get userDetails and the specific isLoading flag from context
     const { logout, userDetails, isLoading, initialCheckComplete } = useAuth();
@@ -26,6 +32,52 @@ export function LoggedIn() {
 
     // Determine if we should show loading skeletons
     const showLoadingState = isLoading || !initialCheckComplete;
+
+    // Wrap navigation so the drawer can close itself after a tap.
+    const go = (path: string) => {
+        navigate(path);
+        onNavigate?.();
+    };
+
+    // --- Mobile drawer: flat, full-width list instead of an avatar dropdown ---
+    if (orientation === 'vertical') {
+        return (
+            <Stack gap="xs">
+                <Group gap="sm" px="xs" pb="xs" wrap="nowrap">
+                    {showLoadingState ? (
+                        <Skeleton height={42} circle />
+                    ) : (
+                        <Avatar src={avatarUrl || undefined} alt="Profile Avatar" radius="xl" size={42} color="mainPurple.1" />
+                    )}
+                    {showLoadingState ? (
+                        <Skeleton height={16} width={120} />
+                    ) : (
+                        <Title order={2} fw={450} size="16px" c="black">{displayName || 'User'}</Title>
+                    )}
+                </Group>
+                <Divider />
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        onClick={() => go("/Discover")}>Discover</Button>
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        leftSection={<IconLayoutDashboardFilled color="#37c5e7" size={21} />}
+                        onClick={() => go("/my-projects")}>My Projects</Button>
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        onClick={() => { onNavigate?.(); }}>Messages</Button>
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        leftSection={<IconInbox size={21} />}
+                        onClick={() => go("/my-applications")}>My Applications</Button>
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        leftSection={<IconUser size={22} />}
+                        onClick={() => go("/profile")}>My Profile</Button>
+                <Divider />
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        leftSection={<IconLogout color="#f10e34" size={22} />}
+                        onClick={() => { logout(); onNavigate?.(); }}>Logout</Button>
+                <Button variant="subtle" color="black" fw={400} justify="flex-start" fullWidth
+                        leftSection={<IconSettings size={22} />}>Settings</Button>
+            </Stack>
+        );
+    }
 
     return (
         <Group h="100%" p="0" justify="flex-end" gap="xl" wrap="nowrap">

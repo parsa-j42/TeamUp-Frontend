@@ -1,71 +1,58 @@
-import { useState } from 'react';
-import { AppShell, Group, Image, TextInput, rem } from "@mantine/core";
+import { useEffect } from 'react';
+import { AppShell, Group, Image, Burger, Drawer, Stack } from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { LoggedIn } from "@components/layout/NavBar/LoggedIn.tsx";
 import { LoggedOut } from "@components/layout/NavBar/LoggedOut.tsx";
-import { IconSearch } from "@tabler/icons-react";
+import { ProjectSearchInput } from "@components/layout/NavBar/ProjectSearchInput.tsx";
 import { useAuth } from "@contexts/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
 
 export function NavBar() {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
-    const [searchValue, setSearchValue] = useState('');
+    const [drawerOpened, { open, close }] = useDisclosure(false);
 
-    const handleLogoClick = () => {
-        navigate('/');
-    };
+    // The burger only exists below "sm"; close the drawer if the viewport grows past it.
+    const isDesktop = useMediaQuery('(min-width: 48em)');
+    useEffect(() => {
+        if (isDesktop && drawerOpened) close();
+    }, [isDesktop, drawerOpened, close]);
 
-    // Handle search initiation (e.g., on Enter key press)
-    const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter' && searchValue.trim()) {
-            navigate(`/discover?search=${encodeURIComponent(searchValue.trim())}`);
-        }
-    };
-
-    // Handle search initiation via icon click (optional)
-    const handleSearchIconClick = () => {
-        if (searchValue.trim()) {
-            navigate(`/discover?search=${encodeURIComponent(searchValue.trim())}`);
-        }
-    };
+    const handleLogoClick = () => navigate('/');
 
     return (
         <AppShell.Header>
-            <Group h="100%" px="13%" justify="space-between" wrap="nowrap">
+            <Group h="100%" px="var(--page-gutter)" justify="space-between" wrap="nowrap">
                 <Image fit="contain" h={57}
                        src="/TeamUpLogo.svg" alt="TeamUp Logo"
                        style={{ cursor: 'pointer' }}
                        onClick={handleLogoClick}/>
-                <Group h="100%" p="0" justify="space-between" gap="xs" wrap="nowrap" pl="60px" flex="1">
-                    <TextInput
-                        placeholder="Search Projects..." // Updated placeholder
-                        w="35%"
-                        radius="md"
-                        value={searchValue} // Controlled input
-                        onChange={(event) => setSearchValue(event.currentTarget.value)} // Update state
-                        onKeyDown={handleSearchKeyDown}
-                        rightSection={
-                            <IconSearch
-                                style={{ width: rem(19), height: rem(19), cursor: 'pointer', color: 'var(--mantine-color-mainBlue-6)' }}
-                                stroke={3}
-                                onClick={handleSearchIconClick}
-                            />
-                        }
-                        styles={(theme) => ({
-                            input: {
-                                borderColor: theme.colors.mainBlue[6],
-                                borderWidth: 2,
-                            },
-                            section: {
-                                // backgroundColor: "white",
-                                // color: "white",
-                                cursor: 'pointer', // Indicate clickable section
-                            },
-                        })}
-                    />
+
+                {/* Desktop: search and nav links sit inline in the bar */}
+                <Group h="100%" justify="space-between" gap="xs" wrap="nowrap" pl="60px" flex="1" visibleFrom="sm">
+                    <ProjectSearchInput w="35%" />
                     {isAuthenticated ? <LoggedIn /> : <LoggedOut />}
                 </Group>
+
+                {/* Mobile: collapse everything behind a burger */}
+                <Burger opened={drawerOpened} onClick={open} hiddenFrom="sm" aria-label="Open navigation" />
             </Group>
+
+            <Drawer
+                opened={drawerOpened}
+                onClose={close}
+                position="right"
+                size="xs"
+                padding="lg"
+                title={<Image h={36} fit="contain" src="/TeamUpLogo.svg" alt="TeamUp Logo" />}
+            >
+                <Stack gap="lg">
+                    <ProjectSearchInput w="100%" onSearch={close} />
+                    {isAuthenticated
+                        ? <LoggedIn orientation="vertical" onNavigate={close} />
+                        : <LoggedOut orientation="vertical" onNavigate={close} />}
+                </Stack>
+            </Drawer>
         </AppShell.Header>
     );
 }
