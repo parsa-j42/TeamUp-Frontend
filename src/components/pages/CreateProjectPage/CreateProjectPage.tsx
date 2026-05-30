@@ -18,12 +18,12 @@ export default function CreateProjectPage() {
         <GradientBackground
             gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)"
         >
-            <Box p="xl"> {/* Outer padding for the content area */}
+            <Box p="clamp(12px, 3vw, 32px)"> {/* Outer padding for the content area */}
                 {/* Container for the main form content */}
                 <Container
                     size="md" // Max width of the container
                     py="xl" // Vertical padding
-                    px="xl" // Horizontal padding inside the container
+                    px="clamp(16px, 4vw, 32px)" // Horizontal padding shrinks on small screens
                     bg="white" // White background for the form container
                     style={{
                         borderRadius: theme.radius.md, // Rounded corners

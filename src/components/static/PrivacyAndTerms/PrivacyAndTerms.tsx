@@ -45,11 +45,11 @@ export default function PrivacyAndTermsPage() {
         <GradientBackground gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%,
                 rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             {/* Content Area Container */}
-            <Container size="lg" py={100} style={{ position: 'relative', zIndex: 1, flexGrow: 1 }}>
+            <Container size="lg" px="md" py="clamp(48px, 9vw, 100px)" style={{ position: 'relative', zIndex: 1, flexGrow: 1 }}>
                 {/* Main stack for content sections */}
                 <Stack gap={50}> {/* Increased gap between main sections */}
                     {/* Page Title */}
-                    <Title order={1} ta="center" fw={500} fz={36}>Privacy and Terms</Title>
+                    <Title order={1} ta="center" fw={500} fz="clamp(1.8rem, 5vw, 36px)">Privacy and Terms</Title>
 
                     {/* Effective Date */}
                     <Text size="sm" fw={500} mt={-30}> {/* Adjusted margin */}

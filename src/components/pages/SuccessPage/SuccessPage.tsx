@@ -97,7 +97,7 @@ export default function SuccessPage() {
                     </Box>
 
                     {/* Success Text */}
-                    <Text size="28px" fw={400} c="black">
+                    <Text size="clamp(1.3rem, 5vw, 28px)" fw={400} c="black" ta="center">
                         {successMessage}
                     </Text>
 

@@ -11,6 +11,7 @@ import {
     Center,
     Container,
     Divider,
+    Flex,
     Group,
     Loader,
     Modal,
@@ -460,7 +461,7 @@ export default function ProfilePage() {
     return (
         <GradientBackground
             gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
-            <Container mx="12%" size="100%" style={{borderRadius: theme.radius.md}} p="xl">
+            <Container mx="var(--page-gutter)" size="100%" style={{borderRadius: theme.radius.md}} p="xl">
                 {/* General Page Error */}
                 {error && !profileEditOpened && !skillsEditOpened && !interestsEditOpened && !experienceEditOpened && !portfolioProjectAddOpened && !portfolioProjectEditOpened && (
                     <Alert icon={<IconAlertCircle size="1rem"/>} title="Operation Error" color="red" radius="md"
@@ -579,7 +580,7 @@ export default function ProfilePage() {
             </Container>
 
             {/* --- Portfolio Projects Section --- */}
-            <Container mx="12%" size="100%" mt="lg" p="xl" pt="0">
+            <Container mx="var(--page-gutter)" size="100%" mt="lg" p="xl" pt="0">
                 <Paper radius="md" p="lg" shadow="sm">
                     <Stack gap="lg">
                         <Title order={3} fw={500}>Portfolio Projects</Title>
@@ -596,7 +597,7 @@ export default function ProfilePage() {
                                     zIndex: 1
                                 }} onClick={() => handleOpenPortfolioProjectEdit(project)}> <IconPencil size={18}/>
                                 </ActionIcon>}
-                                <Group wrap="nowrap" align="flex-start" gap="xl">
+                                <Flex direction={{base: 'column', sm: 'row'}} align="flex-start" gap="xl">
                                     <Stack gap="md" style={{flex: 1}}>
                                         <Title order={4} fw={500}>{project.title}</Title>
                                         <Group gap="xs"> {project.tags?.map(tag => (
@@ -620,7 +621,7 @@ export default function ProfilePage() {
                                             </Box>
                                         </AspectRatio>
                                     </Box>
-                                </Group>
+                                </Flex>
                                 {/* Only show delete button if own profile */}
                                 {isOwnProfile && (
                                     <Group justify="flex-end" mt="md">

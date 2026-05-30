@@ -47,15 +47,15 @@ export default function AboutUsPage() {
         <GradientBackground gradient="linear-gradient(0deg, rgba(55, 197, 231, 0.3) 0%,
                 rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             {/* Content Area Container */}
-            <Container size="xl" py={120} style={{ position: 'relative', zIndex: 1, flexGrow: 1 }}>
+            <Container size="xl" px="md" py="clamp(56px, 10vw, 120px)" style={{ position: 'relative', zIndex: 1, flexGrow: 1 }}>
                 {/* Main stack for content sections, increased gap */}
                 <Stack gap={70}>
                     {/* About Us Title - Adjusted font weight */}
-                    <Title order={1} ta="center" fw={400} fz={42}>About Us</Title> {/* Increased font size slightly */}
+                    <Title order={1} ta="center" fw={400} fz="clamp(2rem, 6vw, 42px)">About Us</Title> {/* Increased font size slightly */}
 
                     {/* Welcome Section - Adjusted title font weight */}
                     <Stack gap="lg">
-                        <Title order={3} fw={400} fz={28}>Welcome to TeamUp</Title> {/* Adjusted fw, increased size */}
+                        <Title order={3} fw={400} fz="clamp(1.5rem, 4vw, 28px)">Welcome to TeamUp</Title> {/* Adjusted fw, increased size */}
                         <Text size="lg" lh={1.65}>
                             TeamUp is a platform designed to connect individuals with complementary skills, helping them
                             collaborate on meaningful projects. Whether you're a developer, designer, or project manager, we
@@ -65,8 +65,8 @@ export default function AboutUsPage() {
 
                     {/* TeamUp Team Section - Adjusted title font weight */}
                     <Stack gap="xl" align="center">
-                        <Title order={3} fw={400} fz={28}>TeamUp Team</Title> {/* Adjusted fw, increased size */}
-                        <SimpleGrid cols={{ base: 3, xs: 5 }} spacing="xl" mt="lg">
+                        <Title order={3} fw={400} fz="clamp(1.5rem, 4vw, 28px)">TeamUp Team</Title> {/* Adjusted fw, increased size */}
+                        <SimpleGrid cols={{ base: 2, xs: 3, sm: 5 }} spacing="xl" mt="lg">
                             {teamMembers.map((member) => (
                                 <Stack key={member.name} align="center" gap={10}>
                                     <Avatar
@@ -86,7 +86,7 @@ export default function AboutUsPage() {
 
                     {/* Our Mission Section - Adjusted title font weight */}
                     <Stack gap="lg">
-                        <Title order={3} fw={400} fz={28}>Our Mission</Title> {/* Adjusted fw, increased size */}
+                        <Title order={3} fw={400} fz="clamp(1.5rem, 4vw, 28px)">Our Mission</Title> {/* Adjusted fw, increased size */}
                         <Text size="lg" lh={1.65}>
                             We aim to bridge the gap between talented individuals and exciting opportunities by providing
                             seamless team-matching and project collaboration tools.
@@ -95,7 +95,7 @@ export default function AboutUsPage() {
 
                     {/* What We Offer Section - Adjusted title font weight */}
                     <Stack gap="lg">
-                        <Title order={3} fw={400} fz={28}>What We Offer</Title> {/* Adjusted fw, increased size */}
+                        <Title order={3} fw={400} fz="clamp(1.5rem, 4vw, 28px)">What We Offer</Title> {/* Adjusted fw, increased size */}
                         <List size="lg" spacing="lg" withPadding listStyleType='disc'>
                             <List.Item>
                                 <Text size="lg" component="span" lh={1.65}>
@@ -117,7 +117,7 @@ export default function AboutUsPage() {
 
                     {/* Join Us Section - Adjusted title font weight */}
                     <Stack gap="lg">
-                        <Title order={3} fw={400} fz={28}>Join Us</Title> {/* Adjusted fw, increased size */}
+                        <Title order={3} fw={400} fz="clamp(1.5rem, 4vw, 28px)">Join Us</Title> {/* Adjusted fw, increased size */}
                         <Text size="lg" lh={1.65}>
                             Whether you're looking to start a project or join an existing one, TeamUp helps you find the
                             perfect team and build something great together. Let's collaborate!
