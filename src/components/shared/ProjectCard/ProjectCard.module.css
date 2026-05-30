@@ -1,8 +1,9 @@
 .cardContainer {
     perspective: 1000px; /* Needed for the 3D flip effect */
-    width: 450px; /* Match card width */
+    width: min(86vw, 450px); /* Shrink to fit narrow screens, cap at the desktop width */
     height: 280px; /* Match card height */
     cursor: pointer;
+    flex-shrink: 0; /* Keep its width inside the horizontal scroll row */
 }
 
 .cardInner {
@@ -15,8 +16,15 @@
     border-radius: var(--mantine-radius-lg); /* Match card radius */
 }
 
-/* Flip the card when hovering over the container */
-.cardContainer:hover .cardInner {
+/* Flip on hover, but only on devices that actually have a hover (i.e. a mouse). */
+@media (hover: hover) {
+    .cardContainer:hover .cardInner {
+        transform: rotateY(180deg);
+    }
+}
+
+/* On touch there is no hover, so the component toggles this class on tap instead. */
+.flipped .cardInner {
     transform: rotateY(180deg);
 }
 

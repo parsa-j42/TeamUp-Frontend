@@ -73,8 +73,8 @@ const WavyBackground = ({
                     margin: '0 auto',
                     boxSizing: 'border-box',
                     width: '100%',
-                    paddingLeft: '13%',
-                    paddingRight: '13%',
+                    paddingLeft: 'var(--page-gutter)',
+                    paddingRight: 'var(--page-gutter)',
                     paddingTop: contentPaddingTop,
                     // Apply the calculated bottom padding here
                     paddingBottom: effectiveBottomPadding, // <-- Use the calculated value

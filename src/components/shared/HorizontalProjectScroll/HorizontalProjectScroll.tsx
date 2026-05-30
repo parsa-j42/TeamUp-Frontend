@@ -14,8 +14,10 @@ export interface HorizontalProjectScrollProps {
 
 export function HorizontalProjectScroll({
                                             projects,
-                                            containerWidth = 'calc(100% + 18%)', // Default matches previous usage
-                                            containerMarginRight = '-13%', // Default matches previous usage
+                                            // Bleed the row past the right gutter so cards reach the screen edge.
+                                            // Tied to --page-gutter, so it stays correct as the gutter shrinks (13% on desktop).
+                                            containerWidth = 'calc(100% + var(--page-gutter) + 5%)',
+                                            containerMarginRight = 'calc(var(--page-gutter) * -1)',
                                         }: HorizontalProjectScrollProps) {
     const theme = useMantineTheme();
     const viewportRef = useRef<HTMLDivElement>(null);

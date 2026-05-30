@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Card, Text, Title, Group, Badge, Stack, Button, Box } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconUsers, IconMessageCircleQuestion, IconSparkles, IconCoffee, IconBulb } from '@tabler/icons-react'; // Added icons
 import { useNavigate } from 'react-router-dom';
 import classes from './ProjectCard.module.css';
@@ -37,7 +39,17 @@ export function ProjectCard({
                             }: ProjectCardProps) {
     const navigate = useNavigate();
 
-    const handleApplyClick = (e: React.MouseEvent) => {
+    // No hover on touch devices, so we flip on tap instead of relying on :hover.
+    const isTouch = useMediaQuery('(hover: none)');
+    const [flipped, setFlipped] = useState(false);
+
+    const handleCardClick = () => {
+        if (isTouch) {
+            setFlipped((prev) => !prev);
+        }
+    };
+
+    const openProject = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (id) {
             navigate(`/project/${id}`);
@@ -92,7 +104,11 @@ export function ProjectCard({
     // --- End Mentor Badge Logic ---
 
     return (
-        <Box className={classes.cardContainer} {...otherProps}>
+        <Box
+            className={`${classes.cardContainer} ${isTouch && flipped ? classes.flipped : ''}`}
+            onClick={handleCardClick}
+            {...otherProps}
+        >
             <Box className={classes.cardInner}>
                 {/* --- Front Face --- */}
                 <Box className={`${classes.cardFace} ${classes.cardFront}`}>
@@ -149,7 +165,7 @@ export function ProjectCard({
                             <Text> {description} </Text>
                         </Box>
                         <Group justify="flex-end" mt="auto">
-                            <Button variant="filled" color="mainBlue.6" radius="xl" onClick={handleApplyClick} disabled={!id}> Apply </Button>
+                            <Button variant="filled" color="mainBlue.6" radius="xl" onClick={openProject} disabled={!id}> Open </Button>
                         </Group>
                     </Stack>
                 </Box>

@@ -2,6 +2,13 @@
      width: 84% !important;
 }
 
+/* On phones/tablets use the full width so cards do not leave dead space on the right. */
+@media (max-width: 48em) {
+    .scrollbarRoot {
+        width: 100% !important;
+    }
+}
+
 .scrollbar {
     background-color: transparent;
     border-radius: 10px;

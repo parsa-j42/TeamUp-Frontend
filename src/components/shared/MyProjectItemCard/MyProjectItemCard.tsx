@@ -31,8 +31,7 @@ export function MyProjectItemCard({ id, title, date, category, isOngoing, member
             radius="lg"
             p="md"
             pt="xl"
-            // Remove fixed height to allow content to determine height naturally
-            w="400px"
+            // Height follows content; width fills the grid cell it sits in.
             style={{
                 position: 'relative', // Needed for absolute positioning of the badge
                 width: '100%', // Allow card to take available width in grid
