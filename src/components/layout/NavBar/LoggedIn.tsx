@@ -1,6 +1,7 @@
 import { Avatar, Box, Button, Divider, Group, Menu, Stack, Title, Skeleton } from "@mantine/core";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@contexts/AuthContext";
+import { getUserDisplayName } from "@utils/userDisplay";
 import {
     IconLayoutDashboardFilled,
     IconLogout,
@@ -21,9 +22,7 @@ export function LoggedIn({ orientation = 'horizontal', onNavigate }: LoggedInPro
     const { logout, userDetails, isLoading, initialCheckComplete } = useAuth();
 
     // --- Get username and avatar from userDetails ---
-    const displayName = userDetails
-        ? `${userDetails.preferredUsername || userDetails.firstName} ${userDetails.lastName}`.trim() // Use preferredUsername first
-        : ''; // Default to empty if no details yet
+    const displayName = userDetails ? getUserDisplayName(userDetails) : '';
 
     // Get avatar URL from profile within userDetails
     // const avatarUrl = userDetails?.profile?.avatarUrl;

@@ -7,6 +7,7 @@ import { IconBox, IconChevronRight, IconAlertCircle } from '@tabler/icons-react'
 import '@mantine/core/styles.css';
 import { useNavigate } from "react-router-dom";
 import { apiClient } from '@utils/apiClient';
+import { getUserDisplayName } from '@utils/userDisplay';
 import { ProjectDto } from '../../types/api';
 import dayjs from 'dayjs';
 
@@ -56,10 +57,10 @@ function ProjectItem({ project, isSelected, onClick }: ProjectItemProps) {
                     {project.members?.slice(0, 4).map((member, index) => (
                         <Avatar
                             key={member.userId}
-                            alt={`${member.user.firstName} ${member.user.lastName}`}
+                            alt={getUserDisplayName(member.user)}
                             radius="xl" size="md" color={theme.colors.gray[5]}
                             style={{ marginLeft: index > 0 ? '-12px' : undefined, border: `1px solid ${theme.white}` }}
-                            title={`${member.user.firstName} ${member.user.lastName}`}
+                            title={getUserDisplayName(member.user)}
                         >
                             {`${member.user.firstName?.[0] || ''}${member.user.lastName?.[0] || ''}`}
                         </Avatar>

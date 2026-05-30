@@ -137,7 +137,6 @@ export default function SignUpPage() {
         if (step === 0) {
             if (!formData.firstName?.trim()) { newErrors.firstName = 'First name is required'; isValid = false; }
             if (!formData.lastName?.trim()) { newErrors.lastName = 'Last name is required'; isValid = false; }
-            if (!formData.preferredUsername?.trim()) { newErrors.preferredUsername = 'Preferred name is required'; isValid = false; }
             if (!formData.email?.trim() || !emailRegex.test(formData.email)) { newErrors.email = 'Valid email is required'; isValid = false; }
             if (!formData.password || !passwordRegex.test(formData.password)) { newErrors.password = 'Password must be at least 8 characters'; isValid = false; }
             if (formData.password !== formData.confirmPassword) { newErrors.confirmPassword = 'Passwords do not match'; isValid = false; }
@@ -174,7 +173,11 @@ export default function SignUpPage() {
                     options: {
                         userAttributes: {
                             email: formData.email!, given_name: formData.firstName!,
-                            family_name: formData.lastName!, preferred_username: formData.preferredUsername!,
+                            family_name: formData.lastName!,
+                            // Preferred name is optional; only send it when provided.
+                            ...(formData.preferredUsername?.trim()
+                                ? { preferred_username: formData.preferredUsername.trim() }
+                                : {}),
                         },
                     }
                 });
@@ -299,7 +302,7 @@ export default function SignUpPage() {
                         <>
                             <TextInput required variant="unstyled" label="First Name" name="firstName" value={formData.firstName || ''} onChange={handleInputChange} error={errors.firstName} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
                             <TextInput required variant="unstyled" label="Last Name" name="lastName" value={formData.lastName || ''} onChange={handleInputChange} error={errors.lastName} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
-                            <TextInput required variant="unstyled" label="Preferred Name" name="preferredUsername" value={formData.preferredUsername || ''} onChange={handleInputChange} error={errors.preferredUsername} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
+                            <TextInput variant="unstyled" label="Preferred Name (Optional)" name="preferredUsername" value={formData.preferredUsername || ''} onChange={handleInputChange} error={errors.preferredUsername} classNames={{ wrapper: styles.inputWrapper }} />
                             <TextInput required variant="unstyled" label="Email" name="email" type="email" value={formData.email || ''} onChange={handleInputChange} error={errors.email} classNames={{ wrapper: styles.inputWrapper, required: styles.asterisk }} />
                             <PasswordInput required variant="unstyled" label="Password" name="password" value={formData.password || ''} onChange={handleInputChange} error={errors.password} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput, required: styles.asterisk }} />
                             <PasswordInput required variant="unstyled" label="Confirm Password" name="confirmPassword" value={formData.confirmPassword || ''} onChange={handleInputChange} error={errors.confirmPassword} classNames={{ wrapper: styles.inputWrapper, innerInput: styles.passwordInnerInput, required: styles.asterisk }} />

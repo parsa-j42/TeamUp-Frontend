@@ -7,6 +7,7 @@ import { IconAlertCircle, IconBookmark, IconBookmarkFilled } from '@tabler/icons
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ProjectSectionCard } from './components/ProjectSectionCard';
 import { apiClient } from '@utils/apiClient';
+import { getUserDisplayName } from '@utils/userDisplay';
 import { ProjectDto, ApplicationDto, BookmarkDto } from '../../../types/api'; // Ensure correct path
 import { useAuth } from '@contexts/AuthContext';
 import GradientBackground from "@components/shared/GradientBackground/GradientBackground.tsx"; // Ensure correct path
@@ -154,8 +155,7 @@ export default function ProjectPage() {
     const currentUserId = userDetails?.id; // Use the backend ID from userDetails
     const isOwner = !!currentUserId && currentUserId === owner.id;
     const isMember = !!currentUserId && members.some(m => m.userId === currentUserId);
-    // Use preferredUsername + lastName for owner name
-    const ownerName = `${owner.preferredUsername || owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Owner Name';
+    const ownerName = getUserDisplayName(owner) || 'Owner Name';
 
     // --- Render Logic ---
     return (
@@ -196,15 +196,14 @@ export default function ProjectPage() {
                                     {members.map((member) => (
                                         <Stack key={member.id} align="left" ta="left" gap="xs">
                                             <Avatar src={undefined /* member.user.avatarUrl? */} radius="xl" size="lg" color="gray" />
-                                            {/* Use preferredUsername + lastName */}
-                                            <Text 
+                                            <Text
                                                 fw={500} 
                                                 mt="xs" 
                                                 lh={1.2}
                                                 style={{ cursor: 'pointer' }}
                                                 onClick={() => navigate(`/profile/${member.userId}`)}
                                             >
-                                                {`${member.user.preferredUsername} ${member.user.lastName}`}
+                                                {getUserDisplayName(member.user)}
                                             </Text>
                                             <Text size="sm" c="dimmed">{member.role}</Text>
                                         </Stack>

@@ -13,6 +13,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@contexts/AuthContext'; // Adjust path
 import { apiClient } from '@utils/apiClient'; // Adjust path
+import { getUserDisplayName } from '@utils/userDisplay';
 import {
     ProjectDto, ProjectMemberDto, TaskDto, SimpleUserDto, MilestoneDto, // Added MilestoneDto
     CreateTaskDto, AssignTaskDto, UpdateTaskDto, InviteUserDto, ApplicationDto,
@@ -88,7 +89,7 @@ export default function MyProjectDetailsPage() {
         { value: '', label: 'Unassigned' },
         ...(projectData?.members.map(member => ({
             value: member.userId,
-            label: `${member.user.preferredUsername} ${member.user.lastName}`
+            label: getUserDisplayName(member.user)
         })) || [])
     ];
 
@@ -354,7 +355,7 @@ export default function MyProjectDetailsPage() {
                                         style={{ cursor: 'pointer' }}
                                         onClick={() => navigate(`/profile/${member.userId}`)}
                                     >
-                                        {`${member.user.preferredUsername} ${member.user.lastName}`}
+                                        {getUserDisplayName(member.user)}
                                     </Text>
                                     <Text className={classes.memberRole}>{member.role}</Text>
                                     <Text className={classes.memberDescription}> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </Text>
@@ -463,7 +464,7 @@ export default function MyProjectDetailsPage() {
                                                         <Group justify='space-between' wrap='nowrap'>
                                                             <Stack gap={2} className={classes.taskItemContent}>
                                                                 <Text fw={500} lineClamp={1} className={classes.taskItemName}>{task.name}</Text>
-                                                                {task.assignee && (<Text className={classes.taskAssignee}> Assigned to: {task.assignee.preferredUsername} {task.assignee.lastName} </Text>)}
+                                                                {task.assignee && (<Text className={classes.taskAssignee}> Assigned to: {getUserDisplayName(task.assignee)} </Text>)}
                                                             </Stack>
                                                             {isOwner && (
                                                                 <Group gap="xs" className={classes.taskActions}>
@@ -490,7 +491,7 @@ export default function MyProjectDetailsPage() {
                 <Modal radius="md" opened={inviteModalOpened} onClose={closeInviteModal} title="Invite Member" centered>
                     <Stack>
                         {inviteError && <Alert color="red" title="Invite Error" icon={<IconAlertCircle />} withCloseButton onClose={() => setInviteError(null)}>{inviteError}</Alert>}
-                        <Select label="Search User by Name" placeholder="Start typing a name..." data={inviteSearchResults.map(u => ({ value: u.id, label: `${u.preferredUsername} ${u.lastName}` }))} searchable onSearchChange={setInviteSearchQuery} searchValue={inviteSearchQuery} value={inviteUserId} onChange={setInviteUserId} rightSection={isSearchingUsers ? <Loader size="xs" /> : null} nothingFoundMessage="No users found" />
+                        <Select label="Search User by Name" placeholder="Start typing a name..." data={inviteSearchResults.map(u => ({ value: u.id, label: getUserDisplayName(u) }))} searchable onSearchChange={setInviteSearchQuery} searchValue={inviteSearchQuery} value={inviteUserId} onChange={setInviteUserId} rightSection={isSearchingUsers ? <Loader size="xs" /> : null} nothingFoundMessage="No users found" />
                         <Group justify="flex-end" mt="md"><Button variant="outline" color="mainBlue.6" radius="md" onClick={closeInviteModal} disabled={isInvitingUser}>Cancel</Button><Button color="mainBlue.6" radius="md" onClick={handleInviteMember} loading={isInvitingUser} disabled={!inviteUserId || isInvitingUser}>Send Invitation</Button></Group>
                     </Stack>
                 </Modal>

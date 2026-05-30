@@ -1,6 +1,7 @@
 import { Paper, Group, Stack, Text, Title, Badge, Avatar, ActionIcon, useMantineTheme } from '@mantine/core';
 import { IconPalette, IconChevronRight, IconPhoto } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { getUserDisplayName } from '@utils/userDisplay';
 import { ProjectMemberDto } from '../../../types/api';
 
 export interface MyProjectItemCardProps {
@@ -95,10 +96,10 @@ export function MyProjectItemCard({ id, title, date, category, isOngoing, member
                             <Avatar
                                 key={member.userId}
                                 src={"/avatar-blue.svg"} // Use actual avatar if available
-                                alt={`${member.user.preferredUsername} ${member.user.lastName}`}
+                                alt={getUserDisplayName(member.user)}
                                 radius="xl" size="sm" color={theme.colors.gray[3]}
                                 style={{ marginLeft: index > 0 ? '-10px' : undefined, border: `1px solid ${theme.white}` }}
-                                title={`${member.user.preferredUsername} ${member.user.lastName}`}
+                                title={getUserDisplayName(member.user)}
                             >
                                 {/* Placeholder icon if no image */}
                                 <IconPhoto size="0.8rem" color={theme.colors.gray[6]} />

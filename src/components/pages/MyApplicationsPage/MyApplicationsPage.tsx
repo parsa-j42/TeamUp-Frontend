@@ -6,6 +6,7 @@ import {
 import { IconClock, IconAlertCircle, IconChevronDown } from '@tabler/icons-react';
 import { useNavigate } from "react-router-dom";
 import { apiClient } from '@utils/apiClient';
+import { getUserDisplayName } from '@utils/userDisplay';
 import { useAuth } from '@contexts/AuthContext';
 import {
     ApplicationDto, ProjectDto, FindApplicationsQueryDto,
@@ -163,7 +164,7 @@ export default function MyApplicationsPage() {
                                     {app.applicant.lastName?.[0] || ''}
                                 </Avatar>
                                 <Text size="sm" className={classes.applicantNameText} lineClamp={1}>
-                                    Applicant: {`${app.applicant.preferredUsername} ${app.applicant.lastName}`}
+                                    Applicant: {getUserDisplayName(app.applicant)}
                                 </Text>
                             </Group>
                         ) : (

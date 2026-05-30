@@ -29,6 +29,7 @@ import {IconAlertCircle, IconArrowRight, IconClock, IconPencil, IconPhoto, IconP
 import GradientBackground from '@components/shared/GradientBackground/GradientBackground';
 import {useDisclosure} from '@mantine/hooks';
 import {apiClient} from '@utils/apiClient';
+import {getUserDisplayName} from '@utils/userDisplay';
 import {useAuth} from '@contexts/AuthContext';
 import {
     CreatePortfolioProjectPayload,
@@ -443,7 +444,7 @@ export default function ProfilePage() {
     }
 
     // --- Destructure data ---
-    const {firstName, lastName, profile} = profileUserData; // Use profileUserData
+    const {profile} = profileUserData; // Use profileUserData
     const {
         status,
         institution,
@@ -455,7 +456,7 @@ export default function ProfilePage() {
         workExperiences = [],
         portfolioProjects = []
     } = profile;
-    const displayName = `${firstName || ''} ${lastName || ''}`.trim();
+    const displayName = getUserDisplayName(profileUserData);
 
     // --- Render Main Content ---
     return (

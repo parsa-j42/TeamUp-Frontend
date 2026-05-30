@@ -3,7 +3,7 @@ export interface SimpleUserDto {
   id: string;
   firstName: string;
   lastName: string;
-  preferredUsername: string;
+  preferredUsername?: string;
   name?: string;
 }
 
@@ -91,7 +91,7 @@ export interface UserDto {
   email: string;
   firstName: string;
   lastName: string;
-  preferredUsername: string;
+  preferredUsername?: string;
   createdAt: string;
   updatedAt: string;
   profile?: UserProfileDto;
