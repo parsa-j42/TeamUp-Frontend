@@ -12,7 +12,7 @@ export function NavBar() {
     const [searchValue, setSearchValue] = useState('');
 
     const handleLogoClick = () => {
-        navigate('/landing');
+        navigate('/');
     };
 
     // Handle search initiation (e.g., on Enter key press)

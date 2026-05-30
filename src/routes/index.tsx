@@ -34,7 +34,7 @@ export const AppRouter: React.FC = () => {
     return (
         <Routes>
             {/* Public routes */}
-            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/AboutUs" element={<AboutUsPage />} />
             <Route path="/Privacy" element={<PrivacyAndTermsPage />} />
             <Route path="/SignUp" element={<SignUpPage />} />
@@ -54,8 +54,8 @@ export const AppRouter: React.FC = () => {
                 <Route path="/my-project-details/:projectId" element={<MyProjectDetailsPage />} />
             </Route>
 
-            {/* Redirect root to landing */}
-            <Route path="/" element={<Navigate to="/landing" replace />} />
+            {/* Unknown routes -> landing */}
+            <Route path="*" element={<Navigate to="/" replace />} />
 
             {/* 404 route */}
             {/*<Route path="*" element={<NotFound />} />*/}

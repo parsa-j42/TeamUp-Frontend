@@ -114,7 +114,7 @@ export default function LogInPage() {
     };
     // --- END MODIFIED ---
 
-    const handleCancel = () => { navigate("/landing"); };
+    const handleCancel = () => { navigate("/"); };
 
     return (
         <GradientBackground className={styles.container}

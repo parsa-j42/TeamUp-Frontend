@@ -240,7 +240,7 @@ export default function SignUpPage() {
         setErrors({});
     };
 
-    const handleCancel = () => { navigate("/landing"); };
+    const handleCancel = () => { navigate("/"); };
 
     // --- Dynamic Content ---
     const getStepContent = () => {
