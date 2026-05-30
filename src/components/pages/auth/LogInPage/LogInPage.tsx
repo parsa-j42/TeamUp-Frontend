@@ -120,7 +120,7 @@ export default function LogInPage() {
         <GradientBackground className={styles.container}
                             gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%, rgba(55, 197, 231, 0.3) 35%,
                              rgba(255, 255, 255, 1) 100%">
-            <Paper m="xl" px="xl" shadow="sm" w="600px" radius="lg" pt="50px" pb="40px">
+            <Paper my="xl" px="clamp(20px, 5vw, 32px)" shadow="sm" w="min(600px, calc(100vw - 32px))" radius="lg" pt="50px" pb="40px">
                 <Stack justify="flex-end" align="center" mt="lg" mb="xl" pb="xs">
                     <Title order={2} size="30px" fw={600}>Sign In</Title>
                     {/* Display message from confirmation page if present */}

@@ -14,7 +14,7 @@
     font-weight: 500;
 }
 
-/* Additional styling for control elements if needed */
+/* Horizontal: share a single vertical border between segments. */
 .control {
     border: 2px solid #37c5e7;
     border-right: 0;
@@ -22,6 +22,16 @@
 
 .control:last-of-type {
     border-right: 2px solid #37c5e7;
+}
+
+/* Vertical (mobile): segments stack, so share a single horizontal border instead. */
+.root[data-orientation="vertical"] .control {
+    border: 2px solid #37c5e7;
+    border-bottom: 0;
+}
+
+.root[data-orientation="vertical"] .control:last-of-type {
+    border-bottom: 2px solid #37c5e7;
 }
 
 /* For the active indicator */

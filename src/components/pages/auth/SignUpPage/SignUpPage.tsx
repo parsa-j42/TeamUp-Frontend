@@ -266,10 +266,10 @@ export default function SignUpPage() {
     return (
         <GradientBackground className={styles.container} gradient="linear-gradient(180deg, rgba(55, 197, 231, 0.3) 0%,
                             rgba(55, 197, 231, 0.3) 35%, rgba(255, 255, 255, 1) 100%">
-            <Paper m="7%" p="xl" shadow="sm" w="600px" radius="lg">
+            <Paper my="xl" p="clamp(16px, 4vw, 32px)" shadow="sm" w="min(600px, calc(100vw - 32px))" radius="lg">
                 {/* Stepper Component */}
                 <Stepper
-                    mx="70px"
+                    mx="clamp(8px, 8vw, 70px)"
                     color="mainRed.6"
                     size="xs"
                     active={active}
@@ -288,7 +288,7 @@ export default function SignUpPage() {
 
                 {/* Title and Description */}
                 <Stack justify="flex-end" align="center" mt="xl">
-                    <Title order={2} size="30px" fw={600}>{title}</Title>
+                    <Title order={2} size="clamp(1.35rem, 5vw, 30px)" fw={600} ta="center">{title}</Title>
                     <Text size="15px" lh="1.5" ta="center">{description}</Text>
                 </Stack>
 

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Stack, Title, Text, Group, PinInput, Anchor, useMantineTheme,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconMail } from '@tabler/icons-react';
 import styles from './ConfirmSignUpPage.module.css';
 import RoundedButton from "@components/shared/RoundedButton/RoundedButton.tsx";
@@ -19,6 +20,9 @@ export default function ConfirmSignUpPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useMantineTheme();
+
+    // Six "lg" boxes overflow a narrow phone, so shrink them there.
+    const isNarrow = useMediaQuery('(max-width: 30em)');
 
     const [username] = useState<string>(location.state?.username || '');
     const [code, setCode] = useState<string>('');
@@ -124,14 +128,14 @@ export default function ConfirmSignUpPage() {
                 rgba(55, 197, 231, 0.3) 70%, rgba(255, 255, 255, 1) 100%)">
             <Stack align="center" justify="center" style={{ minHeight: '100vh', padding: '20px' }}>
                 <Box style={emailIconContainerStyle}> <IconMail {...emailIconStyle} /> </Box>
-                <Title order={2} size="32px" fw={400} c="mainBlue.6" ta="center"> Verify Email Address </Title>
+                <Title order={2} size="clamp(1.5rem, 6vw, 32px)" fw={400} c="mainBlue.6" ta="center"> Verify Email Address </Title>
                 <Text size="15px" lh={1.5} ta="center" maw={450} mb="lg">
                     We sent a verification code to{' '} <Text span fw={500}>{username || 'your email'}</Text>.{' '}
                     Please enter the 6-digit code below. <br />
                     <Anchor component="button" type="button" onClick={handleChangeEmail} size="sm"> Click here </Anchor>
                     {' '}if this is not the correct email address.
                 </Text>
-                <PinInput type="number" length={6} size="lg" value={code} onChange={handleCodeChange} error={!!errors.code || !!errors.apiError} autoFocus aria-label="Verification Code" />
+                <PinInput type="number" length={6} size={isNarrow ? 'sm' : 'lg'} value={code} onChange={handleCodeChange} error={!!errors.code || !!errors.apiError} autoFocus aria-label="Verification Code" />
                 {errors.code && <Text c="red" size="sm" ta="center" mt="xs">{errors.code}</Text>}
                 {errors.apiError && <Text c="red" size="sm" ta="center" mt="xs">{errors.apiError}</Text>}
                 {resendMessage && <Text c={resendMessage.startsWith('Failed') ? 'red' : 'green'} size="sm" ta="center" mt="xs">{resendMessage}</Text>}
