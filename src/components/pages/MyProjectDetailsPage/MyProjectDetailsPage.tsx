@@ -349,7 +349,7 @@ export default function MyProjectDetailsPage() {
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="xl">
                             {projectData.members.map((member: ProjectMemberDto) => (
                                 <Stack key={member.userId} className={classes.memberCard} gap="xs">
-                                    <Avatar src={undefined} size={80} radius="50%" className={classes.memberAvatar}> <IconPhoto size="2rem" color={theme.colors.gray[5]} /> </Avatar>
+                                    <Avatar src={member.user.avatarUrl || undefined} size={80} radius="50%" className={classes.memberAvatar}> <IconPhoto size="2rem" color={theme.colors.gray[5]} /> </Avatar>
                                     <Text
                                         className={classes.memberName}
                                         style={{ cursor: 'pointer' }}
@@ -358,7 +358,7 @@ export default function MyProjectDetailsPage() {
                                         {getUserDisplayName(member.user)}
                                     </Text>
                                     <Text className={classes.memberRole}>{member.role}</Text>
-                                    <Text className={classes.memberDescription}> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </Text>
+                                    {member.user.bio && <Text className={classes.memberDescription}>{member.user.bio}</Text>}
                                     <Group justify="center" gap="sm" className={classes.memberActions}>
                                         <Tooltip label="Send Message (Not Implemented)"><ActionIcon variant="subtle" color="gray"><IconMail size={18} /></ActionIcon></Tooltip>
                                         <Tooltip label="View Profile"><ActionIcon variant="subtle" color="gray" onClick={() => navigate(`/profile/${member.userId}`)}><IconArrowRight size={18} /></ActionIcon></Tooltip>

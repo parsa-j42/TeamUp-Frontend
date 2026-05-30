@@ -179,7 +179,7 @@ export default function ProjectPage() {
                         {/* Project Owner Section */}
                         <Paper shadow="sm" radius="md">
                             <Group pt={lgPadding} pb={lgPadding} pr={lgPadding} pl="9%">
-                                <Avatar src={undefined /* owner.avatarUrl? */} radius="xl" size="lg" color="gray" />
+                                <Avatar src={owner.avatarUrl || undefined} radius="xl" size="lg" color="gray" />
                                 <Stack gap={0}>
                                     <Text size="sm" c="dimmed">Project Owner</Text>
                                     <Text fw={500}>{ownerName}</Text> {/* Updated name format */}
@@ -195,7 +195,7 @@ export default function ProjectPage() {
                                 <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="sm">
                                     {members.map((member) => (
                                         <Stack key={member.id} align="left" ta="left" gap="xs">
-                                            <Avatar src={undefined /* member.user.avatarUrl? */} radius="xl" size="lg" color="gray" />
+                                            <Avatar src={member.user.avatarUrl || undefined} radius="xl" size="lg" color="gray" />
                                             <Text
                                                 fw={500} 
                                                 mt="xs" 

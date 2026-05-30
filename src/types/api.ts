@@ -5,6 +5,9 @@ export interface SimpleUserDto {
   lastName: string;
   preferredUsername?: string;
   name?: string;
+  // Profile bits embedded for rendering avatars/bios on project pages.
+  avatarUrl?: string;
+  bio?: string;
 }
 
 // --- Skills ---
