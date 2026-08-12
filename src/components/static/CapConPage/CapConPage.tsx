@@ -39,7 +39,7 @@ const teamMembers = [
     {
         name: 'Parsa Jafari',
         title: 'Software Developer',
-        linkedin: 'https://www.linkedin.com/in/parsa-j42/',
+        linkedin: 'https://www.linkedin.com/in/parsaj-dev/',
         initial: 'P'
     },
 ];

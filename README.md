@@ -15,7 +15,7 @@
 ### Environment Setup
 1. Clone this repository.
 ```bash
-git clone https://github.com/parsa-j42/TeamUp-Frontend.git
+git clone https://github.com/parsaj-dev/TeamUp-Frontend.git
 cd ./TeamUp-Frontend
 ```
 2. Install dependencies
